@@ -1,0 +1,557 @@
+{
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "size": "mega",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "扣繳相關資源",
+            "size": "xl",
+            "align": "center",
+            "color": "#1B222C",
+            "weight": "bold"
+          },
+          {
+            "type": "separator",
+            "color": "#AB8C4B",
+            "margin": "sm"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "xs",
+            "contents": [
+              {
+                "type": "text",
+                "text": "勞健保及勞退分攤表",
+                "align": "start",
+                "size": "md",
+                "wrap": true,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "請點選年份連結至外部網站",
+                "align": "start",
+                "size": "xs",
+                "color": "#4A525E"
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "uri",
+                  "label": "民國 115 年三合一對照表",
+                  "uri": "https://tool.kscpb.com/labor-insurance/"
+                },
+                "style": "primary",
+                "margin": "sm",
+                "color": "#8A6E33",
+                "height": "sm"
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "margin": "md",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "xs",
+            "contents": [
+              {
+                "type": "text",
+                "text": "租金扣繳與補充保費",
+                "align": "start",
+                "size": "md",
+                "wrap": true,
+                "weight": "bold"
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "uri",
+                  "label": "租金試算",
+                  "uri": "https://tool.kscpb.com/rent/"
+                },
+                "style": "primary",
+                "margin": "sm",
+                "color": "#8A6E33",
+                "height": "sm"
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "margin": "md",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "spacing": "xs",
+            "contents": [
+              {
+                "type": "text",
+                "text": "薪資所得扣繳試算",
+                "align": "start",
+                "size": "md",
+                "wrap": true,
+                "weight": "bold"
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "uri",
+                  "label": "薪資扣繳試算",
+                  "uri": "https://tool.kscpb.com/withholding/"
+                },
+                "style": "primary",
+                "margin": "sm",
+                "color": "#8A6E33",
+                "height": "sm"
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "margin": "md",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "text",
+            "text": "薪資所得扣繳稅額表&繳款書",
+            "align": "start",
+            "size": "md",
+            "weight": "bold",
+            "margin": "sm"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "uri",
+              "uri": "https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0",
+              "label": "下載稅額表及說明"
+            },
+            "style": "primary",
+            "margin": "sm",
+            "height": "sm",
+            "color": "#8A6E33"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "uri",
+              "uri": "https://www.etax.nat.gov.tw/etwmain/etw144w/151",
+              "label": "薪資所得扣繳稅額繳款書"
+            },
+            "style": "primary",
+            "margin": "sm",
+            "height": "sm",
+            "color": "#8A6E33"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "postback",
+              "label": "扣繳減免罰標準",
+              "data": "/扣繳減免罰標準"
+            },
+            "style": "primary",
+            "margin": "sm",
+            "height": "sm",
+            "color": "#8A6E33"
+          }
+        ]
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "mega",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "115 (2026) 年度標準",
+            "weight": "bold",
+            "size": "xl",
+            "color": "#1B222C",
+            "align": "center"
+          },
+          {
+            "type": "separator",
+            "color": "#AB8C4B",
+            "margin": "sm"
+          },
+          {
+            "type": "text",
+            "text": "居住者 (Resident)",
+            "weight": "bold",
+            "size": "md",
+            "color": "#1B222C"
+          },
+          {
+            "type": "separator",
+            "margin": "xs",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "md",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "每月(有填表，照表扣)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $90,501",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "每月(未填表，5%)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $40,020",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "兼職薪資/非每月給付的獎金(5%)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $90,501",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "非居住者 (Non-Resident)",
+            "weight": "bold",
+            "size": "md",
+            "margin": "xxl",
+            "color": "#8A6E33"
+          },
+          {
+            "type": "separator",
+            "margin": "xs",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "md",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "低薪 (≤$44,250)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 2,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "扣繳 6%",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "高薪 (>$44,250)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 2,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "扣繳 18%",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "margin": "lg",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "text",
+            "text": "上列為 0 位扶養親屬。扶養人數增加，起扣點會提高（1 位 99,001、2 位 107,501…）。",
+            "size": "xs",
+            "color": "#8C949E",
+            "wrap": true,
+            "margin": "md"
+          }
+        ]
+      }
+    },
+    {
+      "type": "bubble",
+      "size": "mega",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "contents": [
+          {
+            "type": "text",
+            "text": "114 (2025) 年度標準",
+            "weight": "bold",
+            "size": "xl",
+            "color": "#1B222C",
+            "align": "center"
+          },
+          {
+            "type": "separator",
+            "color": "#AB8C4B",
+            "margin": "sm"
+          },
+          {
+            "type": "text",
+            "text": "居住者 (Resident)",
+            "weight": "bold",
+            "size": "md",
+            "color": "#1B222C"
+          },
+          {
+            "type": "separator",
+            "margin": "xs",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "md",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "每月(有填表，照表扣)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $88,501",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "每月(未填表，5%)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $40,020",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "兼職薪資/非每月給付的獎金(5%)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 4,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "起扣 $88,501",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "text": "非居住者 (Non-Resident)",
+            "weight": "bold",
+            "size": "md",
+            "margin": "xxl",
+            "color": "#8A6E33"
+          },
+          {
+            "type": "separator",
+            "margin": "xs",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "margin": "md",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "低薪 (≤$42,885)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 2,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "扣繳 6%",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "高薪 (>$42,885)",
+                    "size": "sm",
+                    "color": "#4A525E",
+                    "flex": 2,
+                    "wrap": true
+                  },
+                  {
+                    "type": "text",
+                    "text": "扣繳 18%",
+                    "size": "sm",
+                    "align": "end",
+                    "flex": 3,
+                    "weight": "bold"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "separator",
+            "margin": "lg",
+            "color": "#C9CFD6"
+          },
+          {
+            "type": "text",
+            "text": "114 年度為歷史資料，試算工具已更新為 115 年度。",
+            "size": "xs",
+            "color": "#8C949E",
+            "wrap": true,
+            "margin": "md"
+          },
+          {
+            "type": "button",
+            "action": {
+              "type": "uri",
+              "label": "114 年度稅額表",
+              "uri": "https://www.ntbna.gov.tw/download/f1284d1525174e84abd7841a9860b055"
+            },
+            "style": "secondary",
+            "margin": "md",
+            "height": "sm"
+          }
+        ]
+      }
+    }
+  ]
+}

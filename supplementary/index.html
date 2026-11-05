@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>二代健保補充保費試算（單位／個人）｜tool.kscpb.com</title>
+<meta name="description" content="115 年度二代健保補充保費試算。單位：薪資總額與投保金額差額 × 2.11%；個人：獎金、兼職薪資、執行業務、股利、利息五項所得。支援職業工會投保免扣判定。租金另有專頁。" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>" />
+<style>
+  :root{
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff;
+    --brand:#1d4ed8; --brand-2:#0e7490;
+    --unit:#b45309; --unit-bg:#fffbeb;
+    --person:#0e7490; --person-bg:#ecfeff;
+    --ok:#047857; --ok-bg:#ecfdf5;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -12px rgba(15,23,42,.18);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",system-ui,-apple-system,sans-serif;
+    line-height:1.6; padding-bottom:88px;
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:24px 16px 40px}
+
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#134e4a 55%,#0e7490 100%);
+    color:#fff;border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  header.hero::after{
+    content:"";position:absolute;inset:auto -60px -120px auto;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle,rgba(45,212,191,.32),transparent 65%);
+  }
+  .backwrap{margin-bottom:14px;position:relative;z-index:2}
+  .backlink{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#cbd5e1;font-size:13px;font-weight:700;text-decoration:none;
+    padding:5px 12px 5px 9px;border-radius:999px;transition:.15s;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  }
+  .backlink:hover{background:rgba(255,255,255,.18);color:#fff}
+  .year-tag{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.04em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    padding:5px 12px;border-radius:999px;margin-bottom:12px;
+  }
+  header.hero h1{margin:0;font-size:clamp(21px,3.4vw,29px);line-height:1.35;position:relative;z-index:2}
+  header.hero p{margin:10px 0 0;color:#cbd5e1;font-size:14.5px;max-width:58ch;position:relative;z-index:2;text-wrap:pretty;line-break:strict}
+  .btn-print{
+    position:absolute;right:20px;top:20px;z-index:2;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+    border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-print:hover{background:rgba(255,255,255,.24)}
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+  section{margin-top:18px}
+  .pad{padding:20px 22px}
+  h2.sec{font-size:15px;margin:0 0 14px;color:var(--ink-2);letter-spacing:.06em;font-weight:800;display:flex;align-items:center;gap:9px}
+  h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand-2))}
+  h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
+
+  /* ---------- 主分頁 ---------- */
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+  .tab{
+    border:2px solid var(--line);background:#f8fafc;border-radius:14px;padding:15px 17px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;position:relative;
+  }
+  .tab:hover{border-color:#99f6e4;background:#f0fdfa}
+  .tab.on{border-color:var(--person);background:var(--person-bg);box-shadow:0 0 0 4px rgba(14,116,144,.10)}
+  .tab .t{display:block;font-size:15px;font-weight:800;color:var(--ink);margin-bottom:3px}
+  .tab.on .t{color:var(--person)}
+  .tab .d{display:block;font-size:11.5px;color:var(--muted);line-height:1.5}
+  .tab .badge{
+    position:absolute;right:12px;top:12px;font-size:10px;font-weight:800;
+    background:var(--person);color:#fff;padding:1px 6px;border-radius:999px;opacity:0;transition:.15s;
+  }
+  .tab.on .badge{opacity:1}
+  .tab.unit.on{border-color:var(--unit);background:var(--unit-bg);box-shadow:0 0 0 4px rgba(180,83,9,.10)}
+  .tab.unit.on .t{color:var(--unit)}
+  .tab.unit .badge{background:var(--unit)}
+
+  /* ---------- 輸入 ---------- */
+  .field{display:grid;gap:8px;min-width:0}
+  .field label{font-size:13px;font-weight:700;color:var(--ink-2)}
+  .money{min-width:0;
+    display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;
+    padding:6px 14px;background:#f8fafc;transition:.15s;
+  }
+  .money:focus-within{border-color:var(--person);background:#fff;box-shadow:0 0 0 4px rgba(14,116,144,.12)}
+  .money.unit:focus-within{border-color:var(--unit);box-shadow:0 0 0 4px rgba(180,83,9,.12)}
+  .money .cur{font-size:16px;color:var(--muted);font-weight:700}
+  .money input{
+    flex:1;min-width:0;border:0;background:transparent;outline:none;
+    font-size:clamp(24px,4.4vw,31px);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+    font-variant-numeric:tabular-nums;padding:6px 0;
+  }
+  .money input::-webkit-outer-spin-button,.money input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .money input[type=number]{-moz-appearance:textfield}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .row2 > *{min-width:0}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:999px;
+    padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-variant-numeric:tabular-nums;
+  }
+  .chip:hover{border-color:#5eead4;background:#f0fdfa;color:#0e7490}
+  .chip.on{background:#0e7490;border-color:#0e7490;color:#fff}
+  .note{font-size:13px;color:var(--muted);margin:14px 0 0;padding-left:14px;border-left:3px solid var(--line);line-height:1.7}
+  .note b{color:var(--ink-2)}
+
+  /* ---------- 所得類型選擇 ---------- */
+  .types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .type{
+    border:2px solid var(--line);background:#f8fafc;border-radius:12px;padding:11px 13px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;
+  }
+  .type:hover{border-color:#a5f3fc;background:#ecfeff}
+  .type.on{border-color:var(--person);background:var(--person-bg);box-shadow:0 0 0 3px rgba(14,116,144,.08)}
+  .type .tn{display:block;font-size:13.5px;font-weight:800;color:var(--ink)}
+  .type.on .tn{color:var(--person)}
+  .type .tm{display:block;font-size:11px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
+
+  /* ---------- 身分開關 ---------- */
+  .unionbox{
+    margin-top:16px;border:1px solid #fde68a;background:var(--unit-bg);border-radius:12px;
+    padding:14px 16px;display:flex;align-items:flex-start;gap:12px;
+  }
+  .unionbox .chk{margin-top:3px;width:18px;height:18px;accent-color:var(--unit);cursor:pointer;flex:0 0 18px}
+  .unionbox .txt{font-size:13px;color:#78350f;line-height:1.65}
+  .unionbox .txt b{color:#92400e}
+  .unionbox .lb{font-size:13.5px;font-weight:800;color:#92400e;cursor:pointer;display:block;margin-bottom:2px}
+
+  /* ---------- 結果 ---------- */
+  .results{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .res{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .res::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .res.pay{background:linear-gradient(180deg,#fef2f2,#fff 62%)}
+  .res.pay::before{background:#b91c1c}
+  .res.keep{background:linear-gradient(180deg,var(--ok-bg),#fff 62%)}
+  .res.keep::before{background:var(--ok)}
+  .res .who{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .res .who h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.02em}
+  .res.pay .who h3{color:#b91c1c}
+  .res.keep .who h3{color:var(--ok)}
+  .res .who .sub{font-size:12px;color:var(--muted);font-weight:600}
+  .res .amt{margin:10px 0 2px;font-size:clamp(30px,5.8vw,42px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .res.pay .amt{color:#b91c1c}
+  .res.keep .amt{color:var(--ok)}
+  .res .amt small{font-size:14px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0}
+  .res .brk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink-2)}
+  .res .brk div{display:flex;justify-content:space-between;gap:10px;padding:2.5px 0;font-variant-numeric:tabular-nums}
+  .res .brk span:last-child{font-weight:700}
+
+  /* ---------- 表格 ---------- */
+  .sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sechead h2.sec{margin:0}
+  .btn-copy{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:10px;
+    padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:#5eead4;background:#f0fdfa;color:#0e7490}
+  .btn-copy.done{background:#d1fae5;border-color:#6ee7b7;color:#047857}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:10px 12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;white-space:normal}
+  thead th{background:#f8fafc;font-size:12.5px;color:var(--muted);letter-spacing:.03em;font-weight:800;border-bottom:2px solid var(--line)}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#f8fafc;font-weight:900;font-size:15px;border-top:2px solid var(--line)}
+  .rate{display:block;font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:0}
+  .zero{color:#cbd5e1}
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;
+    background:#fee2e2;color:#b91c1c;
+  }
+  .tag.free{background:#d1fae5;color:#047857}
+  .tag.na{background:#f1f5f9;color:#94a3b8}
+
+  .warn{
+    margin-top:16px;background:var(--unit-bg);border:1px solid #fde68a;border-left:4px solid var(--unit);
+    border-radius:12px;padding:13px 16px;font-size:13px;color:#78350f;line-height:1.75;
+  }
+  .warn b{color:#92400e}
+
+  details{margin-top:18px}
+  details > summary{
+    cursor:pointer;list-style:none;font-weight:800;font-size:14.5px;color:var(--ink-2);
+    padding:16px 22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  details > summary::-webkit-details-marker{display:none}
+  details > summary .arw{transition:.2s;color:var(--muted)}
+  details[open] > summary .arw{transform:rotate(180deg)}
+  details[open] > summary{border-radius:var(--radius) var(--radius) 0 0;border-bottom:0;box-shadow:none}
+  details .body{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--radius) var(--radius);padding:18px 22px 22px;box-shadow:var(--shadow)}
+  details .body h4{margin:16px 0 6px;font-size:13.5px;color:var(--ink-2);font-weight:800}
+  details .body h4:first-child{margin-top:0}
+  details .body p{margin:0 0 8px;font-size:13px;color:var(--ink-2);line-height:1.75}
+  details .body ul{margin:0 0 8px;padding-left:1.3em;font-size:13px;color:var(--ink-2);line-height:1.8}
+  details .body a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+  details .body .lim{
+    list-style:none;margin:0 0 10px;padding:12px 16px;border-radius:10px;
+    background:#ecfeff;border:1px solid #a5f3fc;font-variant-numeric:tabular-nums;line-height:2;
+  }
+  footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.8}
+  footer.dis b{color:var(--ink-2)}
+
+  /* ---------- 固定列 ---------- */
+  .sticky{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(15,23,42,.96);
+    backdrop-filter:blur(10px);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,64px);
+    box-shadow:0 -8px 24px rgba(15,23,42,.22);border-top:1px solid rgba(255,255,255,.12);
+  }
+  .sticky .it{display:flex;flex-direction:column;align-items:center;line-height:1.25}
+  .sticky .it .k{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.04em}
+  .sticky .it .v{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .sticky .it.a .v{color:#fca5a5}
+  .sticky .it.b .v{color:#6ee7b7}
+  .sticky .lvbox{font-size:11px;color:#94a3b8;text-align:center;border-left:1px solid rgba(255,255,255,.14);padding-left:clamp(12px,4vw,28px);font-variant-numeric:tabular-nums}
+  .sticky .lvbox b{display:block;color:#e2e8f0;font-size:13px}
+
+  @media (max-width:780px){
+    .results,.row2,.tabs{grid-template-columns:1fr}
+    .types{grid-template-columns:1fr 1fr}
+    .pad{padding:18px 16px}
+    .res{padding:18px}
+    .btn-print{display:none}
+  }
+  @media (max-width:640px){
+    table{font-size:12.5px}
+    th,td{padding:8px 7px}
+    .rate{font-size:10.5px}
+    tr.total td{font-size:13.5px}
+    .types{grid-template-columns:1fr}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .sticky,.chips,.tab .badge,.btn-print,.btn-copy,.backwrap{display:none!important}
+    .card,.res,header.hero,details>summary,details .body{box-shadow:none;border:1px solid #cbd5e1}
+    header.hero{background:#f1f5f9!important;color:#0f172a}
+    header.hero p{color:#334155}
+    .tab{display:none}
+    .tab.on{display:block;border-color:#94a3b8}
+    details .body{display:block}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="btn-print" onclick="window.print()">列印／存 PDF</button>
+    <div class="backwrap"><a class="backlink" href="../">← 回工具列表</a></div>
+    <div class="year-tag">115 年度 ・ 費率 2.11%</div>
+    <h1>二代健保補充保費試算</h1>
+    <p>補充保費分兩邊算：<b>單位</b>是薪資總額超過投保金額的差額，<b>個人</b>是五項所得就源扣取。選好身分與所得類型，立即算出應繳金額。租金請用租金專頁。</p>
+  </header>
+
+  <!-- 主分頁 -->
+  <section class="card pad">
+    <h2 class="sec">步驟 1 ・ 要算哪一邊</h2>
+    <div class="tabs">
+      <button class="tab unit on" id="tabUnit" type="button">
+        <span class="badge">已選</span>
+        <span class="t">單位（雇主）</span>
+        <span class="d">每月薪資總額 − 受僱者投保金額總額，差額 × 2.11%</span>
+      </button>
+      <button class="tab" id="tabPerson" type="button">
+        <span class="badge">已選</span>
+        <span class="t">個人（被保險人）</span>
+        <span class="d">五項所得就源扣取：獎金、兼職薪資、執行業務、股利、利息</span>
+      </button>
+    </div>
+
+    <!-- ========== 單位 ========== -->
+    <div id="unitSection">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 輸入金額</h2>
+      <div class="row2">
+        <div class="field">
+          <label for="payrollTotal">每月給付薪資所得總額</label>
+          <div class="money unit">
+            <span class="cur">NT$</span>
+            <input id="payrollTotal" type="number" inputmode="numeric" min="0" step="1" value="600000" autocomplete="off" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="insuredTotal">受僱者當月投保金額總額</label>
+          <div class="money unit">
+            <span class="cur">NT$</span>
+            <input id="insuredTotal" type="number" inputmode="numeric" min="0" step="1" value="550000" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+      <p class="note" id="unitNote"></p>
+    </div>
+
+    <!-- ========== 個人 ========== -->
+    <div id="personSection" style="display:none">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 選擇所得類型</h2>
+      <div class="types" id="types"></div>
+
+      <div class="unionbox">
+        <input type="checkbox" class="chk" id="unionMember" />
+        <div>
+          <label class="lb" for="unionMember">所得人是在「職業工會」投保（第二類被保險人）</label>
+          <div class="txt">
+            依健保署規定，職業工會會員的<b>薪資所得</b>與<b>執行業務所得</b>免扣補充保費；
+            但<b>股利、利息、租金</b>等其他項目仍要扣。眷屬的兼職所得也不適用這項免扣。
+          </div>
+        </div>
+      </div>
+
+      <h2 class="sec" style="margin-top:22px">步驟 3 ・ 輸入金額</h2>
+
+      <!-- 一般所得 -->
+      <div id="simpleInput">
+        <div class="field">
+          <label for="incomeAmt" id="incomeLabel">單次給付金額</label>
+          <div class="money">
+            <span class="cur">NT$</span>
+            <input id="incomeAmt" type="number" inputmode="numeric" min="0" step="1" value="30000" autocomplete="off" />
+          </div>
+        </div>
+        <div class="chips" id="chips"></div>
+      </div>
+
+      <!-- 獎金（需要額外欄位） -->
+      <div id="bonusInput" style="display:none">
+        <div class="row2">
+          <div class="field">
+            <label for="monthlyInsured">月投保金額</label>
+            <div class="money">
+              <span class="cur">NT$</span>
+              <input id="monthlyInsured" type="number" inputmode="numeric" min="0" step="1" value="45800" autocomplete="off" />
+            </div>
+          </div>
+          <div class="field">
+            <label for="bonusPaid">今年已領獎金累計</label>
+            <div class="money">
+              <span class="cur">NT$</span>
+              <input id="bonusPaid" type="number" inputmode="numeric" min="0" step="1" value="0" autocomplete="off" />
+            </div>
+          </div>
+        </div>
+        <div class="field" style="margin-top:16px">
+          <label for="bonusThis">本次獎金金額</label>
+          <div class="money">
+            <span class="cur">NT$</span>
+            <input id="bonusThis" type="number" inputmode="numeric" min="0" step="1" value="200000" autocomplete="off" />
+          </div>
+        </div>
+        <div class="chips" id="bonusChips"></div>
+      </div>
+
+      <p class="note" id="personNote"></p>
+    </div>
+  </section>
+
+  <!-- 結果 -->
+  <section class="results" aria-live="polite">
+    <div class="res pay">
+      <div class="who">
+        <h3>應繳補充保費</h3>
+        <span class="sub" id="paySub">單位負擔</span>
+      </div>
+      <div class="amt" id="payAmt">—<small>元／月</small></div>
+      <div class="brk" id="payBrk"></div>
+    </div>
+
+    <div class="res keep">
+      <div class="who">
+        <h3>實際到手</h3>
+        <span class="sub" id="keepSub">差額留在公司</span>
+      </div>
+      <div class="amt" id="keepAmt">—<small>元</small></div>
+      <div class="brk" id="keepBrk"></div>
+    </div>
+  </section>
+
+  <!-- 明細 -->
+  <section class="card pad" style="margin-top:16px">
+    <div class="sechead">
+      <h2 class="sec">計算明細 <span class="hint" id="detailHead"></span></h2>
+      <button class="btn-copy" id="copyBtn" type="button">複製試算結果</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>金額／數值</th>
+            <th>說明</th>
+          </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+    <div class="warn" id="warnBox" style="display:none"></div>
+  </section>
+
+  <!-- 六項所得一覽 -->
+  <section class="card pad">
+    <h2 class="sec">六項所得的下限與上限 <span class="hint">健保署公告</span></h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th>計費項目</th><th>下限</th><th>上限</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>全年累計超過投保金額 4 倍部分的獎金</td><td>無</td><td>單次 1,000 萬元</td></tr>
+          <tr><td>兼職薪資所得<span class="tag">注意</span></td><td><b>達基本工資 29,500 元</b></td><td>單次 1,000 萬元</td></tr>
+          <tr><td>執行業務收入</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
+          <tr><td>股利所得</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
+          <tr><td>利息所得</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">
+      <b>兼職薪資的下限與其他五項不同</b>：不是 20,000 元，而是「達基本工資」（115 年為 29,500 元）。
+      兼職領 25,000 元看起來超過 2 萬，但未達 29,500 元，<b>免扣</b>補充保費。
+    </p>
+  </section>
+
+  <!-- 說明 -->
+  <details>
+    <summary>
+      <span>計算方式、工會投保規則與法源</span>
+      <span class="arw">▾</span>
+    </summary>
+    <div class="body">
+      <h4>一、單位（雇主）的補充保費</h4>
+      <p>投保單位每月支付的薪資所得總額（所得稅格式代號 50、79A、79B），
+      與受僱者當月投保金額總額之間的<b>差額</b>，按費率計算：</p>
+      <ul>
+        <li><b>(每月給付薪資所得總額 − 受僱者當月投保金額總額) × 2.11%</b></li>
+        <li>差額為 0 或負數時，不用繳。</li>
+        <li>常見情況：發年終獎金、績效獎金、加班費等未列入投保金額的項目時，就會產生差額。</li>
+      </ul>
+
+      <h4>二、個人（被保險人）的六項所得</h4>
+      <p>由扣費單位（給付的公司在給付時）按費率 2.11% 就源扣取。六項中，
+      本頁計算以下五項：</p>
+      <ul>
+        <li>全年累計超過當月投保金額 <b>4 倍</b>部分的獎金</li>
+        <li><b>兼職薪資所得</b>（下限：達基本工資 29,500 元）</li>
+        <li>執行業務收入（下限 20,000 元）</li>
+        <li>股利所得（下限 20,000 元）</li>
+        <li>利息所得（下限 20,000 元）</li>
+      </ul>
+      <p><b>租金收入</b>另有專頁處理（含扣繳與補充保費、房東實拿／含稅兩種情境）：
+      <a href="../rent/">租金扣繳與補充保費試算</a>。</p>
+
+      <h4>三、職業工會投保（第二類被保險人）的免扣規則</h4>
+      <p>這是最容易搞錯的地方。在職業工會投保的會員，依健保署規定：</p>
+      <ul>
+        <li><b>薪資所得</b>（含兼職薪資）：<b>免扣</b>補充保費。</li>
+        <li><b>執行業務所得</b>（演講費、顧問費、車馬費等）：<b>免扣</b>。</li>
+        <li><b>股利、利息、租金</b>：<b>仍要扣</b>，工會身分不適用。</li>
+        <li>眷屬的兼職薪酬<b>不適用</b>這項免扣（因為眷屬沒有在工會投保）。</li>
+      </ul>
+      <p>會員持工會開立的繳費收據，或工會出具的在保證明，作為免扣的證明文件。</p>
+
+      <h4>四、下限的兩個陷阱</h4>
+      <ul>
+        <li><b>兼職薪資用基本工資（29,500），不是 20,000。</b>這是六項中唯一不同的。</li>
+        <li><b>達下限時以「全額」計算</b>，不是只算超過的部分。
+          例如執行業務收入 25,000 元 → 25,000 × 2.11% = 527 元，不是 (25,000 − 20,000) × 2.11%。</li>
+      </ul>
+
+      <h4>五、獎金的四倍門檻怎麼算</h4>
+      <p>獎金是否要扣，看的是「全年累計」是否超過「當月投保金額的 4 倍」：</p>
+      <ul>
+        <li>四倍門檻 = 月投保金額 × 4</li>
+        <li>只有<b>超過四倍的那一段</b>要扣，不是整筆獎金都扣</li>
+        <li>所以同樣金額的獎金，年初發和年底發，扣的金額可能不同（因為累計基礎不同）</li>
+      </ul>
+
+      <h4>六、繳納期限</h4>
+      <ul>
+        <li>單位：與一般保險費於<b>次月底前</b>一併繳納。</li>
+        <li>個人：扣費單位於給付日<b>次月底前</b>填具繳款書向健保署繳納。</li>
+      </ul>
+
+      <h4>七、法源</h4>
+      <ul>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0060001" target="_blank" rel="noopener noreferrer">全民健康保險法</a>第 31 條（補充保險費計費範圍）</li>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0060027" target="_blank" rel="noopener noreferrer">全民健康保險扣取及繳納補充保險費辦法</a></li>
+        <li><a href="https://www.nhi.gov.tw/ch/cp-4516-74b0f-2613-1.html" target="_blank" rel="noopener noreferrer">健保署：補充保險費計算公式與上、下限</a></li>
+        <li><a href="https://www.nhi.gov.tw/ch/cp-3007-17808-3150-1.html" target="_blank" rel="noopener noreferrer">健保署：職業工會會員依照規定免扣取兼職所得補充保險費</a></li>
+      </ul>
+    </div>
+  </details>
+
+  <footer class="dis">
+    <b>提醒：</b>本頁為試算工具，結果僅供參考，不構成法律或保險建議。實際金額以健保署核定為準。
+  </footer>
+</div>
+
+<!-- 手機固定列 -->
+<div class="sticky" aria-hidden="true">
+  <div class="it a"><span class="k">應繳補充保費</span><span class="v" id="barPay">—</span></div>
+  <div class="lvbox" id="barLv">—</div>
+  <div class="it b"><span class="k" id="barKeepK">實際到手</span><span class="v" id="barKeep">—</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var RATE = 0.0211;
+  var CAP = 10000000;        // 單次上限 1,000 萬
+  var BASE_WAGE = 29500;     // 115 年基本工資
+
+  var nf = new Intl.NumberFormat("zh-TW");
+  var money = function(n){ return nf.format(Math.round(n)); };
+
+  /* 六項所得類型
+     min: 下限金額（達此金額才扣）
+     union: 職業工會投保時是否免扣 */
+  var TYPES = [
+    { id: "bonus",    name: "獎金",       desc: "超過投保金額 4 倍部分", min: 0,        union: false, custom: true },
+    { id: "parttime", name: "兼職薪資",   desc: "下限 = 基本工資 29,500", min: BASE_WAGE, union: true },
+    { id: "practice", name: "執行業務",   desc: "下限 20,000",           min: 20000,    union: true },
+    { id: "dividend", name: "股利",       desc: "下限 20,000",           min: 20000,    union: false },
+    { id: "interest", name: "利息",       desc: "下限 20,000",           min: 20000,    union: false }
+  ];
+
+  var el = {
+    tabUnit: document.getElementById("tabUnit"),
+    tabPerson: document.getElementById("tabPerson"),
+    unitSection: document.getElementById("unitSection"),
+    personSection: document.getElementById("personSection"),
+    payrollTotal: document.getElementById("payrollTotal"),
+    insuredTotal: document.getElementById("insuredTotal"),
+    unitNote: document.getElementById("unitNote"),
+    types: document.getElementById("types"),
+    unionMember: document.getElementById("unionMember"),
+    simpleInput: document.getElementById("simpleInput"),
+    bonusInput: document.getElementById("bonusInput"),
+    incomeAmt: document.getElementById("incomeAmt"),
+    incomeLabel: document.getElementById("incomeLabel"),
+    monthlyInsured: document.getElementById("monthlyInsured"),
+    bonusPaid: document.getElementById("bonusPaid"),
+    bonusThis: document.getElementById("bonusThis"),
+    chips: document.getElementById("chips"),
+    bonusChips: document.getElementById("bonusChips"),
+    personNote: document.getElementById("personNote"),
+    payAmt: document.getElementById("payAmt"),
+    paySub: document.getElementById("paySub"),
+    payBrk: document.getElementById("payBrk"),
+    keepAmt: document.getElementById("keepAmt"),
+    keepSub: document.getElementById("keepSub"),
+    keepBrk: document.getElementById("keepBrk"),
+    detailHead: document.getElementById("detailHead"),
+    detailBody: document.getElementById("detailBody"),
+    warnBox: document.getElementById("warnBox"),
+    copyBtn: document.getElementById("copyBtn"),
+    barPay: document.getElementById("barPay"),
+    barLv: document.getElementById("barLv"),
+    barKeep: document.getElementById("barKeep"),
+    barKeepK: document.getElementById("barKeepK")
+  };
+
+  var state = {
+    side: "unit",          // unit | person
+    type: "parttime",      // 所得類型
+    last: null
+  };
+
+  var CHIPS = {
+    parttime: [20000, 29500, 35000, 50000, 80000],
+    practice: [15000, 20000, 30000, 50000, 100000],
+    dividend: [15000, 20000, 50000, 100000, 500000],
+    interest:  [15000, 20000, 50000, 100000, 500000]
+  };
+
+  /* ---------- 單位計算 ---------- */
+  function calcUnit(payroll, insured){
+    var diff = payroll - insured;
+    if (diff < 0) diff = 0;
+    var fee = Math.round(diff * RATE);
+    return {
+      side: "unit",
+      payroll: payroll, insured: insured, diff: diff,
+      fee: fee, keep: diff - fee, raw: diff * RATE
+    };
+  }
+
+  /* ---------- 個人：一般所得 ---------- */
+  function calcPerson(amount, typeId, isUnion){
+    var t = null;
+    for (var i = 0; i < TYPES.length; i++){ if (TYPES[i].id === typeId) t = TYPES[i]; }
+    if (!t) return null;
+
+    // 職業工會免扣（僅薪資與執行業務）
+    var unionFree = (isUnion && t.union);
+
+    if (unionFree){
+      return {
+        side: "person", typeId: typeId, typeName: t.name,
+        amount: amount, base: 0, fee: 0, keep: amount,
+        unionFree: true, belowMin: false, capped: false, raw: 0
+      };
+    }
+
+    // 達下限才扣，且以全額計算
+    var belowMin = (amount < t.min);
+    var base = belowMin ? 0 : Math.min(amount, CAP);
+    var raw = base * RATE;
+    var fee = Math.round(raw);
+
+    return {
+      side: "person", typeId: typeId, typeName: t.name,
+      amount: amount, base: base, fee: fee, keep: amount - fee,
+      unionFree: false, belowMin: belowMin, capped: amount > CAP, raw: raw,
+      min: t.min
+    };
+  }
+
+  /* ---------- 個人：獎金（四倍門檻） ---------- */
+  function calcBonus(monthlyInsured, paidBefore, thisBonus){
+    var quota = monthlyInsured * 4;              // 四倍門檻
+    var totalBefore = paidBefore;
+    var totalAfter = paidBefore + thisBonus;
+
+    // 超過四倍的部分才計費
+    var overBefore = Math.max(0, totalBefore - quota);
+    var overAfter = Math.max(0, totalAfter - quota);
+    var base = overAfter - overBefore;           // 本次新增的超過金額
+
+    if (base > CAP) base = CAP;                  // 單次上限
+    var raw = base * RATE;
+    var fee = Math.round(raw);
+
+    return {
+      side: "person", typeId: "bonus", typeName: "獎金",
+      monthlyInsured: monthlyInsured, quota: quota,
+      paidBefore: paidBefore, thisBonus: thisBonus, totalAfter: totalAfter,
+      overBefore: overBefore, overAfter: overAfter,
+      amount: thisBonus, base: base, fee: fee, keep: thisBonus - fee,
+      raw: raw, unionFree: false, belowMin: base === 0, capped: base >= CAP,
+      isBonus: true
+    };
+  }
+
+  /* ---------- 渲染 ---------- */
+  function render(){
+    if (state.side === "unit"){
+      renderUnit();
+    } else {
+      renderPerson();
+    }
+  }
+
+  function renderUnit(){
+    var payroll = parseFloat(el.payrollTotal.value) || 0;
+    var insured = parseFloat(el.insuredTotal.value) || 0;
+    var r = calcUnit(payroll, insured);
+    state.last = r;
+
+    el.paySub.textContent = "單位負擔";
+    el.keepSub.textContent = "差額留在公司";
+    el.barKeepK.textContent = "計費差額";
+
+    el.payAmt.innerHTML = money(r.fee) + "<small>元／月</small>";
+    el.keepAmt.innerHTML = money(r.diff) + "<small>元</small>";
+
+    el.payBrk.innerHTML =
+        "<div><span>薪資所得總額</span><span>" + money(r.payroll) + "</span></div>"
+      + "<div><span>投保金額總額</span><span>− " + money(r.insured) + "</span></div>"
+      + "<div><span>計費差額</span><span>" + money(r.diff) + "</span></div>";
+
+    el.keepBrk.innerHTML =
+        "<div><span>計費差額</span><span>" + money(r.diff) + "</span></div>"
+      + "<div><span>費率</span><span>2.11%</span></div>"
+      + "<div><span>補充保費</span><span>− " + money(r.fee) + "</span></div>";
+
+    el.detailHead.textContent = "單位 ・ 薪資總額 " + money(r.payroll) + " 元";
+    el.detailBody.innerHTML =
+        row("每月給付薪資所得總額", "所得稅代號 50、79A、79B", money(r.payroll), "—")
+      + row("受僱者當月投保金額總額", "依投保薪資計算", money(r.insured), "—")
+      + row("計費差額", "薪資總額 − 投保金額總額", money(r.diff), r.diff <= 0 ? "無差額，免繳" : "計費基礎")
+      + row("補充保費", "費率 2.11%", money(r.fee), "次月底前繳納", true);
+
+    el.barPay.textContent = money(r.fee);
+    el.barLv.textContent = "差額 " + money(r.diff);
+    el.barKeep.textContent = money(r.diff);
+
+    var tips = [];
+    if (r.diff <= 0){
+      tips.push("薪資總額未超過投保金額總額，<b>免繳</b>單位補充保費。");
+    } else {
+      tips.push("薪資總額 <b>" + money(r.payroll) + " 元</b> 超過投保金額 <b>" + money(r.insured) + " 元</b>，差額 <b>" + money(r.diff) + " 元</b> × 2.11% ＝ <b>" + money(r.fee) + " 元</b>。");
+    }
+    if (r.diff > 0 && r.diff < r.payroll * 0.05){
+      tips.push("差額不大，通常是加班費、津貼等未列入投保金額的項目造成。");
+    }
+    el.unitNote.innerHTML = tips.join(" ");
+    el.unitNote.style.display = tips.length ? "" : "none";
+
+    warningUnit(r);
+  }
+
+  function row(name, sub, val, note, bold){
+    return "<tr" + (bold ? ' class="total"' : "") + ">"
+      + "<td>" + name + '<span class="rate">' + sub + "</span></td>"
+      + "<td>" + val + "</td>"
+      + "<td>" + note + "</td></tr>";
+  }
+
+  function warningUnit(r){
+    var warns = [];
+    if (r.diff > 0){
+      warns.push("差額的認定以<b>當月</b>為準。若某月沒有獎金或加班費，該月就不會產生差額。");
+      warns.push("投保金額若申報過低（低報），差額會變大、補充保費也會增加，且可能面臨罰則。");
+    }
+    setWarn(warns);
+  }
+
+  function renderPerson(){
+    var t = null;
+    for (var i = 0; i < TYPES.length; i++){ if (TYPES[i].id === state.type) t = TYPES[i]; }
+    if (!t) return;
+
+    var isUnion = el.unionMember.checked;
+    var r, amount;
+
+    if (state.type === "bonus"){
+      var mi = parseFloat(el.monthlyInsured.value) || 0;
+      var paid = parseFloat(el.bonusPaid.value) || 0;
+      var now = parseFloat(el.bonusThis.value) || 0;
+      r = calcBonus(mi, paid, now);
+      amount = now;
+    } else {
+      amount = parseFloat(el.incomeAmt.value) || 0;
+      r = calcPerson(amount, state.type, isUnion);
+    }
+
+    state.last = r;
+
+    el.paySub.textContent = "扣費單位代扣";
+    el.keepSub.textContent = "所得人實拿";
+    el.barKeepK.textContent = "所得人實拿";
+
+    el.payAmt.innerHTML = money(r.fee) + "<small>元</small>";
+    el.keepAmt.innerHTML = money(r.keep) + "<small>元</small>";
+
+    var brk1 = "";
+    if (r.unionFree){
+      brk1 = "<div><span>計費金額</span><span>0（工會投保免扣）</span></div>";
+    } else if (r.isBonus){
+      brk1 = "<div><span>四倍門檻</span><span>" + money(r.quota) + "</span></div>"
+           + "<div><span>超過門檻金額</span><span>" + money(r.base) + "</span></div>";
+    } else {
+      brk1 = "<div><span>單次給付</span><span>" + money(r.amount) + "</span></div>"
+           + "<div><span>計費金額</span><span>" + money(r.base) + "</span></div>";
+    }
+    el.payBrk.innerHTML = brk1;
+
+    el.keepBrk.innerHTML =
+        "<div><span>給付金額</span><span>" + money(r.amount) + "</span></div>"
+      + "<div><span>補充保費</span><span>" + (r.fee ? "− " + money(r.fee) : "0") + "</span></div>"
+      + "<div><span>實拿</span><span>" + money(r.keep) + "</span></div>";
+
+    // 明細
+    var rows = "";
+    if (r.isBonus){
+      rows += row("月投保金額", "計四倍門檻的基礎", money(r.monthlyInsured), "—");
+      rows += row("四倍門檻", "月投保金額 × 4", money(r.quota), "超過此金額才計費");
+      rows += row("今年已領獎金累計", "本次給付前", money(r.paidBefore), "—");
+      rows += row("本次獎金", "本次給付", money(r.thisBonus), "—");
+      rows += row("累計後超過門檻金額", "只算超過的那一段", money(r.base), "計費基礎");
+      rows += row("補充保費", "費率 2.11%", money(r.fee), r.fee ? "次月底前繳納" : "未超過門檻，免扣", true);
+    } else {
+      rows += row("所得類型", t.desc, t.name, r.unionFree ? '<span class="tag free">工會投保免扣</span>' : (r.belowMin ? '<span class="tag">未達下限</span>' : '<span class="tag na">應扣</span>'));
+      rows += row("單次給付金額", "本次給付", money(r.amount), "—");
+      if (r.belowMin && !r.unionFree){
+        rows += row("下限", "達此金額才扣", money(t.min), "未達，免扣");
+      } else {
+        rows += row("計費金額", "達下限以全額計算", money(r.base), r.capped ? "已達上限 1,000 萬" : "—");
+      }
+      rows += row("補充保費", "費率 2.11%", money(r.fee), r.fee ? "次月底前繳納" : "免扣", true);
+    }
+    el.detailBody.innerHTML = rows;
+    el.detailHead.textContent = (r.isBonus ? "獎金" : t.name) + " ・ " + money(r.amount) + " 元";
+
+    el.barPay.textContent = money(r.fee);
+    el.barLv.textContent = r.isBonus ? ("門檻 " + money(r.quota)) : (r.belowMin ? "未達下限" : "2.11%");
+    el.barKeep.textContent = money(r.keep);
+
+    // 提示
+    var tips = [];
+    if (r.unionFree){
+      tips.push("<b>職業工會投保</b>，依規定" + t.name + "<b>免扣</b>補充保費。給付 " + money(r.amount) + " 元全額給所得人。");
+    } else if (r.isBonus){
+      if (r.fee === 0){
+        tips.push("本次獎金 <b>" + money(r.thisBonus) + " 元</b> 加上已領 " + money(r.paidBefore) + " 元，仍未超過四倍門檻 <b>" + money(r.quota) + " 元</b>，<b>免扣</b>。");
+      } else {
+        tips.push("累計 <b>" + money(r.totalAfter) + " 元</b> 超過四倍門檻 <b>" + money(r.quota) + " 元</b>，超過部分 <b>" + money(r.base) + " 元</b> × 2.11% ＝ <b>" + money(r.fee) + " 元</b>。");
+      }
+    } else if (r.belowMin){
+      tips.push("<b>" + t.name + "</b> " + money(r.amount) + " 元未達下限 <b>" + money(t.min) + " 元</b>，<b>免扣</b>補充保費。");
+    } else {
+      tips.push("<b>" + t.name + "</b> " + money(r.amount) + " 元達下限 <b>" + money(t.min) + " 元</b>，以<b>全額</b>計算：" + money(r.base) + " × 2.11% ＝ <b>" + money(r.fee) + " 元</b>。");
+    }
+    el.personNote.innerHTML = tips.join(" ");
+    el.personNote.style.display = tips.length ? "" : "none";
+
+    warningPerson(r, t);
+  }
+
+  function warningPerson(r, t){
+    var warns = [];
+    if (r.unionFree){
+      warns.push("工會投保免扣<b>僅限薪資所得與執行業務所得</b>。若同時有股利、利息、租金收入，那些項目<b>仍要扣</b>補充保費。");
+      warns.push("眷屬的兼職薪酬<b>不適用</b>這項免扣，仍應扣取。");
+    }
+    if (!r.isBonus && !r.belowMin && !r.unionFree){
+      warns.push("達下限時以<b>全額</b>計算，不是只算超過下限的部分。");
+    }
+    if (r.isBonus){
+      warns.push("獎金看的是<b>全年累計</b>。同樣金額，年初發與年底發扣的金額可能不同。");
+      warns.push("所稱「獎金」包含年終獎金、節金、分紅等，不含一般按月薪資。");
+    }
+    if (r.capped){
+      warns.push("單次給付超過上限 <b>1,000 萬元</b>，已以上限金額計算。");
+    }
+    if (state.type === "parttime"){
+      warns.push("兼職薪資的下限是<b>基本工資 29,500 元</b>，不是其他項目的 20,000 元。");
+    }
+    setWarn(warns);
+  }
+
+  function setWarn(warns){
+    if (warns.length){
+      el.warnBox.innerHTML = warns.map(function(w){ return "・" + w; }).join("<br>");
+      el.warnBox.style.display = "";
+    } else {
+      el.warnBox.style.display = "none";
+    }
+  }
+
+  /* ---------- UI 建構 ---------- */
+  function buildTypes(){
+    el.types.innerHTML = "";
+    TYPES.forEach(function(t){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "type" + (t.id === state.type ? " on" : "");
+      b.dataset.id = t.id;
+      b.innerHTML = '<span class="tn">' + t.name + "</span>"
+        + '<span class="tm">' + t.desc + "</span>";
+      b.addEventListener("click", function(){
+        state.type = t.id;
+        syncTypeUI();
+        render();
+      });
+      el.types.appendChild(b);
+    });
+  }
+
+  function syncTypeUI(){
+    Array.prototype.forEach.call(el.types.children, function(b){
+      b.classList.toggle("on", b.dataset.id === state.type);
+    });
+    var isBonus = (state.type === "bonus");
+    el.simpleInput.style.display = isBonus ? "none" : "";
+    el.bonusInput.style.display = isBonus ? "" : "none";
+    el.incomeLabel.textContent = "單次給付金額";
+
+    if (!isBonus){
+      rebuildChips(CHIPS[state.type] || []);
+    } else {
+      rebuildChips2([100000, 200000, 500000, 1000000], el.bonusChips, el.bonusThis);
+    }
+
+    // 工會勾選只對薪資/執行業務有意義
+    var applies = (state.type === "parttime" || state.type === "practice");
+    el.unionMember.disabled = !applies;
+    if (!applies) el.unionMember.checked = false;
+    el.unionMember.parentElement.style.opacity = applies ? "1" : ".45";
+  }
+
+  function rebuildChips(list){
+    el.chips.innerHTML = "";
+    list.forEach(function(v){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.v = v;
+      b.textContent = nf.format(v);
+      b.addEventListener("click", function(){
+        el.incomeAmt.value = v;
+        render();
+      });
+      el.chips.appendChild(b);
+    });
+  }
+
+  function rebuildChips2(list, box, target){
+    box.innerHTML = "";
+    list.forEach(function(v){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.v = v;
+      b.textContent = nf.format(v);
+      b.addEventListener("click", function(){
+        target.value = v;
+        render();
+      });
+      box.appendChild(b);
+    });
+  }
+
+  function setSide(s){
+    state.side = s;
+    el.tabUnit.classList.toggle("on", s === "unit");
+    el.tabPerson.classList.toggle("on", s === "person");
+    el.unitSection.style.display = (s === "unit") ? "" : "none";
+    el.personSection.style.display = (s === "person") ? "" : "none";
+    render();
+  }
+
+  /* ---------- 複製 ---------- */
+  function copyResult(){
+    var r = state.last;
+    if (!r) return;
+    var lines = ["【115 年度二代健保補充保費試算】"];
+    if (r.side === "unit"){
+      lines.push("計算對象：單位（雇主）");
+      lines.push("");
+      lines.push("薪資所得總額：" + money(r.payroll) + " 元");
+      lines.push("投保金額總額：" + money(r.insured) + " 元");
+      lines.push("計費差額：" + money(r.diff) + " 元");
+      lines.push("補充保費（2.11%）：" + money(r.fee) + " 元／月");
+    } else {
+      lines.push("計算對象：個人（被保險人）");
+      lines.push("所得類型：" + r.typeName);
+      lines.push("");
+      if (r.isBonus){
+        lines.push("月投保金額：" + money(r.monthlyInsured) + " 元");
+        lines.push("四倍門檻：" + money(r.quota) + " 元");
+        lines.push("本次獎金：" + money(r.thisBonus) + " 元");
+        lines.push("超過門檻金額：" + money(r.base) + " 元");
+      } else {
+        lines.push("單次給付：" + money(r.amount) + " 元");
+        lines.push("計費金額：" + money(r.base) + " 元");
+      }
+      lines.push("補充保費（2.11%）：" + money(r.fee) + " 元");
+      lines.push("所得人實拿：" + money(r.keep) + " 元");
+      if (r.unionFree) lines.push("（職業工會投保，免扣）");
+    }
+    lines.push("");
+    lines.push("※ 僅供參考，實際以健保署核定為準。");
+
+    var text = lines.join("\n");
+    var done = function(){
+      var b = el.copyBtn;
+      b.textContent = "已複製 ✓";
+      b.classList.add("done");
+      clearTimeout(b._t);
+      b._t = setTimeout(function(){
+        b.textContent = "複製試算結果";
+        b.classList.remove("done");
+      }, 1800);
+    };
+    var fallback = function(){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { window.prompt("請手動複製：", text); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---------- 事件 ---------- */
+  el.tabUnit.addEventListener("click", function(){ setSide("unit"); });
+  el.tabPerson.addEventListener("click", function(){ setSide("person"); });
+  el.payrollTotal.addEventListener("input", render);
+  el.insuredTotal.addEventListener("input", render);
+  el.incomeAmt.addEventListener("input", render);
+  el.monthlyInsured.addEventListener("input", render);
+  el.bonusPaid.addEventListener("input", render);
+  el.bonusThis.addEventListener("input", render);
+  el.unionMember.addEventListener("change", render);
+  el.copyBtn.addEventListener("click", copyResult);
+
+  /* ---------- 啟動 ---------- */
+  buildTypes();
+  syncTypeUI();
+  setSide("unit");
+})();
+</script>
+</body>
+</html>
