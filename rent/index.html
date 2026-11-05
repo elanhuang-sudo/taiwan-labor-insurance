@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>租金扣繳與二代健保補充保費試算｜tool.kscpb.com</title>
+<meta name="description" content="公司向個人承租房屋的租金扣繳（10%）與二代健保補充保費（2.11%）試算。支援房東實拿（稅外加）與含稅兩種情境，並算出實際應付金額。" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>" />
+<style>
+  :root{
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff;
+    --brand:#1d4ed8; --brand-2:#0e7490;
+    --rent:#0e7490; --rent-bg:#ecfeff;
+    --tax:#b45309; --tax-bg:#fffbeb;
+    --net:#047857; --net-bg:#ecfdf5;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -12px rgba(15,23,42,.18);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",system-ui,-apple-system,sans-serif;
+    line-height:1.6; padding-bottom:88px;
+  }
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 16px 40px}
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#134e4a 55%,#0e7490 100%);
+    color:#fff;border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  header.hero::after{
+    content:"";position:absolute;inset:auto -60px -120px auto;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle,rgba(45,212,191,.32),transparent 65%);
+  }
+  .backwrap{margin-bottom:14px;position:relative;z-index:2}
+  .backlink{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#cbd5e1;font-size:13px;font-weight:700;text-decoration:none;
+    padding:5px 12px 5px 9px;border-radius:999px;transition:.15s;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  }
+  .backlink:hover{background:rgba(255,255,255,.18);color:#fff}
+  .year-tag{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.04em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    padding:5px 12px;border-radius:999px;margin-bottom:12px;
+  }
+  header.hero h1{margin:0;font-size:clamp(21px,3.4vw,29px);line-height:1.35;letter-spacing:.01em;position:relative;z-index:2}
+  header.hero p{margin:10px 0 0;color:#cbd5e1;font-size:14.5px;max-width:58ch;position:relative;z-index:2}
+  .btn-print{
+    position:absolute;right:20px;top:20px;z-index:2;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+    border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-print:hover{background:rgba(255,255,255,.24)}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+  section{margin-top:18px}
+  .pad{padding:20px 22px}
+  h2.sec{font-size:15px;margin:0 0 14px;color:var(--ink-2);letter-spacing:.06em;font-weight:800;display:flex;align-items:center;gap:9px}
+  h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand-2))}
+  h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
+
+  /* ---------- mode toggle ---------- */
+  .modes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+  .mode{
+    border:2px solid var(--line);background:#f8fafc;border-radius:14px;padding:14px 16px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;position:relative;
+  }
+  .mode:hover{border-color:#99f6e4;background:#f0fdfa}
+  .mode.on{border-color:var(--rent);background:var(--rent-bg);box-shadow:0 0 0 4px rgba(14,116,144,.10)}
+  .mode .t{display:block;font-size:14.5px;font-weight:800;color:var(--ink);margin-bottom:3px}
+  .mode.on .t{color:#0e7490}
+  .mode .d{display:block;font-size:12px;color:var(--muted);line-height:1.5}
+  .mode .badge{
+    position:absolute;right:12px;top:12px;font-size:10.5px;font-weight:800;
+    background:#0e7490;color:#fff;padding:1px 7px;border-radius:999px;opacity:0;transition:.15s;
+  }
+  .mode.on .badge{opacity:1}
+
+  /* ---------- input ---------- */
+  .field{display:grid;gap:8px}
+  .field label{font-size:13px;font-weight:700;color:var(--ink-2)}
+  .money{
+    display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;
+    padding:6px 14px;background:#f8fafc;transition:.15s;
+  }
+  .money:focus-within{border-color:var(--rent);background:#fff;box-shadow:0 0 0 4px rgba(14,116,144,.12)}
+  .money .cur{font-size:16px;color:var(--muted);font-weight:700}
+  .money input{
+    flex:1;min-width:0;border:0;background:transparent;outline:none;
+    font-size:clamp(26px,5vw,34px);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+    font-variant-numeric:tabular-nums;padding:6px 0;
+  }
+  .money input::-webkit-outer-spin-button,.money input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .money input[type=number]{-moz-appearance:textfield}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:999px;
+    padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-variant-numeric:tabular-nums;
+  }
+  .chip:hover{border-color:#5eead4;background:#f0fdfa;color:#0e7490}
+  .chip.on{background:#0e7490;border-color:#0e7490;color:#fff}
+  .note{font-size:13px;color:var(--muted);margin:14px 0 0;padding-left:14px;border-left:3px solid var(--line);line-height:1.7}
+  .note b{color:var(--ink-2)}
+
+  /* ---------- results ---------- */
+  .results{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .res{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .res::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .res.net{background:linear-gradient(180deg,var(--net-bg),#fff 62%)}
+  .res.net::before{background:var(--net)}
+  .res.cost{background:linear-gradient(180deg,#eef2ff,#fff 62%)}
+  .res.cost::before{background:#4338ca}
+  .res .who{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .res .who h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.02em}
+  .res.net .who h3{color:var(--net)}
+  .res.cost .who h3{color:#4338ca}
+  .res .who .sub{font-size:12px;color:var(--muted);font-weight:600}
+  .res .amt{margin:10px 0 2px;font-size:clamp(30px,5.8vw,42px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .res.net .amt{color:var(--net)}
+  .res.cost .amt{color:#4338ca}
+  .res .amt small{font-size:14px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0}
+  .res .brk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink-2)}
+  .res .brk div{display:flex;justify-content:space-between;gap:10px;padding:2.5px 0;font-variant-numeric:tabular-nums}
+  .res .brk span:last-child{font-weight:700}
+
+  /* ---------- breakdown table ---------- */
+  .sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sechead h2.sec{margin:0}
+  .btn-copy{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:10px;
+    padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:#5eead4;background:#f0fdfa;color:#0e7490}
+  .btn-copy.done{background:#d1fae5;border-color:#6ee7b7;color:#047857}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:10px 12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;white-space:normal}
+  thead th{background:#f8fafc;font-size:12.5px;color:var(--muted);letter-spacing:.03em;font-weight:800;border-bottom:2px solid var(--line)}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#f8fafc;font-weight:900;font-size:15px;border-top:2px solid var(--line)}
+  .rate{display:block;font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:0}
+  .zero{color:#cbd5e1}
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;
+    background:#fef3c7;color:#b45309;margin-left:6px;vertical-align:1px;
+  }
+  .tag.off{background:#f1f5f9;color:#94a3b8}
+
+  /* ---------- options ---------- */
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+  .opt{display:grid;gap:7px}
+  .opt label{font-size:13px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+  .opt .sm{font-size:12px;color:var(--muted);font-weight:500;line-height:1.5}
+  select,input[type=number].mini{
+    width:100%;border:2px solid var(--line);border-radius:12px;padding:10px 12px;background:#f8fafc;
+    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;
+  }
+  select{cursor:pointer}
+  select:focus,input[type=number].mini:focus{outline:none;border-color:var(--rent);background:#fff;box-shadow:0 0 0 4px rgba(14,116,144,.12)}
+
+  .warn{
+    margin-top:16px;background:var(--tax-bg);border:1px solid #fde68a;border-left:4px solid var(--tax);
+    border-radius:12px;padding:13px 16px;font-size:13px;color:#78350f;line-height:1.7;
+  }
+  .warn b{color:#92400e}
+
+  details{margin-top:18px}
+  details > summary{
+    cursor:pointer;list-style:none;font-weight:800;font-size:14.5px;color:var(--ink-2);
+    padding:16px 22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  details > summary::-webkit-details-marker{display:none}
+  details > summary .arw{transition:.2s;color:var(--muted)}
+  details[open] > summary .arw{transform:rotate(180deg)}
+  details[open] > summary{border-radius:var(--radius) var(--radius) 0 0;border-bottom:0;box-shadow:none}
+  details .body{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--radius) var(--radius);padding:18px 22px 22px;box-shadow:var(--shadow)}
+  details .body h4{margin:16px 0 6px;font-size:13.5px;color:var(--ink-2);font-weight:800}
+  details .body h4:first-child{margin-top:0}
+  details .body p{margin:0 0 8px;font-size:13px;color:var(--ink-2);line-height:1.75}
+  details .body ul{margin:0 0 8px;padding-left:1.3em;font-size:13px;color:var(--ink-2);line-height:1.8}
+  details .body code{
+    background:#f1f5f9;border:1px solid var(--line);border-radius:6px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;
+  }
+  details .body a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+
+  footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.8}
+  footer.dis b{color:var(--ink-2)}
+
+  /* ---------- sticky ---------- */
+  .sticky{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(15,23,42,.96);
+    backdrop-filter:blur(10px);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,64px);
+    box-shadow:0 -8px 24px rgba(15,23,42,.22);border-top:1px solid rgba(255,255,255,.12);
+  }
+  .sticky .it{display:flex;flex-direction:column;align-items:center;line-height:1.25}
+  .sticky .it .k{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.04em}
+  .sticky .it .v{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .sticky .it.a .v{color:#6ee7b7}
+  .sticky .it.b .v{color:#a5b4fc}
+  .sticky .lvbox{font-size:11px;color:#94a3b8;text-align:center;border-left:1px solid rgba(255,255,255,.14);padding-left:clamp(12px,4vw,28px);font-variant-numeric:tabular-nums}
+  .sticky .lvbox b{display:block;color:#e2e8f0;font-size:13px}
+
+  @media (max-width:720px){
+    .results{grid-template-columns:1fr}
+    .modes{grid-template-columns:1fr}
+    .pad{padding:18px 16px}
+    .res{padding:18px}
+    .btn-print{display:none}
+  }
+  @media (max-width:640px){
+    table{font-size:12.5px}
+    th,td{padding:8px 7px}
+    .rate{font-size:10.5px}
+    tr.total td{font-size:13.5px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .sticky,.chips,.modes .mode .badge,.btn-print,.btn-copy,.backwrap{display:none!important}
+    .card,.res,header.hero,.strip,details>summary,details .body{box-shadow:none;border:1px solid #cbd5e1}
+    header.hero{background:#f1f5f9!important;color:#0f172a}
+    header.hero p{color:#334155}
+    .mode{display:none}
+    .mode.on{display:block;border-color:#94a3b8}
+    details .body{display:block}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="btn-print" onclick="window.print()">列印／存 PDF</button>
+    <div class="backwrap"><a class="backlink" href="../">← 回工具列表</a></div>
+    <div class="year-tag">115 年適用 ・ 扣繳 10% ＋ 補充保費 2.11%</div>
+    <h1>租金扣繳與二代健保補充保費試算</h1>
+    <p>公司向個人承租房屋，給付租金時要代扣所得稅與補充保費。選好情境、輸入金額，立刻算出扣多少、房東實拿多少、公司實際支出多少。</p>
+  </header>
+
+  <!-- 輸入 -->
+  <section class="card pad">
+    <h2 class="sec">步驟 1 ・ 選擇情境</h2>
+
+    <div class="modes">
+      <button class="mode on" id="modeNet" type="button">
+        <span class="badge">已選</span>
+        <span class="t">房東實拿（稅外加）</span>
+        <span class="d">租約寫「房東每月實收 X 元」，扣繳與補充保費由公司另行負擔、外加計算。</span>
+      </button>
+      <button class="mode" id="modeGross" type="button">
+        <span class="badge">已選</span>
+        <span class="t">租金含稅（內扣）</span>
+        <span class="d">租約寫「租金 X 元（含稅）」，稅費從這筆錢裡扣，房東實拿會少於 X。</span>
+      </button>
+    </div>
+
+    <h2 class="sec" style="margin-top:22px">步驟 2 ・ 輸入金額</h2>
+    <div class="field">
+      <label for="amount" id="amountLabel">房東每月實拿金額</label>
+      <div class="money">
+        <span class="cur">NT$</span>
+        <input id="amount" type="number" inputmode="numeric" min="0" step="1" value="20000" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <p class="note" id="pickNote"></p>
+  </section>
+
+  <!-- 結果 -->
+  <section class="results" aria-live="polite">
+    <div class="res net">
+      <div class="who">
+        <h3>房東實拿</h3>
+        <span class="sub">匯給房東的金額</span>
+      </div>
+      <div class="amt" id="netAmt">—<small>元／月</small></div>
+      <div class="brk" id="netBrk"></div>
+    </div>
+
+    <div class="res cost">
+      <div class="who">
+        <h3>公司實際支出</h3>
+        <span class="sub">租金＋代繳稅費</span>
+      </div>
+      <div class="amt" id="costAmt">—<small>元／月</small></div>
+      <div class="brk" id="costBrk"></div>
+    </div>
+  </section>
+
+  <!-- 明細 -->
+  <section class="card pad" style="margin-top:16px">
+    <div class="sechead">
+      <h2 class="sec">費用明細 <span class="hint" id="detailHead"></span></h2>
+      <button class="btn-copy" id="copyBtn" type="button">複製試算結果</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>金額（元／月）</th>
+            <th>誰付</th>
+          </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+    <div class="warn" id="warnBox" style="display:none"></div>
+  </section>
+
+  <!-- 進階 -->
+  <section class="card pad">
+    <h2 class="sec">進階選項 <span class="hint">選填，一般情況用預設即可</span></h2>
+    <div class="opts">
+      <div class="opt">
+        <label for="whRate">租金扣繳率</label>
+        <select id="whRate">
+          <option value="0.10" selected>10%　居住者（本國人）</option>
+          <option value="0.20">20%　非居住者</option>
+        </select>
+        <span class="sm">所得稅法各類所得扣繳率標準第 2 條</span>
+      </div>
+      <div class="opt">
+        <label for="shRate">補充保費費率</label>
+        <input id="shRate" class="mini" type="number" step="0.01" min="0" max="10" value="2.11" />
+        <span class="sm">現行 2.11%，單次給付達 20,000 元才扣</span>
+      </div>
+      <div class="opt">
+        <label for="months">試算期數</label>
+        <select id="months">
+          <option value="1" selected>1 個月</option>
+          <option value="3">3 個月（一季）</option>
+          <option value="6">6 個月（半年）</option>
+          <option value="12">12 個月（一年）</option>
+        </select>
+        <span class="sm">用來估算整段租期的累計金額</span>
+      </div>
+    </div>
+    <p class="note" id="periodNote" style="display:none"></p>
+  </section>
+
+  <!-- 說明 -->
+  <details>
+    <summary>
+      <span>計算方式與法源說明</span>
+      <span class="arw">▾</span>
+    </summary>
+    <div class="body">
+      <h4>一、租金扣繳（所得稅）</h4>
+      <ul>
+        <li>公司（扣繳義務人）給付租金給<b>境內居住者</b>，按給付額扣取 <b>10%</b>；給付<b>非居住者</b>扣取 <b>20%</b>。</li>
+        <li>每次應扣繳稅額<b>不超過 2,000 元</b>者，免予扣繳 → 換算租金未達 <b>20,010 元</b>（10% 情境）時免扣。</li>
+        <li>扣繳稅款應於給付日的<b>次月 10 日前</b>向國庫繳清，並於次年 1 月底前申報扣繳憑單。</li>
+      </ul>
+
+      <h4>二、二代健保補充保費</h4>
+      <ul>
+        <li>租金收入屬補充保險費計費範圍，費率 <b>2.11%</b>，由<b>扣費義務人（公司）</b>於給付時代為扣取。</li>
+        <li><b>單次給付金額達 20,000 元</b>才需扣取；未達者免扣。</li>
+        <li>款項應於給付日的<b>次月底前</b>繳納健保署。</li>
+      </ul>
+
+      <h4>三、兩種情境的算法</h4>
+      <p><b>租金含稅（內扣）</b>：租金總額就是申報金額，稅費從中扣除。</p>
+      <ul>
+        <li>扣繳 = 租金 × 扣繳率（未達門檻為 0）</li>
+        <li>補充保費 = 租金 × 2.11%（未達門檻為 0）</li>
+        <li>房東實拿 = 租金 − 扣繳 − 補充保費</li>
+      </ul>
+      <p><b>房東實拿（稅外加）</b>：先回推租金總額，稅費由公司額外負擔。</p>
+      <ul>
+        <li>租金總額 = 實拿 ÷ (1 − 扣繳率 − 補充保費率)</li>
+        <li>扣繳 = 租金總額 × 扣繳率；補充保費 = 租金總額 × 2.11%</li>
+        <li>公司支出 = 實拿 ＋ 扣繳 ＋ 補充保費（＝租金總額）</li>
+      </ul>
+
+      <h4>四、注意事項</h4>
+      <ul>
+        <li>本頁假設房東為<b>個人</b>（免開統一發票）。若房東是<b>營業人</b>並開立發票，另有 5% 營業稅，不在本試算範圍。</li>
+        <li>若租約含<b>管理費、水電費</b>等，實務上多另行約定；本頁僅就租金本身計算。</li>
+        <li>門檻以<b>給付總額</b>判定。當「房東實拿」金額較低時，回推的租金總額仍可能超過 20,000 元而需扣補充保費。</li>
+        <li>本頁僅供參考，實際應以稽徵機關及健保署認定為準。</li>
+      </ul>
+
+      <h4>五、法源</h4>
+      <ul>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340081" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>（租金 10%／20%）</li>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0060001" target="_blank" rel="noopener noreferrer">全民健康保險法</a>第 31 條（補充保險費）</li>
+        <li><a href="https://www.nhi.gov.tw/" target="_blank" rel="noopener noreferrer">衛生福利部中央健康保險署</a>（補充保費費率與扣取方式）</li>
+      </ul>
+    </div>
+  </details>
+
+  <footer class="dis">
+    <b>提醒：</b>本頁為試算工具，結果僅供參考，不構成稅務或法律建議。實際扣繳與繳納義務，請依稽徵機關及健保署規定辦理。
+  </footer>
+</div>
+
+<!-- 手機固定摘要 -->
+<div class="sticky" aria-hidden="true">
+  <div class="it a"><span class="k">房東實拿</span><span class="v" id="barNet">—</span></div>
+  <div class="lvbox">公司支出<b id="barCost">—</b></div>
+  <div class="it b"><span class="k">代繳稅費</span><span class="v" id="barTax">—</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var nf = new Intl.NumberFormat("zh-TW");
+  var money = function(n){ return nf.format(Math.round(n)); };
+
+  // 法規門檻
+  var WH_TAX_FREE = 2000;    // 每次應扣繳稅額不超過 2,000 元者免扣
+  var SH_MIN_BASE = 20000;   // 單次給付達 20,000 元才扣補充保費
+
+  var el = {
+    amount: document.getElementById("amount"),
+    amountLabel: document.getElementById("amountLabel"),
+    modeNet: document.getElementById("modeNet"),
+    modeGross: document.getElementById("modeGross"),
+    chips: document.getElementById("chips"),
+    pickNote: document.getElementById("pickNote"),
+    netAmt: document.getElementById("netAmt"),
+    netBrk: document.getElementById("netBrk"),
+    costAmt: document.getElementById("costAmt"),
+    costBrk: document.getElementById("costBrk"),
+    detailBody: document.getElementById("detailBody"),
+    detailHead: document.getElementById("detailHead"),
+    warnBox: document.getElementById("warnBox"),
+    copyBtn: document.getElementById("copyBtn"),
+    whRate: document.getElementById("whRate"),
+    shRate: document.getElementById("shRate"),
+    months: document.getElementById("months"),
+    periodNote: document.getElementById("periodNote"),
+    barNet: document.getElementById("barNet"),
+    barCost: document.getElementById("barCost"),
+    barTax: document.getElementById("barTax")
+  };
+
+  var state = { mode: "net", last: null };
+
+  var CHIPS = [15000, 20000, 25000, 30000, 50000, 100000];
+
+  /* =========================================================
+     核心計算
+     模式 net   ：房東實拿（稅外加）→ 回推租金總額
+     模式 gross ：租金含稅（內扣）  → 稅費從總額扣除
+     ========================================================= */
+  function calc(amount, mode, whRate, shRate){
+    var total, wh, sh, net;
+
+    if (mode === "gross"){
+      // 金額就是給付總額
+      total = amount;
+      var whRaw = total * whRate;
+      wh = (whRaw > WH_TAX_FREE) ? Math.floor(whRaw) : 0;
+      sh = (total >= SH_MIN_BASE) ? Math.round(total * shRate) : 0;
+      net = total - wh - sh;
+    } else {
+      // 金額是房東實拿，回推總額
+      // 先假設兩者都扣
+      total = amount / (1 - whRate - shRate);
+      var whRaw = total * whRate;
+      var whApplies = whRaw > WH_TAX_FREE;
+      var shApplies = total >= SH_MIN_BASE;
+
+      if (!shApplies && !whApplies){
+        // 兩者都不到門檻 → 實拿等於總額
+        total = amount; wh = 0; sh = 0;
+      } else if (shApplies && !whApplies){
+        // 只扣補充保費
+        total = amount / (1 - shRate);
+        wh = 0;
+        sh = Math.round(total * shRate);
+        if (total < SH_MIN_BASE){ total = amount; sh = 0; }
+      } else if (!shApplies && whApplies){
+        // 只扣所得稅
+        total = amount / (1 - whRate);
+        wh = Math.floor(total * whRate);
+        sh = 0;
+      } else {
+        // 兩者都扣（一般情況）
+        wh = Math.floor(total * whRate);
+        sh = Math.round(total * shRate);
+      }
+      net = amount;
+    }
+
+    // 統一：讓「實拿 ＋ 扣繳 ＋ 補充保費 ＝ 租金總額 ＝ 公司支出」恆等
+    // （取整後回推總額，避免出現 1 元尾差）
+    if (mode === "net"){
+      total = net + wh + sh;
+    }
+
+    return {
+      mode: mode,
+      total: total,
+      wh: wh,
+      sh: sh,
+      net: net,
+      cost: total,
+      taxTotal: wh + sh
+    };
+  }
+
+  function render(){
+    var mode = state.mode;
+    var amount = parseFloat(el.amount.value);
+    if (!isFinite(amount) || amount < 0) amount = 0;
+
+    var whRate = parseFloat(el.whRate.value);
+    if (!isFinite(whRate)) whRate = 0.1;
+    var shRatePct = parseFloat(el.shRate.value);
+    if (!isFinite(shRatePct) || shRatePct < 0) shRatePct = 0;
+    var shRate = shRatePct / 100;
+    var months = parseInt(el.months.value, 10) || 1;
+
+    var r = calc(amount, mode, whRate, shRate);
+    state.last = r;
+
+    // 主數字
+    el.netAmt.innerHTML = money(r.net) + "<small>元／月</small>";
+    el.costAmt.innerHTML = money(r.cost) + "<small>元／月</small>";
+
+    el.netBrk.innerHTML =
+        "<div><span>租約租金總額</span><span>" + money(r.total) + "</span></div>"
+      + "<div><span>扣繳稅額</span><span>" + (r.wh ? "− " + money(r.wh) : "0") + "</span></div>"
+      + "<div><span>補充保費</span><span>" + (r.sh ? "− " + money(r.sh) : "0") + "</span></div>";
+
+    el.costBrk.innerHTML =
+        "<div><span>給付房東</span><span>" + money(r.net) + "</span></div>"
+      + "<div><span>代扣繳所得稅</span><span>" + money(r.wh) + "</span></div>"
+      + "<div><span>代扣補充保費</span><span>" + money(r.sh) + "</span></div>"
+      + "<div><span>合計</span><span>" + money(r.cost) + "</span></div>";
+
+    // 明細
+    var rows = [
+      ["租金給付總額", '<span class="rate">申報租金收入（含稅）</span>', r.total, "—"],
+      ["所得稅扣繳", '<span class="rate">' + (whRate * 100).toFixed(0) + "%　" +
+        (r.wh ? "次月 10 日前繳國庫" : "未達 2,000 元門檻，免扣") + "</span>", r.wh, "公司代扣"],
+      ["二代健保補充保費", '<span class="rate">' + shRatePct + "%　" +
+        (r.sh ? "次月底前繳健保署" : "未達 20,000 元門檻，免扣") + "</span>", r.sh, "公司代扣"],
+      ["匯給房東", '<span class="rate">租金總額 − 扣繳 − 補充保費</span>', r.net, "公司付房東"],
+      ["公司實際支出", '<span class="rate">租金 ＋ 代扣稅費</span>', r.cost, "公司總成本"]
+    ];
+
+    var html = "";
+    rows.forEach(function(row, i){
+      var isTotal = (i === rows.length - 1);
+      html += "<tr" + (isTotal ? ' class="total"' : "") + ">"
+        + "<td>" + row[0] + row[1] + "</td>"
+        + "<td" + (row[2] ? "" : ' class="zero"') + ">" + (row[2] ? money(row[2]) : "0") + "</td>"
+        + "<td>" + row[3] + "</td>"
+        + "</tr>";
+    });
+    el.detailBody.innerHTML = html;
+
+    el.detailHead.textContent = (mode === "net" ? "房東實拿 " : "租金含稅 ") + money(amount) + " 元";
+
+    // 固定列
+    el.barNet.textContent = money(r.net);
+    el.barCost.textContent = money(r.cost);
+    el.barTax.textContent = money(r.taxTotal);
+
+    // 提示
+    var tips = [];
+    if (amount > 0){
+      if (mode === "net"){
+        tips.push("<b>房東實拿 " + money(amount) + " 元</b>，回推租金總額 <b>" + money(r.total) + " 元</b>，公司每月實際支出 <b>" + money(r.cost) + " 元</b>。");
+      } else {
+        tips.push("<b>租金含稅 " + money(amount) + " 元</b>，扣掉稅費後房東實拿 <b>" + money(r.net) + " 元</b>。");
+      }
+      if (r.wh === 0 && r.sh === 0){
+        tips.push("目前金額<b>未達扣繳與補充保費門檻</b>，無須代扣。");
+      } else if (r.wh === 0){
+        tips.push("所得稅扣繳<b>未達 2,000 元門檻</b>，免扣；仍須扣補充保費。");
+      } else if (r.sh === 0){
+        tips.push("補充保費<b>未達 20,000 元門檻</b>，免扣；仍須扣所得稅。");
+      }
+    }
+    el.pickNote.innerHTML = tips.join(" ");
+    el.pickNote.style.display = tips.length ? "" : "none";
+
+    // 警告（特殊情境）
+    var warns = [];
+    if (mode === "net" && amount > 0 && r.total > amount && r.wh === 0 && r.sh === 0){
+      warns.push("回推後租金總額已達門檻，但稅額計算為 0，請確認輸入值。");
+    }
+    if (mode === "net" && r.total >= SH_MIN_BASE && amount < SH_MIN_BASE){
+      warns.push("<b>注意：</b>房東實拿 " + money(amount) + " 元雖低於 20,000 元，但回推的租金總額 <b>" + money(r.total) + " 元</b>已達補充保費門檻，<b>仍需扣取</b>。");
+    }
+    if (warns.length){
+      el.warnBox.innerHTML = warns.join("<br>");
+      el.warnBox.style.display = "";
+    } else {
+      el.warnBox.style.display = "none";
+    }
+
+    // 期數
+    if (months > 1){
+      el.periodNote.innerHTML = "租期 <b>" + months + " 個月</b>累計：租金總額 <b>" + money(r.total * months) +
+        " 元</b>、扣繳 <b>" + money(r.wh * months) + " 元</b>、補充保費 <b>" + money(r.sh * months) +
+        " 元</b>、公司支出 <b>" + money(r.cost * months) + " 元</b>。";
+      el.periodNote.style.display = "";
+    } else {
+      el.periodNote.style.display = "none";
+    }
+
+    // chip 高亮
+    Array.prototype.forEach.call(el.chips.children, function(b){
+      b.classList.toggle("on", parseInt(b.dataset.v, 10) === Math.round(amount));
+    });
+  }
+
+  /* ---- 模式切換 ---- */
+  function setMode(m){
+    state.mode = m;
+    el.modeNet.classList.toggle("on", m === "net");
+    el.modeGross.classList.toggle("on", m === "gross");
+    el.amountLabel.textContent = (m === "net") ? "房東每月實拿金額" : "租約租金（含稅）";
+    render();
+  }
+
+  /* ---- chips ---- */
+  function buildChips(){
+    CHIPS.forEach(function(v){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.v = v;
+      b.textContent = nf.format(v);
+      b.addEventListener("click", function(){
+        el.amount.value = v;
+        render();
+      });
+      el.chips.appendChild(b);
+    });
+  }
+
+  /* ---- 複製結果 ---- */
+  function copyResult(){
+    var r = state.last;
+    if (!r) return;
+    var whRate = parseFloat(el.whRate.value) || 0.1;
+    var shRatePct = parseFloat(el.shRate.value) || 0;
+    var months = parseInt(el.months.value, 10) || 1;
+
+    var lines = [];
+    lines.push("【租金扣繳與二代健保補充保費試算】");
+    lines.push("情境：" + (r.mode === "net" ? "房東實拿（稅外加）" : "租金含稅（內扣）"));
+    lines.push("扣繳率 " + (whRate * 100).toFixed(0) + "%　補充保費 " + shRatePct + "%");
+    lines.push("");
+    lines.push("租金給付總額：" + money(r.total) + " 元／月");
+    lines.push("所得稅扣繳：" + money(r.wh) + " 元");
+    lines.push("補充保費：" + money(r.sh) + " 元");
+    lines.push("匯給房東：" + money(r.net) + " 元");
+    lines.push("公司實際支出：" + money(r.cost) + " 元");
+    if (months > 1){
+      lines.push("");
+      lines.push("租期 " + months + " 個月累計：");
+      lines.push("　租金總額 " + money(r.total * months) + " 元");
+      lines.push("　扣繳 " + money(r.wh * months) + " 元");
+      lines.push("　補充保費 " + money(r.sh * months) + " 元");
+      lines.push("　公司支出 " + money(r.cost * months) + " 元");
+    }
+    lines.push("");
+    lines.push("※ 僅供參考，實際以稽徵機關及健保署認定為準。");
+
+    var text = lines.join("\n");
+    var done = function(){
+      var b = el.copyBtn;
+      b.textContent = "已複製 ✓";
+      b.classList.add("done");
+      clearTimeout(b._t);
+      b._t = setTimeout(function(){
+        b.textContent = "複製試算結果";
+        b.classList.remove("done");
+      }, 1800);
+    };
+    var fallback = function(){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { window.prompt("請手動複製：", text); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---- 事件 ---- */
+  el.modeNet.addEventListener("click", function(){ setMode("net"); });
+  el.modeGross.addEventListener("click", function(){ setMode("gross"); });
+  el.amount.addEventListener("input", render);
+  el.whRate.addEventListener("change", render);
+  el.shRate.addEventListener("input", render);
+  el.months.addEventListener("change", render);
+  el.copyBtn.addEventListener("click", copyResult);
+
+  /* ---- 啟動 ---- */
+  buildChips();
+  setMode("net");
+})();
+</script>
+</body>
+</html>
