@@ -1,6 +1,6 @@
 # 2026 勞健保三合一保費試算（單位應繳／員工應繳）
 
-**線上版：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>**
+**線上版：<https://labor.kscpb.com/>**（備用：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>）
 
 單檔網頁，免安裝、免網路即可使用：**直接用瀏覽器打開 `index.html`**（或把單一 HTML 檔傳給客戶）。
 
@@ -65,6 +65,23 @@ python verify\verify_official.py
 
 - `verify/official-bli-115.json`：勞保局 ODS 解析出的 28 級金額
 - `verify/official-nhi-115.txt`：健保署負擔金額表(三) 全文
+
+## 網域設定（自訂網域）
+
+本專案使用 `labor.kscpb.com`。`CNAME` 檔內容即自訂網域，GitHub Pages 靠它判斷。
+
+DNS 需在 Namecheap 加一筆：
+
+| Type | Host | Value | TTL |
+|---|---|---|---|
+| CNAME Record | `labor` | `elanhuang-sudo.github.io` | Automatic |
+
+⚠️ 值是 `elanhuang-sudo.github.io`，**不要**寫成 `taiwan-labor-insurance` 或整條 repo 路徑。
+
+設定後到 GitHub repo → Settings → Pages → Custom domain 確認顯示 `labor.kscpb.com`，
+並勾選 **Enforce HTTPS**。憑證由 GitHub 自動申請（Let's Encrypt），簽發可能需要數分鐘至數小時。
+
+若日後在 Namecheap 加了 `*.kscpb.com` 的 wildcard 記錄，明確的 `labor` CNAME 仍會優先，不受影響。
 
 ## 更新資料（換年度時）
 
