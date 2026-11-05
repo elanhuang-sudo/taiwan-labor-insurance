@@ -66,6 +66,32 @@
   h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--tax),var(--brand-2))}
   h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
 
+  /* ---------- 身分選擇 ---------- */
+  .ids{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .idbtn{
+    border:2px solid var(--line);background:#f8fafc;border-radius:14px;padding:14px 16px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;display:grid;gap:3px;
+  }
+  .idbtn:hover{border-color:#c7d2fe;background:#eef2ff}
+  .idbtn.on{border-color:var(--tax);background:var(--tax-bg);box-shadow:0 0 0 4px rgba(67,56,202,.10)}
+  .idbtn .idname{font-size:15px;font-weight:800;color:var(--ink)}
+  .idbtn.on .idname{color:var(--tax)}
+  .idbtn .iddesc{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+  /* ---------- 非居住者費率框 ---------- */
+  .nrbox{
+    border:1px solid #c7d2fe;background:#eef2ff;border-radius:14px;padding:16px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .nrbox .nrl{display:grid;gap:2px}
+  .nrbox .nrt{font-size:14px;font-weight:800;color:var(--tax)}
+  .nrbox .nrd{font-size:12px;color:#475569;line-height:1.6}
+  .nrbox .nrr{
+    font-size:34px;font-weight:900;color:var(--tax);font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em;line-height:1.1;
+  }
+  .nrbox .nrr small{font-size:13px;font-weight:700;color:var(--muted);display:block;letter-spacing:0;text-align:right}
+
   /* ---------- mode cards ---------- */
   .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
   .mode{
@@ -255,30 +281,51 @@
 
   <!-- 輸入 -->
   <section class="card pad">
-    <h2 class="sec">步驟 1 ・ 選擇扣繳方式</h2>
+    <h2 class="sec">步驟 1 ・ 選擇納稅義務人身分</h2>
 
-    <div class="modes">
-      <button class="mode on" id="mFilled" type="button">
-        <span class="badge">已選</span>
-        <span class="t">有填免稅額申報表</span>
-        <span class="d">員工已填表並載明扶養親屬 → 查稅額表</span>
+    <div class="ids">
+      <button class="idbtn on" id="idResident" type="button">
+        <span class="idname">居住者</span>
+        <span class="iddesc">本國人、持居留證者、一課稅年度在台居留滿 183 天</span>
       </button>
-      <button class="mode" id="mNotFilled" type="button">
-        <span class="badge">已選</span>
-        <span class="t">未填／免填申報表</span>
-        <span class="d">按全月給付總額扣 5%</span>
-      </button>
-      <button class="mode" id="mPartTime" type="button">
-        <span class="badge">已選</span>
-        <span class="t">兼職／非每月給付</span>
-        <span class="d">按每次給付扣 5%，起扣點較高</span>
+      <button class="idbtn" id="idNonResident" type="button">
+        <span class="idname">非居住者</span>
+        <span class="iddesc">一課稅年度在台居留、停留合計未滿 183 天</span>
       </button>
     </div>
 
-    <h2 class="sec" style="margin-top:22px">步驟 2 ・ 輸入金額</h2>
+    <div id="modeSection">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 選擇扣繳方式</h2>
+
+      <div class="modes">
+        <button class="mode on" id="mFilled" type="button">
+          <span class="badge">已選</span>
+          <span class="t">有填免稅額申報表</span>
+          <span class="d">員工已填表並載明扶養親屬 → 查稅額表</span>
+        </button>
+        <button class="mode" id="mNotFilled" type="button">
+          <span class="badge">已選</span>
+          <span class="t">未填／免填申報表</span>
+          <span class="d">按全月給付總額扣 5%</span>
+        </button>
+        <button class="mode" id="mPartTime" type="button">
+          <span class="badge">已選</span>
+          <span class="t">兼職／非每月給付</span>
+          <span class="d">按每次給付扣 5%，起扣點較高</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="nrSection" style="display:none">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 適用扣繳率</h2>
+      <div class="nrbox" id="nrBox"></div>
+    </div>
+
+    <h2 class="sec" style="margin-top:22px">步驟 3 ・ 輸入金額</h2>
+
     <div class="row2">
       <div class="field">
-        <label for="salary">每月薪資總額</label>
+        <label for="salary" id="salaryLabel">每月薪資總額</label>
         <div class="money">
           <span class="cur">NT$</span>
           <input id="salary" type="number" inputmode="numeric" min="0" step="1" value="100000" autocomplete="off" />
