@@ -225,6 +225,12 @@
   details .body p{margin:0 0 8px;font-size:13px;color:var(--ink-2);line-height:1.75}
   details .body ul{margin:0 0 8px;padding-left:1.3em;font-size:13px;color:var(--ink-2);line-height:1.8}
   details .body a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+  details .body .thrlist{
+    list-style:none;margin:0 0 10px;padding:12px 16px;border-radius:10px;
+    background:#eef2ff;border:1px solid #c7d2fe;
+    font-variant-numeric:tabular-nums;line-height:2;
+  }
+  details .body .thrlist li{padding:1px 0}
   footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.8}
 
   /* ---------- sticky ---------- */
@@ -471,16 +477,36 @@
 
       <h4>七、本頁計算範圍</h4>
       <ul>
-        <li>查表模式僅適用月薪 <b>80,001～500,000 元</b>；低於 80,001 元者稅額為 0。</li>
+        <li>稅額表列出的範圍是月薪 <b>80,001～500,000 元</b>，但<b>表首不等於起扣點</b>：
+          表列前段稅額皆為 0，實際起扣點依扶養人數而異。</li>
+        <li>115 年度各扶養人數的起扣點（稅額首次出現 2,000 元以上）：</li>
         <li>查表用的薪資為<b>全月給付總額</b>（含獎金、津貼等具工資性質者）；非每月給付者請改用「兼職／非每月給付」模式。</li>
+      <ul class="thrlist">
+        <li>0 位：<b>90,501</b>　1 位：<b>99,001</b>　2 位：<b>107,501</b>　3 位：<b>115,501</b></li>
+        <li>4 位：<b>124,001</b>　5 位：<b>132,501</b>　6 位：<b>141,001</b>　7 位：<b>149,501</b></li>
+        <li>8 位：<b>158,001</b>　9 位：<b>166,001</b>　10 位：<b>174,501</b>　11 位：<b>183,001</b></li>
+      </ul>
+      <p>也就是說，月薪 85,000 元雖然在稅額表範圍內，但因為未達 0 位扶養的起扣點 90,501 元，<b>仍免扣繳</b>。</p>
         <li>非居住者模式僅計算<b>薪資所得</b>。非居住者的租金（20%）、佣金（20%）、執行業務報酬（20%）、股利（21%）等其他所得不在本頁範圍。</li>
         <li>本頁不計算勞健保費、勞退自提等其他扣除項，僅算所得稅扣繳。</li>
       </ul>
 
-      <h4>八、法源</h4>
+      <h4>八、扣繳義務人（114 年 1 月 1 日起修法）</h4>
+      <p>《所得稅法》第 89 條於 114 年 1 月 1 日修正施行，<b>扣繳義務人已變更</b>：</p>
+      <ul>
+        <li><b>修正前</b>：事業負責人、機關團體學校的「責應扣繳單位主管」等<b>自然人</b>。</li>
+        <li><b>修正後</b>：<b>事業、機關、團體或學校本身</b>（組織），符合事責一致。</li>
+      </ul>
+      <p>所以 114 年起，公司的扣繳義務人是<b>公司</b>，不是負責人個人。填寫繳款書或憑單時，
+      扣繳義務人欄位請填公司名稱與統一編號，不要再填負責人姓名。</p>
+
+      <h4>九、法源</h4>
       <ul>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340028" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>第 2 條（居住者）、第 3 條（非居住者）</li>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340009" target="_blank" rel="noopener noreferrer">薪資所得扣繳辦法</a>第 5～7 條</li>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340003" target="_blank" rel="noopener noreferrer">所得稅法</a>第 88 條（扣繳範圍）、第 89 條（扣繳義務人，114 年修正）</li>
+        <li><a href="https://gazette.nat.gov.tw/egFront/eguploadpubWrapper?file=%2FEG_FileManager%2Feguploadpub%2Feg031224%2Fch04%2Ftype3%2Fgov30%2Fnum12%2FEg.htm&metaid=161826" target="_blank" rel="noopener noreferrer">行政院公報：115 年度免稅額、扣除額及課稅級距公告</a>
+          <span style="color:var(--muted);font-size:12px">（稅額表即依此公告參數編製，使用者無須自行計算）</span></li>
         <li><a href="https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0" target="_blank" rel="noopener noreferrer">財政部北區國稅局 扣繳申報專區</a>（稅額表與免稅額申報表下載）</li>
         <li><a href="https://www.mof.gov.tw/singlehtml/384fb3077bb349ea973e7fc6f13b6974?cntId=dd1c8e641b594e6da94a69d613e4947f" target="_blank" rel="noopener noreferrer">財政部：115 年起基本工資調升，非居住者薪資扣繳基準同步調整</a></li>
       </ul>
@@ -582,6 +608,17 @@
     };
   }
 
+  /* ---- 查該扶養人數的實際起扣點（稅額首次 > 0 的列）----
+     稅額表從 80,001 起列出，但前面一大段稅額都是 0；
+     真正的起扣點依扶養人數而異（0 位 90,501、1 位 99,001…）。 */
+  function getThreshold(dep){
+    for (var i = 0; i < TABLE.length; i++){
+      var amt = TABLE[i][1 + dep];
+      if (amt !== undefined && amt > 0) return TABLE[i][0];
+    }
+    return null;
+  }
+
   /* ---- 主計算 ---- */
   function calc(salary, mode, dep, identity){
     var tax = 0, rate = "查表", threshold = 0, note = "", row = null;
@@ -605,11 +642,12 @@
 
     if (mode === "filled"){
       rate = "查表";
-      threshold = 0;   // 表已內含 2,000 門檻
+      threshold = getThreshold(dep);   // 該扶養人數的實際起扣點
       row = lookupTable(salary, dep);
       tax = row ? row.amt : 0;
       note = "依稅額表查得（" + dep + " 位扶養親屬）";
-      if (!row) note = "月薪未達 80,001 元，稅額為 0";
+      if (!row) note = "月薪未達稅額表首列 80,001 元，稅額為 0";
+      else if (tax === 0 && threshold) note = "未達起扣點 " + money(threshold) + " 元（" + dep + " 位扶養親屬），稅額為 0";
     } else if (mode === "notFilled"){
       rate = "5%";
       threshold = THRESHOLD_MONTHLY;
@@ -653,9 +691,12 @@
       taxLines += "<div><span>適用扣繳率</span><span>" + r.rate + "</span></div>";
       taxLines += "<div><span>門檻</span><span>" + money(NR_THRESHOLD) + "</span></div>";
       taxLines += "<div><span>全月給付總額</span><span>" + money(salary) + "</span></div>";
-    } else if (mode === "filled" && r.row){
-      taxLines += "<div><span>查表區間</span><span>" + money(r.row.low) + " ～ " + money(r.row.high) + "</span></div>";
+    } else if (mode === "filled"){
+      if (r.row){
+        taxLines += "<div><span>查表區間</span><span>" + money(r.row.low) + " ～ " + money(r.row.high) + "</span></div>";
+      }
       taxLines += "<div><span>扶養親屬</span><span>" + dep + " 人</span></div>";
+      if (r.threshold) taxLines += "<div><span>起扣點</span><span>" + money(r.threshold) + "</span></div>";
     } else {
       taxLines += "<div><span>扣繳率</span><span>" + r.rate + "</span></div>";
       taxLines += "<div><span>起扣點</span><span>" + money(r.threshold) + "</span></div>";
@@ -721,10 +762,17 @@
           " 元</b> → 按 <b>18%</b> 扣繳 <b>" + money(r.tax) + " 元</b>，實領 <b>" + money(r.net) + " 元</b>。");
       }
     } else if (mode === "filled"){
-      if (!r.row){
-        tips.push("月薪 <b>" + money(salary) + " 元</b> 未達稅額表起點（80,001 元），<b>免扣繳</b>。");
-      } else if (r.tax === 0){
-        tips.push("查表結果為 0：月薪 <b>" + money(salary) + " 元</b>、扶養 <b>" + dep + " 人</b> 的應扣繳稅額未達 2,000 元，<b>免扣繳</b>。");
+      if (r.tax === 0){
+        var thr = getThreshold(dep);
+        var why;
+        if (thr){
+          why = "月薪 <b>" + money(salary) + " 元</b> 未達 <b>" + dep + " 位扶養親屬的起扣點 " + money(thr) + " 元</b>";
+        } else if (false){
+          why = "月薪 <b>" + money(salary) + " 元</b>、扶養 <b>" + dep + " 人</b> 未達起扣點 <b>" + money(thr) + " 元</b>";
+        } else {
+          why = "月薪 <b>" + money(salary) + " 元</b>";
+        }
+        tips.push(why + "，應扣繳稅額為 0，<b>免扣繳</b>。");
       } else {
         tips.push("月薪 <b>" + money(salary) + " 元</b>、扶養 <b>" + dep + " 人</b> → 查表得應扣繳 <b>" + money(r.tax) + " 元</b>，員工實領 <b>" + money(r.net) + " 元</b>。");
       }

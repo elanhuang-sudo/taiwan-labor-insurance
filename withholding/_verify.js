@@ -111,6 +111,42 @@ check("兼職 90,501 → 4,525", calc(90501, "partTime", 0).tax, 4525);
 check("兼職 100,000 → 5,000", calc(100000, "partTime", 0).tax, 5000);
 console.log();
 
+console.log("=== 起扣點：80,001 只是表首，不是起扣點 ===");
+// 各扶養人數的起扣點（稅額首次 > 0）
+function getThreshold(dep) {
+  for (let i = 0; i < TABLE.length; i++) {
+    const amt = TABLE[i][1 + dep];
+    if (amt !== undefined && amt > 0) return TABLE[i][0];
+  }
+  return null;
+}
+const EXPECT_THR = [90501, 99001, 107501, 115501, 124001, 132501, 141001, 149501, 158001, 166001, 174501, 183001];
+EXPECT_THR.forEach((exp, dep) => {
+  const got = getThreshold(dep);
+  check(`  ${dep} 位扶養起扣點`, got, exp);
+});
+console.log();
+console.log("=== 表首區間（80,001~90,500）稅額應全為 0 ===");
+let zeroErr = 0;
+for (let low = 80001; low <= 90500; low += 500) {
+  const r = lookupTable(low, 0);
+  if (r && r.amt !== 0) { zeroErr++; if (zeroErr <= 3) console.log(`  ✗ ${low} → ${r.amt}`); }
+}
+check("  0 位扶養、80,001~90,500 全為 0", zeroErr, 0);
+console.log();
+console.log("=== 40,000 元情境（使用者回報的問題）===");
+const r40k = lookupTable(40000, 0);
+check("  40,000 查無（低於表首 80,001）", r40k, null);
+check("  40,000 稅額為 0", r40k ? r40k.amt : 0, 0);
+check("  0 位扶養起扣點應為 90,501（非 80,001）", getThreshold(0), 90501);
+// 85,000 在表內但未達起扣點
+const r85k = lookupTable(85000, 0);
+check("  85,000 查得到列", r85k !== null, true);
+check("  85,000 稅額為 0（未達起扣點）", r85k.amt, 0);
+// 90,501 才開始有稅額
+check("  90,500 稅額為 0", lookupTable(90500, 0).amt, 0);
+check("  90,501 稅額 2,020", lookupTable(90501, 0).amt, 2020);
+console.log();
 console.log("=== 非居住者：6% / 18% 門檻 ===");
 // 門檻 = 29,500 × 1.5 = 44,250
 check("NR 門檻值", NR_THRESHOLD, 44250);
