@@ -175,6 +175,22 @@
   footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.75}
   footer.dis b{color:var(--ink-2)}
   footer.dis a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+  footer.dis a:hover{border-bottom-color:var(--brand)}
+
+  /* 資料來源區塊 */
+  .srcbox{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+  .srch{margin:0 0 12px;font-size:13px;font-weight:800;color:var(--ink-2);letter-spacing:.04em}
+  .srch::before{content:"";display:inline-block;width:4px;height:13px;border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand-2));margin-right:8px;vertical-align:-2px}
+  .srclist{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+  .srclist li{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:baseline;padding:6px 0;border-bottom:1px dashed var(--line)}
+  .srclist li:last-child{border-bottom:0}
+  .srclist a{font-weight:700;font-size:13px}
+  .srcorg{font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .basis{margin:14px 0 0;padding-left:14px;border-left:3px solid var(--line);font-size:12.5px;line-height:1.8}
+  @media (max-width:560px){
+    .srclist li{grid-template-columns:1fr;gap:1px}
+    .srcorg{white-space:normal}
+  }
 
   /* ---------- sticky bar ---------- */
   .sticky{
@@ -369,18 +385,62 @@
         <tbody id="refBody"></tbody>
       </table>
       <p class="note" style="margin:14px 22px">
-        本表金額以「月」為單位（投保日數 30 日）。勞保費含就業保險，不含職業災害保險。健保費為一般本國人、無眷屬之金額。
+        本表金額以「月」為單位（投保日數 30 日）。勞保費含就業保險，不含職業災害保險。
+        健保費為一般本國人、無眷屬之金額。勞保與健保金額逐筆取自勞保局、健保署 115 年 1 月 1 日起適用之官方分擔金額表；
+        勞退與墊償依勞退新制 6% 與積欠工資墊償基金萬分之 2.5 計算。
       </p>
     </div>
   </details>
 
   <footer class="dis">
-    <b>資料來源：</b>Workforce 勞動力量《2026 年（民國 115 年）勞健保保費及勞退提繳三合一費用對照參考用表》
-    （<a href="https://twworkforce.com/2025/12/12/2026-3in1/" target="_blank" rel="noopener noreferrer">twworkforce.com</a>），
-    級距與金額於 2025-12-12 公告。<br>
-    <b>試算基礎：</b>勞保（含就保）費率 12.5%，勞工 20%／雇主 70%；健保費率 5.17%，勞工 30%／雇主 60%（雇主負擔含平均眷口數 0.56）；
-    勞退新制 6%（雇主全額）；工資墊償基金 0.025%（雇主）。<br>
-    <b>提醒：</b>本頁僅供參考與內部估算，實際應繳金額以勞保局、健保署核定為準。到職或離職當月未足月者，勞保按日計收、健保按月計收。
+    <div class="srcbox">
+      <h3 class="srch">資料來源（政府公開資料，115 年 1 月 1 日起適用）</h3>
+      <ul class="srclist">
+        <li>
+          <a href="https://www.bli.gov.tw/0005475.html" target="_blank" rel="noopener noreferrer">勞工保險投保薪資分級表</a>
+          <span class="srcorg">勞動部勞工保險局</span>
+        </li>
+        <li>
+          <a href="https://www.bli.gov.tw/0011588.html" target="_blank" rel="noopener noreferrer">勞工保險普通事故及就業保險合計之保險費分擔金額表</a>
+          <span class="srcorg">勞動部勞工保險局</span>
+        </li>
+        <li>
+          <a href="https://www.bli.gov.tw/0106148.html" target="_blank" rel="noopener noreferrer">勞工職業災害保險投保薪資分級表</a>
+          <span class="srcorg">勞動部勞工保險局</span>
+        </li>
+        <li>
+          <a href="https://www.bli.gov.tw/0013083.html" target="_blank" rel="noopener noreferrer">勞工退休金月提繳工資分級表</a>
+          <span class="srcorg">勞動部勞工保險局</span>
+        </li>
+        <li>
+          <a href="https://www.nhi.gov.tw/ch/cp-19418-9eefb-2576-1.html" target="_blank" rel="noopener noreferrer">全民健康保險保險費負擔金額表（三）</a>
+          <span class="srcorg">衛生福利部中央健康保險署</span>
+        </li>
+        <li>
+          <a href="https://www.nhi.gov.tw/ch/cp-19421-f9533-2569-1.html" target="_blank" rel="noopener noreferrer">全民健康保險投保金額分級表</a>
+          <span class="srcorg">衛生福利部中央健康保險署</span>
+        </li>
+        <li>
+          <a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=N0030005" target="_blank" rel="noopener noreferrer">積欠工資墊償基金提繳及墊償管理辦法</a>
+          <span class="srcorg">全國法規資料庫（萬分之 2.5）</span>
+        </li>
+      </ul>
+    </div>
+
+    <p class="basis">
+      <b>試算基礎：</b>勞保普通事故費率 11.5%＋就業保險 1%（合計 12.5%），勞工 20%／雇主 70%／政府 10%；
+      健保費率 5.17%，勞工 30%／雇主 60%（雇主負擔含平均眷口數 0.56 人，合計 1.56 人）／政府 10%；
+      勞工退休金新制 6%（雇主全額，提繳下限 1,500、上限 150,000）；
+      積欠工資墊償基金萬分之 2.5（雇主全額，按勞保投保薪資總額計）。
+    </p>
+    <p class="basis">
+      <b>級距上下限：</b>勞保 11,100～45,800；健保 29,500～313,000；勞退提繳 1,500～150,000；職災 29,500～72,800。
+    </p>
+    <p class="basis">
+      <b>提醒：</b>本頁僅供參考與內部估算，實際應繳金額以勞保局、健保署核定為準。
+      上列勞保費含就業保險，<b>不含</b>雇主全額負擔之職業災害保險費（依行業別費率不同，可於上方進階選項加計）。
+      到職或離職當月未足月者，勞保按日計收、健保按月計收。
+    </p>
   </footer>
 </div>
 

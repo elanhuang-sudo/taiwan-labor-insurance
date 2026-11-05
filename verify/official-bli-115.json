@@ -1,0 +1,114 @@
+{
+ "11100": {
+  "worker": 277,
+  "employer": 972
+ },
+ "12540": {
+  "worker": 313,
+  "employer": 1097
+ },
+ "13500": {
+  "worker": 338,
+  "employer": 1182
+ },
+ "15840": {
+  "worker": 396,
+  "employer": 1386
+ },
+ "16500": {
+  "worker": 413,
+  "employer": 1444
+ },
+ "17280": {
+  "worker": 432,
+  "employer": 1512
+ },
+ "17880": {
+  "worker": 447,
+  "employer": 1564
+ },
+ "19047": {
+  "worker": 476,
+  "employer": 1666
+ },
+ "20008": {
+  "worker": 500,
+  "employer": 1751
+ },
+ "21009": {
+  "worker": 525,
+  "employer": 1838
+ },
+ "22000": {
+  "worker": 550,
+  "employer": 1925
+ },
+ "23100": {
+  "worker": 577,
+  "employer": 2022
+ },
+ "24000": {
+  "worker": 600,
+  "employer": 2100
+ },
+ "25250": {
+  "worker": 632,
+  "employer": 2210
+ },
+ "26400": {
+  "worker": 660,
+  "employer": 2310
+ },
+ "27600": {
+  "worker": 690,
+  "employer": 2415
+ },
+ "28590": {
+  "worker": 715,
+  "employer": 2501
+ },
+ "29500": {
+  "worker": 738,
+  "employer": 2582
+ },
+ "30300": {
+  "worker": 758,
+  "employer": 2651
+ },
+ "31800": {
+  "worker": 795,
+  "employer": 2783
+ },
+ "33300": {
+  "worker": 833,
+  "employer": 2914
+ },
+ "34800": {
+  "worker": 870,
+  "employer": 3045
+ },
+ "36300": {
+  "worker": 908,
+  "employer": 3176
+ },
+ "38200": {
+  "worker": 955,
+  "employer": 3342
+ },
+ "40100": {
+  "worker": 1002,
+  "employer": 3509
+ },
+ "42000": {
+  "worker": 1050,
+  "employer": 3675
+ },
+ "43900": {
+  "worker": 1098,
+  "employer": 3841
+ },
+ "45800": {
+  "worker": 1145,
+  "employer": 4008
+ }
+}
