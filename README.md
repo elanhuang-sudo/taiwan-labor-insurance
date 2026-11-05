@@ -8,6 +8,7 @@
 tool.kscpb.com/                   工具選單首頁
 tool.kscpb.com/labor-insurance/   勞健保三合一保費試算
 tool.kscpb.com/rent/              租金扣繳與二代健保補充保費試算
+tool.kscpb.com/withholding/       薪資所得扣繳稅額試算
 tool.kscpb.com/<工具名>/           以後新增的工具放這裡
 ```
 
@@ -20,6 +21,7 @@ tool.kscpb.com/<工具名>/           以後新增的工具放這裡
 |---|---|
 | 勞健保保費試算 | `https://tool.kscpb.com/labor-insurance/` |
 | 租金扣繳試算 | `https://tool.kscpb.com/rent/` |
+| 薪資扣繳試算 | `https://tool.kscpb.com/withholding/` |
 | 工具總覽（首頁） | `https://tool.kscpb.com/` |
 
 > 短網址（Rebrandly `g.kscpb.com`）**不是必要**。既有連結
@@ -187,3 +189,75 @@ node rent\_verify.js
 - 假設房東為**個人**（免開發票）。若為營業人開立發票，另有 5% 營業稅，不在本試算範圍。
 - 管理費、水電費等另行約定者，本頁僅就租金本身計算。
 - 僅供參考，實際以稽徵機關及健保署認定為準。
+
+---
+
+# 工具三：薪資所得扣繳稅額試算（`/withholding/`）
+
+依**財政部中區國稅局**官方「115 年度薪資所得扣繳稅額表」查每月應扣繳稅額。
+
+- 檔案：`withholding/index.html`（單檔、可離線使用）
+- 網址：`https://tool.kscpb.com/withholding/`
+
+## 三種扣繳方式
+
+| 方式 | 適用 | 算法 | 起扣點 |
+|---|---|---|---|
+| **有填免稅額申報表** | 員工已填表載明扶養親屬 | 查稅額表（依薪資＋扶養人數） | 表已內含 2,000 元門檻 |
+| **未填／免填申報表** | 按 5% 扣繳 | 全月給付總額 × 5% | **40,020**（稅額 > 2,000 才扣） |
+| **兼職／非每月給付** | 兼職所得、非按月給付 | 每次給付額 × 5% | **90,501**（無扶養者起扣點） |
+
+> 兩個 5% 的起扣點不同，是《薪資所得扣繳辦法》第 7 條規定的：
+> 按月給付看「每月稅額是否超過 2,000 元」，兼職看「每次給付是否達起扣點」。
+
+## 官方資料
+
+| 項目 | 連結 |
+|---|---|
+| 薪資受領人免稅額申報表 | [PDF](https://www.ntbca.gov.tw/download/15f95ce317284840896358cd2bb226bf) ／ [ODT](https://www.ntbca.gov.tw/download/7757a083dbbe434fb706f67f5fd3bac9) |
+| 115 年度扣繳稅額表 | [PDF](https://www.ntbca.gov.tw/download/1c078888d4344f838b88614ebe8e632b) ／ [ODS](https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7) ／ [說明](https://www.ntbca.gov.tw/download/ec08154ea280452daefa59a110336f6e) |
+| 扣繳申報專區 | <https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812> |
+
+頁面上的下載按鈕直接指向國稅局官方檔案，本專案不另行轉存。
+
+## 資料重建（換年度時）
+
+稅額表有 840 列 × 12 欄，**不要手動編輯**。改走建置腳本：
+
+```powershell
+# 1. 下載官方 ODS（每年的下載 ID 會變，請到扣繳申報專區取得）
+curl -L -o wh115.ods "https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7"
+
+# 2. 解析 ODS → 注入樣板 → 產生網頁
+python build\withholding-from-ods.py wh115.ods
+
+# 3. 驗證
+node withholding\_verify.js
+```
+
+腳本會同時更新 `verify/official-withholding-115.json`（官方資料快照）。
+
+- 樣板：`build/withholding-template.html`（含 `__TABLE_DATA__` 標記）
+- 建置：`build/withholding-from-ods.py`
+
+## 數字驗證
+
+```powershell
+node withholding\_verify.js
+```
+
+會驗證：
+
+- 對照 Google 試算表關鍵值（90,501→2,020；107,501 0位→3,340、2位→2,030；200,001 11位→3,330）
+- 區間邊界（90,500 免扣、90,501 開始扣；90,999 與 91,001 分屬不同列）
+- 5% 模式起扣點（未填 40,019 vs 40,020；兼職 90,500 vs 90,501）
+- 840 列間距皆為 500、連續無斷、`low` 皆為 `500n+1`
+- 單調性：扶養人數增加時稅額遞減或不變
+
+## 注意
+
+- 查表模式僅適用月薪 **80,001～500,000 元**；低於 80,001 元稅額為 0，超過 500,000 元以最高列計算。
+- 查表用的薪資是**全月給付總額**（含具工資性質的獎金、津貼）。非每月給付請改用「兼職／非每月給付」模式。
+- 免扣繳仍須**列單申報**；同一人全年給付不超過 1,000 元者免申報。
+- 本頁只算所得稅扣繳，不含勞健保費、勞退自提等其他扣除。
+- 員工**未實際填寫**免稅額申報表時，公司不得逕行按扶養人數查表，應改用 5% 方式（頁面會提示）。

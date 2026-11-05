@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>薪資所得扣繳稅額試算｜tool.kscpb.com</title>
+<meta name="description" content="115 年度薪資所得扣繳稅額試算。依財政部中區國稅局官方「薪資所得扣繳稅額表」，輸入月薪與扶養親屬人數即算出每月應扣繳稅額與實領金額，並提供免稅額申報表下載。" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧾</text></svg>" />
+<style>
+  :root{
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff;
+    --brand:#1d4ed8; --brand-2:#0e7490;
+    --tax:#4338ca; --tax-bg:#eef2ff;
+    --net:#047857; --net-bg:#ecfdf5;
+    --warn:#b45309; --warn-bg:#fffbeb;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -12px rgba(15,23,42,.18);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",system-ui,-apple-system,sans-serif;
+    line-height:1.6; padding-bottom:88px;
+  }
+  .wrap{max-width:1020px;margin:0 auto;padding:24px 16px 40px}
+
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#312e81 55%,#4338ca 100%);
+    color:#fff;border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  header.hero::after{
+    content:"";position:absolute;inset:auto -60px -120px auto;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle,rgba(129,140,248,.38),transparent 65%);
+  }
+  .backwrap{margin-bottom:14px;position:relative;z-index:2}
+  .backlink{
+    display:inline-flex;align-items:center;gap:6px;
+    color:#cbd5e1;font-size:13px;font-weight:700;text-decoration:none;
+    padding:5px 12px 5px 9px;border-radius:999px;transition:.15s;
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);
+  }
+  .backlink:hover{background:rgba(255,255,255,.18);color:#fff}
+  .year-tag{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.04em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    padding:5px 12px;border-radius:999px;margin-bottom:12px;
+  }
+  header.hero h1{margin:0;font-size:clamp(21px,3.4vw,29px);line-height:1.35;letter-spacing:.01em;position:relative;z-index:2}
+  header.hero p{margin:10px 0 0;color:#c5cae9;font-size:14.5px;max-width:58ch;position:relative;z-index:2}
+  .btn-print{
+    position:absolute;right:20px;top:20px;z-index:2;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+    border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-print:hover{background:rgba(255,255,255,.24)}
+
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+  section{margin-top:18px}
+  .pad{padding:20px 22px}
+  h2.sec{font-size:15px;margin:0 0 14px;color:var(--ink-2);letter-spacing:.06em;font-weight:800;display:flex;align-items:center;gap:9px}
+  h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--tax),var(--brand-2))}
+  h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
+
+  /* ---------- mode cards ---------- */
+  .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  .mode{
+    border:2px solid var(--line);background:#f8fafc;border-radius:14px;padding:14px 15px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;position:relative;
+  }
+  .mode:hover{border-color:#c7d2fe;background:#eef2ff}
+  .mode.on{border-color:var(--tax);background:var(--tax-bg);box-shadow:0 0 0 4px rgba(67,56,202,.10)}
+  .mode .t{display:block;font-size:14px;font-weight:800;color:var(--ink);margin-bottom:3px;line-height:1.4}
+  .mode.on .t{color:var(--tax)}
+  .mode .d{display:block;font-size:11.5px;color:var(--muted);line-height:1.5}
+  .mode .badge{
+    position:absolute;right:11px;top:11px;font-size:10px;font-weight:800;
+    background:var(--tax);color:#fff;padding:1px 6px;border-radius:999px;opacity:0;transition:.15s;
+  }
+  .mode.on .badge{opacity:1}
+
+  /* ---------- input ---------- */
+  .row2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px}
+  .field{display:grid;gap:8px}
+  .field label{font-size:13px;font-weight:700;color:var(--ink-2)}
+  .money{
+    display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;
+    padding:6px 14px;background:#f8fafc;transition:.15s;
+  }
+  .money:focus-within{border-color:var(--tax);background:#fff;box-shadow:0 0 0 4px rgba(67,56,202,.12)}
+  .money .cur{font-size:16px;color:var(--muted);font-weight:700}
+  .money input{
+    flex:1;min-width:0;border:0;background:transparent;outline:none;
+    font-size:clamp(25px,4.6vw,32px);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+    font-variant-numeric:tabular-nums;padding:6px 0;
+  }
+  .money input::-webkit-outer-spin-button,.money input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .money input[type=number]{-moz-appearance:textfield}
+  select{
+    width:100%;border:2px solid var(--line);border-radius:12px;padding:12px;background:#f8fafc;
+    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;cursor:pointer;height:100%;
+  }
+  select:focus{outline:none;border-color:var(--tax);background:#fff;box-shadow:0 0 0 4px rgba(67,56,202,.12)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:999px;
+    padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-variant-numeric:tabular-nums;
+  }
+  .chip:hover{border-color:#c7d2fe;background:#eef2ff;color:var(--tax)}
+  .chip.on{background:var(--tax);border-color:var(--tax);color:#fff}
+  .note{font-size:13px;color:var(--muted);margin:14px 0 0;padding-left:14px;border-left:3px solid var(--line);line-height:1.7}
+  .note b{color:var(--ink-2)}
+
+  /* ---------- results ---------- */
+  .results{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .res{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .res::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .res.tax{background:linear-gradient(180deg,var(--tax-bg),#fff 62%)}
+  .res.tax::before{background:var(--tax)}
+  .res.net{background:linear-gradient(180deg,var(--net-bg),#fff 62%)}
+  .res.net::before{background:var(--net)}
+  .res .who{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .res .who h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.02em}
+  .res.tax .who h3{color:var(--tax)}
+  .res.net .who h3{color:var(--net)}
+  .res .who .sub{font-size:12px;color:var(--muted);font-weight:600}
+  .res .amt{margin:10px 0 2px;font-size:clamp(30px,5.8vw,42px);font-weight:900;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1.1}
+  .res.tax .amt{color:var(--tax)}
+  .res.net .amt{color:var(--net)}
+  .res .amt small{font-size:14px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0}
+  .res .brk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink-2)}
+  .res .brk div{display:flex;justify-content:space-between;gap:10px;padding:2.5px 0;font-variant-numeric:tabular-nums}
+  .res .brk span:last-child{font-weight:700}
+
+  /* ---------- table ---------- */
+  .sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sechead h2.sec{margin:0}
+  .btn-copy{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:10px;
+    padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:#c7d2fe;background:#eef2ff;color:var(--tax)}
+  .btn-copy.done{background:#d1fae5;border-color:#6ee7b7;color:#047857}
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:10px 12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;white-space:normal}
+  thead th{background:#f8fafc;font-size:12.5px;color:var(--muted);letter-spacing:.03em;font-weight:800;border-bottom:2px solid var(--line)}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#f8fafc;font-weight:900;font-size:15px;border-top:2px solid var(--line)}
+  .rate{display:block;font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:0}
+  .zero{color:#cbd5e1}
+
+  /* ---------- download links ---------- */
+  .dl{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .dlcard{
+    border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:#f8fafc;
+  }
+  .dlcard h3{margin:0 0 4px;font-size:14.5px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .dlcard h3 .ico{
+    width:26px;height:26px;border-radius:7px;display:grid;place-items:center;flex:0 0 26px;
+    background:#e0e7ff;color:var(--tax);font-size:13px;
+  }
+  .dlcard p{margin:0 0 12px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .dlrow{display:flex;flex-wrap:wrap;gap:8px}
+  .dlbtn{
+    display:inline-flex;align-items:center;gap:5px;
+    background:#fff;border:1px solid #c7d2fe;color:var(--tax);text-decoration:none;
+    border-radius:9px;padding:7px 13px;font-size:12.5px;font-weight:800;transition:.15s;
+  }
+  .dlbtn:hover{background:var(--tax);border-color:var(--tax);color:#fff;transform:translateY(-1px)}
+  .dlbtn.primary{background:var(--tax);border-color:var(--tax);color:#fff}
+  .dlbtn.primary:hover{background:#3730a3}
+  .dlbtn .ext{font-size:10.5px;opacity:.8;font-weight:700}
+
+  /* ---------- misc ---------- */
+  .warn{
+    margin-top:16px;background:var(--warn-bg);border:1px solid #fde68a;border-left:4px solid var(--warn);
+    border-radius:12px;padding:13px 16px;font-size:13px;color:#78350f;line-height:1.7;
+  }
+  .warn b{color:#92400e}
+  details{margin-top:18px}
+  details > summary{
+    cursor:pointer;list-style:none;font-weight:800;font-size:14.5px;color:var(--ink-2);
+    padding:16px 22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  details > summary::-webkit-details-marker{display:none}
+  details > summary .arw{transition:.2s;color:var(--muted)}
+  details[open] > summary .arw{transform:rotate(180deg)}
+  details[open] > summary{border-radius:var(--radius) var(--radius) 0 0;border-bottom:0;box-shadow:none}
+  details .body{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--radius) var(--radius);padding:18px 22px 22px;box-shadow:var(--shadow)}
+  details .body h4{margin:16px 0 6px;font-size:13.5px;color:var(--ink-2);font-weight:800}
+  details .body h4:first-child{margin-top:0}
+  details .body p{margin:0 0 8px;font-size:13px;color:var(--ink-2);line-height:1.75}
+  details .body ul{margin:0 0 8px;padding-left:1.3em;font-size:13px;color:var(--ink-2);line-height:1.8}
+  details .body a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+  footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.8}
+
+  /* ---------- sticky ---------- */
+  .sticky{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(15,23,42,.96);
+    backdrop-filter:blur(10px);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,64px);
+    box-shadow:0 -8px 24px rgba(15,23,42,.22);border-top:1px solid rgba(255,255,255,.12);
+  }
+  .sticky .it{display:flex;flex-direction:column;align-items:center;line-height:1.25}
+  .sticky .it .k{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.04em}
+  .sticky .it .v{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .sticky .it.a .v{color:#a5b4fc}
+  .sticky .it.b .v{color:#6ee7b7}
+  .sticky .lvbox{font-size:11px;color:#94a3b8;text-align:center;border-left:1px solid rgba(255,255,255,.14);padding-left:clamp(12px,4vw,28px);font-variant-numeric:tabular-nums}
+  .sticky .lvbox b{display:block;color:#e2e8f0;font-size:13px}
+
+  @media (max-width:780px){
+    .modes{grid-template-columns:1fr}
+    .results,.dl{grid-template-columns:1fr}
+    .row2{grid-template-columns:1fr}
+    .pad{padding:18px 16px}
+    .res{padding:18px}
+    .btn-print{display:none}
+  }
+  @media (max-width:640px){
+    table{font-size:12.5px}
+    th,td{padding:8px 7px}
+    .rate{font-size:10.5px}
+    tr.total td{font-size:13.5px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .sticky,.chips,.mode .badge,.btn-print,.btn-copy,.backwrap{display:none!important}
+    .card,.res,header.hero,details>summary,details .body,.dlcard{box-shadow:none;border:1px solid #cbd5e1}
+    header.hero{background:#f1f5f9!important;color:#0f172a}
+    header.hero p{color:#334155}
+    .mode{display:none}
+    .mode.on{display:block;border-color:#94a3b8}
+    details .body{display:block}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="btn-print" onclick="window.print()">列印／存 PDF</button>
+    <div class="backwrap"><a class="backlink" href="../">← 回工具列表</a></div>
+    <div class="year-tag">115 年度 ・ 財政部中區國稅局官方稅額表</div>
+    <h1>薪資所得扣繳稅額試算</h1>
+    <p>每月發薪水要扣多少所得稅？選好扣繳方式、輸入月薪與扶養親屬人數，立即查出應扣繳稅額與員工實領金額。</p>
+  </header>
+
+  <!-- 輸入 -->
+  <section class="card pad">
+    <h2 class="sec">步驟 1 ・ 選擇扣繳方式</h2>
+
+    <div class="modes">
+      <button class="mode on" id="mFilled" type="button">
+        <span class="badge">已選</span>
+        <span class="t">有填免稅額申報表</span>
+        <span class="d">員工已填表並載明扶養親屬 → 查稅額表</span>
+      </button>
+      <button class="mode" id="mNotFilled" type="button">
+        <span class="badge">已選</span>
+        <span class="t">未填／免填申報表</span>
+        <span class="d">按全月給付總額扣 5%</span>
+      </button>
+      <button class="mode" id="mPartTime" type="button">
+        <span class="badge">已選</span>
+        <span class="t">兼職／非每月給付</span>
+        <span class="d">按每次給付扣 5%，起扣點較高</span>
+      </button>
+    </div>
+
+    <h2 class="sec" style="margin-top:22px">步驟 2 ・ 輸入金額</h2>
+    <div class="row2">
+      <div class="field">
+        <label for="salary">每月薪資總額</label>
+        <div class="money">
+          <span class="cur">NT$</span>
+          <input id="salary" type="number" inputmode="numeric" min="0" step="1" value="100000" autocomplete="off" />
+        </div>
+      </div>
+      <div class="field" id="depField">
+        <label for="dep">配偶及受扶養親屬人數</label>
+        <select id="dep">
+          <option value="0">0 人（單身無扶養）</option>
+          <option value="1">1 人</option>
+          <option value="2">2 人</option>
+          <option value="3">3 人</option>
+          <option value="4">4 人</option>
+          <option value="5">5 人</option>
+          <option value="6">6 人</option>
+          <option value="7">7 人</option>
+          <option value="8">8 人</option>
+          <option value="9">9 人</option>
+          <option value="10">10 人</option>
+          <option value="11">11 人</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="chips" id="chips"></div>
+    <p class="note" id="pickNote"></p>
+  </section>
+
+  <!-- 結果 -->
+  <section class="results" aria-live="polite">
+    <div class="res tax">
+      <div class="who">
+        <h3>應扣繳稅額</h3>
+        <span class="sub">公司代扣繳國庫</span>
+      </div>
+      <div class="amt" id="taxAmt">—<small>元／月</small></div>
+      <div class="brk" id="taxBrk"></div>
+    </div>
+
+    <div class="res net">
+      <div class="who">
+        <h3>員工實領</h3>
+        <span class="sub">薪資 − 扣繳稅額</span>
+      </div>
+      <div class="amt" id="netAmt">—<small>元／月</small></div>
+      <div class="brk" id="netBrk"></div>
+    </div>
+  </section>
+
+  <!-- 明細 -->
+  <section class="card pad" style="margin-top:16px">
+    <div class="sechead">
+      <h2 class="sec">扣繳明細 <span class="hint" id="detailHead"></span></h2>
+      <button class="btn-copy" id="copyBtn" type="button">複製試算結果</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>金額／數值</th>
+            <th>說明</th>
+          </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+    <div class="warn" id="warnBox" style="display:none"></div>
+  </section>
+
+  <!-- 表單下載 -->
+  <section class="card pad">
+    <h2 class="sec">表單與官方資料下載 <span class="hint">財政部中區國稅局</span></h2>
+    <div class="dl">
+      <div class="dlcard">
+        <h3><span class="ico">📝</span> 薪資受領人免稅額申報表</h3>
+        <p>員工要「填表」才能按扶養親屬人數查表扣繳。新到職或扶養親屬有異動時，請員工填寫後交回公司留存。</p>
+        <div class="dlrow">
+          <a class="dlbtn primary" href="https://www.ntbca.gov.tw/download/15f95ce317284840896358cd2bb226bf" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
+          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/7757a083dbbe434fb706f67f5fd3bac9" target="_blank" rel="noopener noreferrer">下載 ODT <span class="ext">↗</span></a>
+        </div>
+      </div>
+      <div class="dlcard">
+        <h3><span class="ico">📊</span> 115 年度薪資所得扣繳稅額表</h3>
+        <p>本頁查表結果即取自這份官方檔案（共 840 列，涵蓋月薪 80,001～500,000 元）。可下載原始檔自行核對。</p>
+        <div class="dlrow">
+          <a class="dlbtn primary" href="https://www.ntbca.gov.tw/download/1c078888d4344f838b88614ebe8e632b" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
+          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7" target="_blank" rel="noopener noreferrer">下載 ODS <span class="ext">↗</span></a>
+          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/ec08154ea280452daefa59a110336f6e" target="_blank" rel="noopener noreferrer">說明 PDF <span class="ext">↗</span></a>
+        </div>
+      </div>
+    </div>
+    <p class="note">
+      資料來源：<a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer" style="color:var(--brand)">財政部中區國稅局 扣繳申報專區</a>（更新日期 114-12-24）。
+      檔案連結直接指向國稅局官方下載位置，本頁不另行轉存。
+    </p>
+  </section>
+
+  <!-- 說明 -->
+  <details>
+    <summary>
+      <span>扣繳方式說明與法源</span>
+      <span class="arw">▾</span>
+    </summary>
+    <div class="body">
+      <h4>一、三種扣繳方式</h4>
+      <ul>
+        <li><b>有填免稅額申報表</b>：依「薪資所得扣繳稅額表」，按全月薪資與配偶及受扶養親屬人數查表。表列金額已排除未達 2,000 元者。</li>
+        <li><b>未填／免填申報表</b>：按全月給付總額扣取 <b>5%</b>。每月應扣繳稅額不超過 2,000 元者免予扣繳 → 起扣點 <b>40,020 元</b>。</li>
+        <li><b>兼職所得／非每月給付之薪資</b>：按每次給付額扣取 <b>5%</b>。每次給付未達薪資所得扣繳稅額表「無配偶及受扶養親屬者之起扣點」者免扣 → 起扣點 <b>90,501 元</b>。</li>
+      </ul>
+
+      <h4>二、為什麼有兩個 5% 卻不同起扣點</h4>
+      <p>依《薪資所得扣繳辦法》第 7 條：</p>
+      <ul>
+        <li>按月給付之薪資：<b>每月</b>應扣繳稅額不超過 2,000 元者免扣（故 40,020 × 5% = 2,001 才開始扣）。</li>
+        <li>兼職及非每月給付：<b>每次</b>給付金額未達「無配偶及無扶養親屬者之起扣點」（115 年度為 90,501 元）者免扣。</li>
+      </ul>
+
+      <h4>三、免扣仍要列單申報</h4>
+      <p>依《薪資所得扣繳辦法》第 7 條第 3 項，免予扣繳之薪資，扣繳義務人仍應列單申報該管稽徵機關。但對同一納稅義務人<b>全年給付金額不超過 1,000 元</b>者，免予申報。</p>
+
+      <h4>四、繳納與申報期限</h4>
+      <ul>
+        <li>扣繳稅款：於給付日<b>次月 10 日前</b>向國庫繳清。</li>
+        <li>扣繳憑單：於次年 1 月底前申報（每年實際截止日依財政部公告）。</li>
+      </ul>
+
+      <h4>五、本頁計算範圍</h4>
+      <ul>
+        <li>查表模式僅適用月薪 <b>80,001～500,000 元</b>；低於 80,001 元者稅額為 0。</li>
+        <li>查表用的薪資為<b>全月給付總額</b>（含獎金、津貼等具工資性質者）；非每月給付者請改用「兼職／非每月給付」模式。</li>
+        <li>本頁不計算勞健保費、勞退自提等其他扣除項，僅算所得稅扣繳。</li>
+      </ul>
+
+      <h4>六、法源</h4>
+      <ul>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340081" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>第 2 條</li>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340009" target="_blank" rel="noopener noreferrer">薪資所得扣繳辦法</a>第 5～7 條</li>
+        <li><a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer">財政部中區國稅局 扣繳申報專區</a></li>
+      </ul>
+    </div>
+  </details>
+
+  <footer class="dis">
+    <b>提醒：</b>本頁為試算工具，結果僅供參考，不構成稅務建議。實際扣繳義務請依稽徵機關規定辦理。
+  </footer>
+</div>
+
+<!-- 手機固定摘要 -->
+<div class="sticky" aria-hidden="true">
+  <div class="it a"><span class="k">扣繳稅額</span><span class="v" id="barTax">—</span></div>
+  <div class="lvbox">實領<b id="barNet">—</b></div>
+  <div class="it b"><span class="k">扣繳率</span><span class="v" id="barRate">—</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     115 年度薪資所得扣繳稅額表
+     格式：[薪資下限, 0位, 1位, 2位 ... 11位扶養親屬的扣繳稅額]
+     尾端為 0 的欄位已省略；查表時缺值視為 0
+     資料來源：財政部中區國稅局（840 列，80,001～500,000）
+     ========================================================= */
+  var TABLE = [[80001],[80501],[81001],[81501],[82001],[82501],[83001],[83501],[84001],[84501],[85001],[85501],[86001],[86501],[87001],[87501],[88001],[88501],[89001],[89501],[90001],[90501,2020],[91001,2050],[91501,2070],[92001,2100],[92501,2120],[93001,2150],[93501,2170],[94001,2200],[94501,2220],[95001,2250],[95501,2270],[96001,2300],[96501,2320],[97001,2350],[97501,2370],[98001,2400],[98501,2420],[99001,2450,2020],[99501,2470,2050],[100001,2500,2070],[100501,2520,2100],[101001,2560,2120],[101501,2620,2150],[102001,2680,2170],[102501,2740,2200],[103001,2800,2220],[103501,2860,2250],[104001,2920,2270],[104501,2980,2300],[105001,3040,2320],[105501,3100,2350],[106001,3160,2370],[106501,3220,2400],[107001,3280,2420],[107501,3340,2450,2030],[108001,3400,2470,2050],[108501,3460,2500,2080],[109001,3520,2520,2100],[109501,3580,2570,2130],[110001,3640,2630,2150],[110501,3700,2690,2180],[111001,3760,2750,2200],[111501,3820,2810,2230],[112001,3880,2870,2250],[112501,3940,2930,2280],[113001,4000,2990,2300],[113501,4060,3050,2330],[114001,4120,3110,2350],[114501,4180,3170,2380],[115001,4240,3230,2400],[115501,4300,3290,2430,2010],[116001,4360,3350,2450,2030],[116501,4420,3410,2480,2060],[117001,4480,3470,2500,2080],[117501,4540,3530,2530,2110],[118001,4600,3590,2580,2130],[118501,4660,3650,2640,2160],[119001,4720,3710,2700,2180],[119501,4780,3770,2760,2210],[120001,4840,3830,2820,2230],[120501,4900,3890,2880,2260],[121001,4960,3950,2940,2280],[121501,5020,4010,3000,2310],[122001,5080,4070,3060,2330],[122501,5140,4130,3120,2360],[123001,5200,4190,3180,2380],[123501,5260,4250,3240,2410],[124001,5320,4310,3300,2430,2010],[124501,5380,4370,3360,2460,2040],[125001,5440,4430,3420,2480,2060],[125501,5500,4490,3480,2510,2090],[126001,5560,4550,3540,2530,2110],[126501,5620,4610,3600,2590,2140],[127001,5680,4670,3660,2650,2160],[127501,5740,4730,3720,2710,2190],[128001,5800,4790,3780,2770,2210],[128501,5860,4850,3840,2830,2240],[129001,5920,4910,3900,2890,2260],[129501,5980,4970,3960,2950,2290],[130001,6040,5030,4020,3010,2310],[130501,6100,5090,4080,3070,2340],[131001,6160,5150,4140,3130,2360],[131501,6220,5210,4200,3190,2390],[132001,6280,5270,4260,3250,2410],[132501,6340,5330,4320,3310,2440,2020],[133001,6400,5390,4380,3370,2460,2040],[133501,6460,5450,4440,3430,2490,2070],[134001,6520,5510,4500,3490,2510,2090],[134501,6580,5570,4560,3550,2540,2120],[135001,6640,5630,4620,3610,2600,2140],[135501,6700,5690,4680,3670,2660,2170],[136001,6760,5750,4740,3730,2720,2190],[136501,6820,5810,4800,3790,2780,2220],[137001,6880,5870,4860,3850,2840,2240],[137501,6940,5930,4920,3910,2900,2270],[138001,7000,5990,4980,3970,2960,2290],[138501,7060,6050,5040,4030,3020,2320],[139001,7120,6110,5100,4090,3080,2340],[139501,7180,6170,5160,4150,3140,2370],[140001,7240,6230,5220,4210,3200,2390],[140501,7300,6290,5280,4270,3260,2420],[141001,7360,6350,5340,4330,3320,2440,2020],[141501,7420,6410,5400,4390,3380,2470,2050],[142001,7480,6470,5460,4450,3440,2490,2070],[142501,7540,6530,5520,4510,3500,2520,2100],[143001,7600,6590,5580,4570,3560,2550,2120],[143501,7660,6650,5640,4630,3620,2610,2150],[144001,7720,6710,5700,4690,3680,2670,2170],[144501,7780,6770,5760,4750,3740,2730,2200],[145001,7840,6830,5820,4810,3800,2790,2220],[145501,7900,6890,5880,4870,3860,2850,2250],[146001,7960,6950,5940,4930,3920,2910,2270],[146501,8020,7010,6000,4990,3980,2970,2300],[147001,8080,7070,6060,5050,4040,3030,2320],[147501,8140,7130,6120,5110,4100,3090,2350],[148001,8200,7190,6180,5170,4160,3150,2370],[148501,8260,7250,6240,5230,4220,3210,2400],[149001,8320,7310,6300,5290,4280,3270,2420],[149501,8380,7370,6360,5350,4340,3330,2450,2020],[150001,8440,7430,6420,5410,4400,3390,2470,2050],[150501,8500,7490,6480,5470,4460,3450,2500,2070],[151001,8560,7550,6540,5530,4520,3510,2520,2100],[151501,8620,7610,6600,5590,4580,3570,2560,2120],[152001,8680,7670,6660,5650,4640,3630,2620,2150],[152501,8740,7730,6720,5710,4700,3690,2680,2170],[153001,8800,7790,6780,5770,4760,3750,2740,2200],[153501,8860,7850,6840,5830,4820,3810,2800,2220],[154001,8920,7910,6900,5890,4880,3870,2860,2250],[154501,8980,7970,6960,5950,4940,3930,2920,2270],[155001,9040,8030,7020,6010,5000,3990,2980,2300],[155501,9100,8090,7080,6070,5060,4050,3040,2320],[156001,9160,8150,7140,6130,5120,4110,3100,2350],[156501,9220,8210,7200,6190,5180,4170,3160,2370],[157001,9280,8270,7260,6250,5240,4230,3220,2400],[157501,9340,8330,7320,6310,5300,4290,3280,2420],[158001,9400,8390,7380,6370,5360,4350,3340,2450,2030],[158501,9460,8450,7440,6430,5420,4410,3400,2470,2050],[159001,9520,8510,7500,6490,5480,4470,3460,2500,2080],[159501,9580,8570,7560,6550,5540,4530,3520,2520,2100],[160001,9640,8630,7620,6610,5600,4590,3580,2570,2130],[160501,9700,8690,7680,6670,5660,4650,3640,2630,2150],[161001,9760,8750,7740,6730,5720,4710,3700,2690,2180],[161501,9820,8810,7800,6790,5780,4770,3760,2750,2200],[162001,9880,8870,7860,6850,5840,4830,3820,2810,2230],[162501,9940,8930,7920,6910,5900,4890,3880,2870,2250],[163001,10000,8990,7980,6970,5960,4950,3940,2930,2280],[163501,10060,9050,8040,7030,6020,5010,4000,2990,2300],[164001,10120,9110,8100,7090,6080,5070,4060,3050,2330],[164501,10180,9170,8160,7150,6140,5130,4120,3110,2350],[165001,10240,9230,8220,7210,6200,5190,4180,3170,2380],[165501,10340,9290,8280,7270,6260,5250,4240,3230,2400],[166001,10440,9350,8340,7330,6320,5310,4300,3290,2430,2010],[166501,10540,9410,8400,7390,6380,5370,4360,3350,2450,2030],[167001,10640,9470,8460,7450,6440,5430,4420,3410,2480,2060],[167501,10740,9530,8520,7510,6500,5490,4480,3470,2500,2080],[168001,10840,9590,8580,7570,6560,5550,4540,3530,2530,2110],[168501,10940,9650,8640,7630,6620,5610,4600,3590,2580,2130],[169001,11040,9710,8700,7690,6680,5670,4660,3650,2640,2160],[169501,11140,9770,8760,7750,6740,5730,4720,3710,2700,2180],[170001,11240,9830,8820,7810,6800,5790,4780,3770,2760,2210],[170501,11340,9890,8880,7870,6860,5850,4840,3830,2820,2230],[171001,11440,9950,8940,7930,6920,5910,4900,3890,2880,2260],[171501,11540,10010,9000,7990,6980,5970,4960,3950,2940,2280],[172001,11640,10070,9060,8050,7040,6030,5020,4010,3000,2310],[172501,11740,10130,9120,8110,7100,6090,5080,4070,3060,2330],[173001,11840,10190,9180,8170,7160,6150,5140,4130,3120,2360],[173501,11940,10250,9240,8230,7220,6210,5200,4190,3180,2380],[174001,12040,10350,9300,8290,7280,6270,5260,4250,3240,2410],[174501,12140,10450,9360,8350,7340,6330,5320,4310,3300,2430,2010],[175001,12240,10550,9420,8410,7400,6390,5380,4370,3360,2460,2040],[175501,12340,10650,9480,8470,7460,6450,5440,4430,3420,2480,2060],[176001,12440,10750,9540,8530,7520,6510,5500,4490,3480,2510,2090],[176501,12540,10850,9600,8590,7580,6570,5560,4550,3540,2530,2110],[177001,12640,10950,9660,8650,7640,6630,5620,4610,3600,2590,2140],[177501,12740,11050,9720,8710,7700,6690,5680,4670,3660,2650,2160],[178001,12840,11150,9780,8770,7760,6750,5740,4730,3720,2710,2190],[178501,12940,11250,9840,8830,7820,6810,5800,4790,3780,2770,2210],[179001,13040,11350,9900,8890,7880,6870,5860,4850,3840,2830,2240],[179501,13140,11450,9960,8950,7940,6930,5920,4910,3900,2890,2260],[180001,13240,11550,10020,9010,8000,6990,5980,4970,3960,2950,2290],[180501,13340,11650,10080,9070,8060,7050,6040,5030,4020,3010,2310],[181001,13440,11750,10140,9130,8120,7110,6100,5090,4080,3070,2340],[181501,13540,11850,10200,9190,8180,7170,6160,5150,4140,3130,2360],[182001,13640,11950,10270,9250,8240,7230,6220,5210,4200,3190,2390],[182501,13740,12050,10370,9310,8300,7290,6280,5270,4260,3250,2410],[183001,13840,12150,10470,9370,8360,7350,6340,5330,4320,3310,2440,2020],[183501,13940,12250,10570,9430,8420,7410,6400,5390,4380,3370,2460,2040],[184001,14040,12350,10670,9490,8480,7470,6460,5450,4440,3430,2490,2070],[184501,14140,12450,10770,9550,8540,7530,6520,5510,4500,3490,2510,2090],[185001,14240,12550,10870,9610,8600,7590,6580,5570,4560,3550,2540,2120],[185501,14340,12650,10970,9670,8660,7650,6640,5630,4620,3610,2600,2140],[186001,14440,12750,11070,9730,8720,7710,6700,5690,4680,3670,2660,2170],[186501,14540,12850,11170,9790,8780,7770,6760,5750,4740,3730,2720,2190],[187001,14640,12950,11270,9850,8840,7830,6820,5810,4800,3790,2780,2220],[187501,14740,13050,11370,9910,8900,7890,6880,5870,4860,3850,2840,2240],[188001,14840,13150,11470,9970,8960,7950,6940,5930,4920,3910,2900,2270],[188501,14940,13250,11570,10030,9020,8010,7000,5990,4980,3970,2960,2290],[189001,15040,13350,11670,10090,9080,8070,7060,6050,5040,4030,3020,2320],[189501,15140,13450,11770,10150,9140,8130,7120,6110,5100,4090,3080,2340],[190001,15240,13550,11870,10210,9200,8190,7180,6170,5160,4150,3140,2370],[190501,15340,13650,11970,10290,9260,8250,7240,6230,5220,4210,3200,2390],[191001,15440,13750,12070,10390,9320,8310,7300,6290,5280,4270,3260,2420],[191501,15540,13850,12170,10490,9380,8370,7360,6350,5340,4330,3320,2440],[192001,15640,13950,12270,10590,9440,8430,7420,6410,5400,4390,3380,2470],[192501,15740,14050,12370,10690,9500,8490,7480,6470,5460,4450,3440,2490],[193001,15840,14150,12470,10790,9560,8550,7540,6530,5520,4510,3500,2520],[193501,15940,14250,12570,10890,9620,8610,7600,6590,5580,4570,3560,2550],[194001,16040,14350,12670,10990,9680,8670,7660,6650,5640,4630,3620,2610],[194501,16140,14450,12770,11090,9740,8730,7720,6710,5700,4690,3680,2670],[195001,16240,14550,12870,11190,9800,8790,7780,6770,5760,4750,3740,2730],[195501,16340,14650,12970,11290,9860,8850,7840,6830,5820,4810,3800,2790],[196001,16440,14750,13070,11390,9920,8910,7900,6890,5880,4870,3860,2850],[196501,16540,14850,13170,11490,9980,8970,7960,6950,5940,4930,3920,2910],[197001,16640,14950,13270,11590,10040,9030,8020,7010,6000,4990,3980,2970],[197501,16740,15050,13370,11690,10100,9090,8080,7070,6060,5050,4040,3030],[198001,16840,15150,13470,11790,10160,9150,8140,7130,6120,5110,4100,3090],[198501,16940,15250,13570,11890,10220,9210,8200,7190,6180,5170,4160,3150],[199001,17040,15350,13670,11990,10300,9270,8260,7250,6240,5230,4220,3210],[199501,17140,15450,13770,12090,10400,9330,8320,7310,6300,5290,4280,3270],[200001,17240,15550,13870,12190,10500,9390,8380,7370,6360,5350,4340,3330],[200501,17340,15650,13970,12290,10600,9450,8440,7430,6420,5410,4400,3390],[201001,17440,15750,14070,12390,10700,9510,8500,7490,6480,5470,4460,3450],[201501,17540,15850,14170,12490,10800,9570,8560,7550,6540,5530,4520,3510],[202001,17640,15950,14270,12590,10900,9630,8620,7610,6600,5590,4580,3570],[202501,17740,16050,14370,12690,11000,9690,8680,7670,6660,5650,4640,3630],[203001,17840,16150,14470,12790,11100,9750,8740,7730,6720,5710,4700,3690],[203501,17940,16250,14570,12890,11200,9810,8800,7790,6780,5770,4760,3750],[204001,18040,16350,14670,12990,11300,9870,8860,7850,6840,5830,4820,3810],[204501,18140,16450,14770,13090,11400,9930,8920,7910,6900,5890,4880,3870],[205001,18240,16550,14870,13190,11500,9990,8980,7970,6960,5950,4940,3930],[205501,18340,16650,14970,13290,11600,10050,9040,8030,7020,6010,5000,3990],[206001,18440,16750,15070,13390,11700,10110,9100,8090,7080,6070,5060,4050],[206501,18540,16850,15170,13490,11800,10170,9160,8150,7140,6130,5120,4110],[207001,18640,16950,15270,13590,11900,10230,9220,8210,7200,6190,5180,4170],[207501,18740,17050,15370,13690,12000,10320,9280,8270,7260,6250,5240,4230],[208001,18840,17150,15470,13790,12100,10420,9340,8330,7320,6310,5300,4290],[208501,18940,17250,15570,13890,12200,10520,9400,8390,7380,6370,5360,4350],[209001,19040,17350,15670,13990,12300,10620,9460,8450,7440,6430,5420,4410],[209501,19140,17450,15770,14090,12400,10720,9520,8510,7500,6490,5480,4470],[210001,19240,17550,15870,14190,12500,10820,9580,8570,7560,6550,5540,4530],[210501,19340,17650,15970,14290,12600,10920,9640,8630,7620,6610,5600,4590],[211001,19440,17750,16070,14390,12700,11020,9700,8690,7680,6670,5660,4650],[211501,19540,17850,16170,14490,12800,11120,9760,8750,7740,6730,5720,4710],[212001,19640,17950,16270,14590,12900,11220,9820,8810,7800,6790,5780,4770],[212501,19740,18050,16370,14690,13000,11320,9880,8870,7860,6850,5840,4830],[213001,19840,18150,16470,14790,13100,11420,9940,8930,7920,6910,5900,4890],[213501,19940,18250,16570,14890,13200,11520,10000,8990,7980,6970,5960,4950],[214001,20040,18350,16670,14990,13300,11620,10060,9050,8040,7030,6020,5010],[214501,20140,18450,16770,15090,13400,11720,10120,9110,8100,7090,6080,5070],[215001,20240,18550,16870,15190,13500,11820,10180,9170,8160,7150,6140,5130],[215501,20340,18650,16970,15290,13600,11920,10240,9230,8220,7210,6200,5190],[216001,20440,18750,17070,15390,13700,12020,10340,9290,8280,7270,6260,5250],[216501,20540,18850,17170,15490,13800,12120,10440,9350,8340,7330,6320,5310],[217001,20640,18950,17270,15590,13900,12220,10540,9410,8400,7390,6380,5370],[217501,20740,19050,17370,15690,14000,12320,10640,9470,8460,7450,6440,5430],[218001,20840,19150,17470,15790,14100,12420,10740,9530,8520,7510,6500,5490],[218501,20940,19250,17570,15890,14200,12520,10840,9590,8580,7570,6560,5550],[219001,21040,19350,17670,15990,14300,12620,10940,9650,8640,7630,6620,5610],[219501,21140,19450,17770,16090,14400,12720,11040,9710,8700,7690,6680,5670],[220001,21240,19550,17870,16190,14500,12820,11140,9770,8760,7750,6740,5730],[220501,21340,19650,17970,16290,14600,12920,11240,9830,8820,7810,6800,5790],[221001,21440,19750,18070,16390,14700,13020,11340,9890,8880,7870,6860,5850],[221501,21540,19850,18170,16490,14800,13120,11440,9950,8940,7930,6920,5910],[222001,21640,19950,18270,16590,14900,13220,11540,10010,9000,7990,6980,5970],[222501,21740,20050,18370,16690,15000,13320,11640,10070,9060,8050,7040,6030],[223001,21840,20150,18470,16790,15100,13420,11740,10130,9120,8110,7100,6090],[223501,21940,20250,18570,16890,15200,13520,11840,10190,9180,8170,7160,6150],[224001,22040,20350,18670,16990,15300,13620,11940,10250,9240,8230,7220,6210],[224501,22140,20450,18770,17090,15400,13720,12040,10350,9300,8290,7280,6270],[225001,22240,20550,18870,17190,15500,13820,12140,10450,9360,8350,7340,6330],[225501,22340,20650,18970,17290,15600,13920,12240,10550,9420,8410,7400,6390],[226001,22440,20750,19070,17390,15700,14020,12340,10650,9480,8470,7460,6450],[226501,22540,20850,19170,17490,15800,14120,12440,10750,9540,8530,7520,6510],[227001,22640,20950,19270,17590,15900,14220,12540,10850,9600,8590,7580,6570],[227501,22740,21050,19370,17690,16000,14320,12640,10950,9660,8650,7640,6630],[228001,22840,21150,19470,17790,16100,14420,12740,11050,9720,8710,7700,6690],[228501,22940,21250,19570,17890,16200,14520,12840,11150,9780,8770,7760,6750],[229001,23040,21350,19670,17990,16300,14620,12940,11250,9840,8830,7820,6810],[229501,23140,21450,19770,18090,16400,14720,13040,11350,9900,8890,7880,6870],[230001,23240,21550,19870,18190,16500,14820,13140,11450,9960,8950,7940,6930],[230501,23340,21650,19970,18290,16600,14920,13240,11550,10020,9010,8000,6990],[231001,23440,21750,20070,18390,16700,15020,13340,11650,10080,9070,8060,7050],[231501,23540,21850,20170,18490,16800,15120,13440,11750,10140,9130,8120,7110],[232001,23640,21950,20270,18590,16900,15220,13540,11850,10200,9190,8180,7170],[232501,23740,22050,20370,18690,17000,15320,13640,11950,10270,9250,8240,7230],[233001,23840,22150,20470,18790,17100,15420,13740,12050,10370,9310,8300,7290],[233501,23940,22250,20570,18890,17200,15520,13840,12150,10470,9370,8360,7350],[234001,24040,22350,20670,18990,17300,15620,13940,12250,10570,9430,8420,7410],[234501,24140,22450,20770,19090,17400,15720,14040,12350,10670,9490,8480,7470],[235001,24240,22550,20870,19190,17500,15820,14140,12450,10770,9550,8540,7530],[235501,24340,22650,20970,19290,17600,15920,14240,12550,10870,9610,8600,7590],[236001,24440,22750,21070,19390,17700,16020,14340,12650,10970,9670,8660,7650],[236501,24540,22850,21170,19490,17800,16120,14440,12750,11070,9730,8720,7710],[237001,24640,22950,21270,19590,17900,16220,14540,12850,11170,9790,8780,7770],[237501,24740,23050,21370,19690,18000,16320,14640,12950,11270,9850,8840,7830],[238001,24840,23150,21470,19790,18100,16420,14740,13050,11370,9910,8900,7890],[238501,24940,23250,21570,19890,18200,16520,14840,13150,11470,9970,8960,7950],[239001,25040,23350,21670,19990,18300,16620,14940,13250,11570,10030,9020,8010],[239501,25140,23450,21770,20090,18400,16720,15040,13350,11670,10090,9080,8070],[240001,25240,23550,21870,20190,18500,16820,15140,13450,11770,10150,9140,8130],[240501,25340,23650,21970,20290,18600,16920,15240,13550,11870,10210,9200,8190],[241001,25440,23750,22070,20390,18700,17020,15340,13650,11970,10290,9260,8250],[241501,25540,23850,22170,20490,18800,17120,15440,13750,12070,10390,9320,8310],[242001,25640,23950,22270,20590,18900,17220,15540,13850,12170,10490,9380,8370],[242501,25740,24050,22370,20690,19000,17320,15640,13950,12270,10590,9440,8430],[243001,25840,24150,22470,20790,19100,17420,15740,14050,12370,10690,9500,8490],[243501,25940,24250,22570,20890,19200,17520,15840,14150,12470,10790,9560,8550],[244001,26040,24350,22670,20990,19300,17620,15940,14250,12570,10890,9620,8610],[244501,26140,24450,22770,21090,19400,17720,16040,14350,12670,10990,9680,8670],[245001,26240,24550,22870,21190,19500,17820,16140,14450,12770,11090,9740,8730],[245501,26340,24650,22970,21290,19600,17920,16240,14550,12870,11190,9800,8790],[246001,26440,24750,23070,21390,19700,18020,16340,14650,12970,11290,9860,8850],[246501,26540,24850,23170,21490,19800,18120,16440,14750,13070,11390,9920,8910],[247001,26640,24950,23270,21590,19900,18220,16540,14850,13170,11490,9980,8970],[247501,26740,25050,23370,21690,20000,18320,16640,14950,13270,11590,10040,9030],[248001,26840,25150,23470,21790,20100,18420,16740,15050,13370,11690,10100,9090],[248501,26940,25250,23570,21890,20200,18520,16840,15150,13470,11790,10160,9150],[249001,27040,25350,23670,21990,20300,18620,16940,15250,13570,11890,10220,9210],[249501,27140,25450,23770,22090,20400,18720,17040,15350,13670,11990,10300,9270],[250001,27240,25550,23870,22190,20500,18820,17140,15450,13770,12090,10400,9330],[250501,27340,25650,23970,22290,20600,18920,17240,15550,13870,12190,10500,9390],[251001,27440,25750,24070,22390,20700,19020,17340,15650,13970,12290,10600,9450],[251501,27540,25850,24170,22490,20800,19120,17440,15750,14070,12390,10700,9510],[252001,27640,25950,24270,22590,20900,19220,17540,15850,14170,12490,10800,9570],[252501,27740,26050,24370,22690,21000,19320,17640,15950,14270,12590,10900,9630],[253001,27840,26150,24470,22790,21100,19420,17740,16050,14370,12690,11000,9690],[253501,27940,26250,24570,22890,21200,19520,17840,16150,14470,12790,11100,9750],[254001,28040,26350,24670,22990,21300,19620,17940,16250,14570,12890,11200,9810],[254501,28140,26450,24770,23090,21400,19720,18040,16350,14670,12990,11300,9870],[255001,28240,26550,24870,23190,21500,19820,18140,16450,14770,13090,11400,9930],[255501,28340,26650,24970,23290,21600,19920,18240,16550,14870,13190,11500,9990],[256001,28440,26750,25070,23390,21700,20020,18340,16650,14970,13290,11600,10050],[256501,28540,26850,25170,23490,21800,20120,18440,16750,15070,13390,11700,10110],[257001,28640,26950,25270,23590,21900,20220,18540,16850,15170,13490,11800,10170],[257501,28740,27050,25370,23690,22000,20320,18640,16950,15270,13590,11900,10230],[258001,28840,27150,25470,23790,22100,20420,18740,17050,15370,13690,12000,10320],[258501,28940,27250,25570,23890,22200,20520,18840,17150,15470,13790,12100,10420],[259001,29040,27350,25670,23990,22300,20620,18940,17250,15570,13890,12200,10520],[259501,29140,27450,25770,24090,22400,20720,19040,17350,15670,13990,12300,10620],[260001,29240,27550,25870,24190,22500,20820,19140,17450,15770,14090,12400,10720],[260501,29340,27650,25970,24290,22600,20920,19240,17550,15870,14190,12500,10820],[261001,29440,27750,26070,24390,22700,21020,19340,17650,15970,14290,12600,10920],[261501,29540,27850,26170,24490,22800,21120,19440,17750,16070,14390,12700,11020],[262001,29640,27950,26270,24590,22900,21220,19540,17850,16170,14490,12800,11120],[262501,29740,28050,26370,24690,23000,21320,19640,17950,16270,14590,12900,11220],[263001,29840,28150,26470,24790,23100,21420,19740,18050,16370,14690,13000,11320],[263501,29940,28250,26570,24890,23200,21520,19840,18150,16470,14790,13100,11420],[264001,30040,28350,26670,24990,23300,21620,19940,18250,16570,14890,13200,11520],[264501,30140,28450,26770,25090,23400,21720,20040,18350,16670,14990,13300,11620],[265001,30240,28550,26870,25190,23500,21820,20140,18450,16770,15090,13400,11720],[265501,30340,28650,26970,25290,23600,21920,20240,18550,16870,15190,13500,11820],[266001,30440,28750,27070,25390,23700,22020,20340,18650,16970,15290,13600,11920],[266501,30540,28850,27170,25490,23800,22120,20440,18750,17070,15390,13700,12020],[267001,30640,28950,27270,25590,23900,22220,20540,18850,17170,15490,13800,12120],[267501,30740,29050,27370,25690,24000,22320,20640,18950,17270,15590,13900,12220],[268001,30840,29150,27470,25790,24100,22420,20740,19050,17370,15690,14000,12320],[268501,30940,29250,27570,25890,24200,22520,20840,19150,17470,15790,14100,12420],[269001,31040,29350,27670,25990,24300,22620,20940,19250,17570,15890,14200,12520],[269501,31140,29450,27770,26090,24400,22720,21040,19350,17670,15990,14300,12620],[270001,31240,29550,27870,26190,24500,22820,21140,19450,17770,16090,14400,12720],[270501,31340,29650,27970,26290,24600,22920,21240,19550,17870,16190,14500,12820],[271001,31440,29750,28070,26390,24700,23020,21340,19650,17970,16290,14600,12920],[271501,31540,29850,28170,26490,24800,23120,21440,19750,18070,16390,14700,13020],[272001,31640,29950,28270,26590,24900,23220,21540,19850,18170,16490,14800,13120],[272501,31740,30050,28370,26690,25000,23320,21640,19950,18270,16590,14900,13220],[273001,31840,30150,28470,26790,25100,23420,21740,20050,18370,16690,15000,13320],[273501,31940,30250,28570,26890,25200,23520,21840,20150,18470,16790,15100,13420],[274001,32040,30350,28670,26990,25300,23620,21940,20250,18570,16890,15200,13520],[274501,32140,30450,28770,27090,25400,23720,22040,20350,18670,16990,15300,13620],[275001,32240,30550,28870,27190,25500,23820,22140,20450,18770,17090,15400,13720],[275501,32340,30650,28970,27290,25600,23920,22240,20550,18870,17190,15500,13820],[276001,32440,30750,29070,27390,25700,24020,22340,20650,18970,17290,15600,13920],[276501,32540,30850,29170,27490,25800,24120,22440,20750,19070,17390,15700,14020],[277001,32640,30950,29270,27590,25900,24220,22540,20850,19170,17490,15800,14120],[277501,32740,31050,29370,27690,26000,24320,22640,20950,19270,17590,15900,14220],[278001,32840,31150,29470,27790,26100,24420,22740,21050,19370,17690,16000,14320],[278501,32940,31250,29570,27890,26200,24520,22840,21150,19470,17790,16100,14420],[279001,33040,31350,29670,27990,26300,24620,22940,21250,19570,17890,16200,14520],[279501,33140,31450,29770,28090,26400,24720,23040,21350,19670,17990,16300,14620],[280001,33240,31550,29870,28190,26500,24820,23140,21450,19770,18090,16400,14720],[280501,33340,31650,29970,28290,26600,24920,23240,21550,19870,18190,16500,14820],[281001,33450,31750,30070,28390,26700,25020,23340,21650,19970,18290,16600,14920],[281501,33600,31850,30170,28490,26800,25120,23440,21750,20070,18390,16700,15020],[282001,33750,31950,30270,28590,26900,25220,23540,21850,20170,18490,16800,15120],[282501,33900,32050,30370,28690,27000,25320,23640,21950,20270,18590,16900,15220],[283001,34050,32150,30470,28790,27100,25420,23740,22050,20370,18690,17000,15320],[283501,34200,32250,30570,28890,27200,25520,23840,22150,20470,18790,17100,15420],[284001,34350,32350,30670,28990,27300,25620,23940,22250,20570,18890,17200,15520],[284501,34500,32450,30770,29090,27400,25720,24040,22350,20670,18990,17300,15620],[285001,34650,32550,30870,29190,27500,25820,24140,22450,20770,19090,17400,15720],[285501,34800,32650,30970,29290,27600,25920,24240,22550,20870,19190,17500,15820],[286001,34950,32750,31070,29390,27700,26020,24340,22650,20970,19290,17600,15920],[286501,35100,32850,31170,29490,27800,26120,24440,22750,21070,19390,17700,16020],[287001,35250,32950,31270,29590,27900,26220,24540,22850,21170,19490,17800,16120],[287501,35400,33050,31370,29690,28000,26320,24640,22950,21270,19590,17900,16220],[288001,35550,33150,31470,29790,28100,26420,24740,23050,21370,19690,18000,16320],[288501,35700,33250,31570,29890,28200,26520,24840,23150,21470,19790,18100,16420],[289001,35850,33350,31670,29990,28300,26620,24940,23250,21570,19890,18200,16520],[289501,36000,33480,31770,30090,28400,26720,25040,23350,21670,19990,18300,16620],[290001,36150,33630,31870,30190,28500,26820,25140,23450,21770,20090,18400,16720],[290501,36300,33780,31970,30290,28600,26920,25240,23550,21870,20190,18500,16820],[291001,36450,33930,32070,30390,28700,27020,25340,23650,21970,20290,18600,16920],[291501,36600,34080,32170,30490,28800,27120,25440,23750,22070,20390,18700,17020],[292001,36750,34230,32270,30590,28900,27220,25540,23850,22170,20490,18800,17120],[292501,36900,34380,32370,30690,29000,27320,25640,23950,22270,20590,18900,17220],[293001,37050,34530,32470,30790,29100,27420,25740,24050,22370,20690,19000,17320],[293501,37200,34680,32570,30890,29200,27520,25840,24150,22470,20790,19100,17420],[294001,37350,34830,32670,30990,29300,27620,25940,24250,22570,20890,19200,17520],[294501,37500,34980,32770,31090,29400,27720,26040,24350,22670,20990,19300,17620],[295001,37650,35130,32870,31190,29500,27820,26140,24450,22770,21090,19400,17720],[295501,37800,35280,32970,31290,29600,27920,26240,24550,22870,21190,19500,17820],[296001,37950,35430,33070,31390,29700,28020,26340,24650,22970,21290,19600,17920],[296501,38100,35580,33170,31490,29800,28120,26440,24750,23070,21390,19700,18020],[297001,38250,35730,33270,31590,29900,28220,26540,24850,23170,21490,19800,18120],[297501,38400,35880,33370,31690,30000,28320,26640,24950,23270,21590,19900,18220],[298001,38550,36030,33500,31790,30100,28420,26740,25050,23370,21690,20000,18320],[298501,38700,36180,33650,31890,30200,28520,26840,25150,23470,21790,20100,18420],[299001,38850,36330,33800,31990,30300,28620,26940,25250,23570,21890,20200,18520],[299501,39000,36480,33950,32090,30400,28720,27040,25350,23670,21990,20300,18620],[300001,39150,36630,34100,32190,30500,28820,27140,25450,23770,22090,20400,18720],[300501,39300,36780,34250,32290,30600,28920,27240,25550,23870,22190,20500,18820],[301001,39450,36930,34400,32390,30700,29020,27340,25650,23970,22290,20600,18920],[301501,39600,37080,34550,32490,30800,29120,27440,25750,24070,22390,20700,19020],[302001,39750,37230,34700,32590,30900,29220,27540,25850,24170,22490,20800,19120],[302501,39900,37380,34850,32690,31000,29320,27640,25950,24270,22590,20900,19220],[303001,40050,37530,35000,32790,31100,29420,27740,26050,24370,22690,21000,19320],[303501,40200,37680,35150,32890,31200,29520,27840,26150,24470,22790,21100,19420],[304001,40350,37830,35300,32990,31300,29620,27940,26250,24570,22890,21200,19520],[304501,40500,37980,35450,33090,31400,29720,28040,26350,24670,22990,21300,19620],[305001,40650,38130,35600,33190,31500,29820,28140,26450,24770,23090,21400,19720],[305501,40800,38280,35750,33290,31600,29920,28240,26550,24870,23190,21500,19820],[306001,40950,38430,35900,33390,31700,30020,28340,26650,24970,23290,21600,19920],[306501,41100,38580,36050,33530,31800,30120,28440,26750,25070,23390,21700,20020],[307001,41250,38730,36200,33680,31900,30220,28540,26850,25170,23490,21800,20120],[307501,41400,38880,36350,33830,32000,30320,28640,26950,25270,23590,21900,20220],[308001,41550,39030,36500,33980,32100,30420,28740,27050,25370,23690,22000,20320],[308501,41700,39180,36650,34130,32200,30520,28840,27150,25470,23790,22100,20420],[309001,41850,39330,36800,34280,32300,30620,28940,27250,25570,23890,22200,20520],[309501,42000,39480,36950,34430,32400,30720,29040,27350,25670,23990,22300,20620],[310001,42150,39630,37100,34580,32500,30820,29140,27450,25770,24090,22400,20720],[310501,42300,39780,37250,34730,32600,30920,29240,27550,25870,24190,22500,20820],[311001,42450,39930,37400,34880,32700,31020,29340,27650,25970,24290,22600,20920],[311501,42600,40080,37550,35030,32800,31120,29440,27750,26070,24390,22700,21020],[312001,42750,40230,37700,35180,32900,31220,29540,27850,26170,24490,22800,21120],[312501,42900,40380,37850,35330,33000,31320,29640,27950,26270,24590,22900,21220],[313001,43050,40530,38000,35480,33100,31420,29740,28050,26370,24690,23000,21320],[313501,43200,40680,38150,35630,33200,31520,29840,28150,26470,24790,23100,21420],[314001,43350,40830,38300,35780,33300,31620,29940,28250,26570,24890,23200,21520],[314501,43500,40980,38450,35930,33400,31720,30040,28350,26670,24990,23300,21620],[315001,43650,41130,38600,36080,33550,31820,30140,28450,26770,25090,23400,21720],[315501,43800,41280,38750,36230,33700,31920,30240,28550,26870,25190,23500,21820],[316001,43950,41430,38900,36380,33850,32020,30340,28650,26970,25290,23600,21920],[316501,44100,41580,39050,36530,34000,32120,30440,28750,27070,25390,23700,22020],[317001,44250,41730,39200,36680,34150,32220,30540,28850,27170,25490,23800,22120],[317501,44400,41880,39350,36830,34300,32320,30640,28950,27270,25590,23900,22220],[318001,44550,42030,39500,36980,34450,32420,30740,29050,27370,25690,24000,22320],[318501,44700,42180,39650,37130,34600,32520,30840,29150,27470,25790,24100,22420],[319001,44850,42330,39800,37280,34750,32620,30940,29250,27570,25890,24200,22520],[319501,45000,42480,39950,37430,34900,32720,31040,29350,27670,25990,24300,22620],[320001,45150,42630,40100,37580,35050,32820,31140,29450,27770,26090,24400,22720],[320501,45300,42780,40250,37730,35200,32920,31240,29550,27870,26190,24500,22820],[321001,45450,42930,40400,37880,35350,33020,31340,29650,27970,26290,24600,22920],[321501,45600,43080,40550,38030,35500,33120,31440,29750,28070,26390,24700,23020],[322001,45750,43230,40700,38180,35650,33220,31540,29850,28170,26490,24800,23120],[322501,45900,43380,40850,38330,35800,33320,31640,29950,28270,26590,24900,23220],[323001,46050,43530,41000,38480,35950,33430,31740,30050,28370,26690,25000,23320],[323501,46200,43680,41150,38630,36100,33580,31840,30150,28470,26790,25100,23420],[324001,46350,43830,41300,38780,36250,33730,31940,30250,28570,26890,25200,23520],[324501,46500,43980,41450,38930,36400,33880,32040,30350,28670,26990,25300,23620],[325001,46650,44130,41600,39080,36550,34030,32140,30450,28770,27090,25400,23720],[325501,46800,44280,41750,39230,36700,34180,32240,30550,28870,27190,25500,23820],[326001,46950,44430,41900,39380,36850,34330,32340,30650,28970,27290,25600,23920],[326501,47100,44580,42050,39530,37000,34480,32440,30750,29070,27390,25700,24020],[327001,47250,44730,42200,39680,37150,34630,32540,30850,29170,27490,25800,24120],[327501,47400,44880,42350,39830,37300,34780,32640,30950,29270,27590,25900,24220],[328001,47550,45030,42500,39980,37450,34930,32740,31050,29370,27690,26000,24320],[328501,47700,45180,42650,40130,37600,35080,32840,31150,29470,27790,26100,24420],[329001,47850,45330,42800,40280,37750,35230,32940,31250,29570,27890,26200,24520],[329501,48000,45480,42950,40430,37900,35380,33040,31350,29670,27990,26300,24620],[330001,48150,45630,43100,40580,38050,35530,33140,31450,29770,28090,26400,24720],[330501,48300,45780,43250,40730,38200,35680,33240,31550,29870,28190,26500,24820],[331001,48450,45930,43400,40880,38350,35830,33340,31650,29970,28290,26600,24920],[331501,48600,46080,43550,41030,38500,35980,33450,31750,30070,28390,26700,25020],[332001,48750,46230,43700,41180,38650,36130,33600,31850,30170,28490,26800,25120],[332501,48900,46380,43850,41330,38800,36280,33750,31950,30270,28590,26900,25220],[333001,49050,46530,44000,41480,38950,36430,33900,32050,30370,28690,27000,25320],[333501,49200,46680,44150,41630,39100,36580,34050,32150,30470,28790,27100,25420],[334001,49350,46830,44300,41780,39250,36730,34200,32250,30570,28890,27200,25520],[334501,49500,46980,44450,41930,39400,36880,34350,32350,30670,28990,27300,25620],[335001,49650,47130,44600,42080,39550,37030,34500,32450,30770,29090,27400,25720],[335501,49800,47280,44750,42230,39700,37180,34650,32550,30870,29190,27500,25820],[336001,49950,47430,44900,42380,39850,37330,34800,32650,30970,29290,27600,25920],[336501,50100,47580,45050,42530,40000,37480,34950,32750,31070,29390,27700,26020],[337001,50250,47730,45200,42680,40150,37630,35100,32850,31170,29490,27800,26120],[337501,50400,47880,45350,42830,40300,37780,35250,32950,31270,29590,27900,26220],[338001,50550,48030,45500,42980,40450,37930,35400,33050,31370,29690,28000,26320],[338501,50700,48180,45650,43130,40600,38080,35550,33150,31470,29790,28100,26420],[339001,50850,48330,45800,43280,40750,38230,35700,33250,31570,29890,28200,26520],[339501,51000,48480,45950,43430,40900,38380,35850,33350,31670,29990,28300,26620],[340001,51150,48630,46100,43580,41050,38530,36000,33480,31770,30090,28400,26720],[340501,51300,48780,46250,43730,41200,38680,36150,33630,31870,30190,28500,26820],[341001,51450,48930,46400,43880,41350,38830,36300,33780,31970,30290,28600,26920],[341501,51600,49080,46550,44030,41500,38980,36450,33930,32070,30390,28700,27020],[342001,51750,49230,46700,44180,41650,39130,36600,34080,32170,30490,28800,27120],[342501,51900,49380,46850,44330,41800,39280,36750,34230,32270,30590,28900,27220],[343001,52050,49530,47000,44480,41950,39430,36900,34380,32370,30690,29000,27320],[343501,52200,49680,47150,44630,42100,39580,37050,34530,32470,30790,29100,27420],[344001,52350,49830,47300,44780,42250,39730,37200,34680,32570,30890,29200,27520],[344501,52500,49980,47450,44930,42400,39880,37350,34830,32670,30990,29300,27620],[345001,52650,50130,47600,45080,42550,40030,37500,34980,32770,31090,29400,27720],[345501,52800,50280,47750,45230,42700,40180,37650,35130,32870,31190,29500,27820],[346001,52950,50430,47900,45380,42850,40330,37800,35280,32970,31290,29600,27920],[346501,53100,50580,48050,45530,43000,40480,37950,35430,33070,31390,29700,28020],[347001,53250,50730,48200,45680,43150,40630,38100,35580,33170,31490,29800,28120],[347501,53400,50880,48350,45830,43300,40780,38250,35730,33270,31590,29900,28220],[348001,53550,51030,48500,45980,43450,40930,38400,35880,33370,31690,30000,28320],[348501,53700,51180,48650,46130,43600,41080,38550,36030,33500,31790,30100,28420],[349001,53850,51330,48800,46280,43750,41230,38700,36180,33650,31890,30200,28520],[349501,54000,51480,48950,46430,43900,41380,38850,36330,33800,31990,30300,28620],[350001,54150,51630,49100,46580,44050,41530,39000,36480,33950,32090,30400,28720],[350501,54300,51780,49250,46730,44200,41680,39150,36630,34100,32190,30500,28820],[351001,54450,51930,49400,46880,44350,41830,39300,36780,34250,32290,30600,28920],[351501,54600,52080,49550,47030,44500,41980,39450,36930,34400,32390,30700,29020],[352001,54750,52230,49700,47180,44650,42130,39600,37080,34550,32490,30800,29120],[352501,54900,52380,49850,47330,44800,42280,39750,37230,34700,32590,30900,29220],[353001,55050,52530,50000,47480,44950,42430,39900,37380,34850,32690,31000,29320],[353501,55200,52680,50150,47630,45100,42580,40050,37530,35000,32790,31100,29420],[354001,55350,52830,50300,47780,45250,42730,40200,37680,35150,32890,31200,29520],[354501,55500,52980,50450,47930,45400,42880,40350,37830,35300,32990,31300,29620],[355001,55650,53130,50600,48080,45550,43030,40500,37980,35450,33090,31400,29720],[355501,55800,53280,50750,48230,45700,43180,40650,38130,35600,33190,31500,29820],[356001,55950,53430,50900,48380,45850,43330,40800,38280,35750,33290,31600,29920],[356501,56100,53580,51050,48530,46000,43480,40950,38430,35900,33390,31700,30020],[357001,56250,53730,51200,48680,46150,43630,41100,38580,36050,33530,31800,30120],[357501,56400,53880,51350,48830,46300,43780,41250,38730,36200,33680,31900,30220],[358001,56550,54030,51500,48980,46450,43930,41400,38880,36350,33830,32000,30320],[358501,56700,54180,51650,49130,46600,44080,41550,39030,36500,33980,32100,30420],[359001,56850,54330,51800,49280,46750,44230,41700,39180,36650,34130,32200,30520],[359501,57000,54480,51950,49430,46900,44380,41850,39330,36800,34280,32300,30620],[360001,57150,54630,52100,49580,47050,44530,42000,39480,36950,34430,32400,30720],[360501,57300,54780,52250,49730,47200,44680,42150,39630,37100,34580,32500,30820],[361001,57450,54930,52400,49880,47350,44830,42300,39780,37250,34730,32600,30920],[361501,57600,55080,52550,50030,47500,44980,42450,39930,37400,34880,32700,31020],[362001,57750,55230,52700,50180,47650,45130,42600,40080,37550,35030,32800,31120],[362501,57900,55380,52850,50330,47800,45280,42750,40230,37700,35180,32900,31220],[363001,58050,55530,53000,50480,47950,45430,42900,40380,37850,35330,33000,31320],[363501,58200,55680,53150,50630,48100,45580,43050,40530,38000,35480,33100,31420],[364001,58350,55830,53300,50780,48250,45730,43200,40680,38150,35630,33200,31520],[364501,58500,55980,53450,50930,48400,45880,43350,40830,38300,35780,33300,31620],[365001,58650,56130,53600,51080,48550,46030,43500,40980,38450,35930,33400,31720],[365501,58800,56280,53750,51230,48700,46180,43650,41130,38600,36080,33550,31820],[366001,58950,56430,53900,51380,48850,46330,43800,41280,38750,36230,33700,31920],[366501,59100,56580,54050,51530,49000,46480,43950,41430,38900,36380,33850,32020],[367001,59250,56730,54200,51680,49150,46630,44100,41580,39050,36530,34000,32120],[367501,59400,56880,54350,51830,49300,46780,44250,41730,39200,36680,34150,32220],[368001,59550,57030,54500,51980,49450,46930,44400,41880,39350,36830,34300,32320],[368501,59700,57180,54650,52130,49600,47080,44550,42030,39500,36980,34450,32420],[369001,59850,57330,54800,52280,49750,47230,44700,42180,39650,37130,34600,32520],[369501,60000,57480,54950,52430,49900,47380,44850,42330,39800,37280,34750,32620],[370001,60150,57630,55100,52580,50050,47530,45000,42480,39950,37430,34900,32720],[370501,60300,57780,55250,52730,50200,47680,45150,42630,40100,37580,35050,32820],[371001,60450,57930,55400,52880,50350,47830,45300,42780,40250,37730,35200,32920],[371501,60600,58080,55550,53030,50500,47980,45450,42930,40400,37880,35350,33020],[372001,60750,58230,55700,53180,50650,48130,45600,43080,40550,38030,35500,33120],[372501,60900,58380,55850,53330,50800,48280,45750,43230,40700,38180,35650,33220],[373001,61050,58530,56000,53480,50950,48430,45900,43380,40850,38330,35800,33320],[373501,61200,58680,56150,53630,51100,48580,46050,43530,41000,38480,35950,33430],[374001,61350,58830,56300,53780,51250,48730,46200,43680,41150,38630,36100,33580],[374501,61500,58980,56450,53930,51400,48880,46350,43830,41300,38780,36250,33730],[375001,61650,59130,56600,54080,51550,49030,46500,43980,41450,38930,36400,33880],[375501,61800,59280,56750,54230,51700,49180,46650,44130,41600,39080,36550,34030],[376001,61950,59430,56900,54380,51850,49330,46800,44280,41750,39230,36700,34180],[376501,62100,59580,57050,54530,52000,49480,46950,44430,41900,39380,36850,34330],[377001,62250,59730,57200,54680,52150,49630,47100,44580,42050,39530,37000,34480],[377501,62400,59880,57350,54830,52300,49780,47250,44730,42200,39680,37150,34630],[378001,62550,60030,57500,54980,52450,49930,47400,44880,42350,39830,37300,34780],[378501,62700,60180,57650,55130,52600,50080,47550,45030,42500,39980,37450,34930],[379001,62850,60330,57800,55280,52750,50230,47700,45180,42650,40130,37600,35080],[379501,63000,60480,57950,55430,52900,50380,47850,45330,42800,40280,37750,35230],[380001,63150,60630,58100,55580,53050,50530,48000,45480,42950,40430,37900,35380],[380501,63300,60780,58250,55730,53200,50680,48150,45630,43100,40580,38050,35530],[381001,63450,60930,58400,55880,53350,50830,48300,45780,43250,40730,38200,35680],[381501,63600,61080,58550,56030,53500,50980,48450,45930,43400,40880,38350,35830],[382001,63750,61230,58700,56180,53650,51130,48600,46080,43550,41030,38500,35980],[382501,63900,61380,58850,56330,53800,51280,48750,46230,43700,41180,38650,36130],[383001,64050,61530,59000,56480,53950,51430,48900,46380,43850,41330,38800,36280],[383501,64200,61680,59150,56630,54100,51580,49050,46530,44000,41480,38950,36430],[384001,64350,61830,59300,56780,54250,51730,49200,46680,44150,41630,39100,36580],[384501,64500,61980,59450,56930,54400,51880,49350,46830,44300,41780,39250,36730],[385001,64650,62130,59600,57080,54550,52030,49500,46980,44450,41930,39400,36880],[385501,64800,62280,59750,57230,54700,52180,49650,47130,44600,42080,39550,37030],[386001,64950,62430,59900,57380,54850,52330,49800,47280,44750,42230,39700,37180],[386501,65100,62580,60050,57530,55000,52480,49950,47430,44900,42380,39850,37330],[387001,65250,62730,60200,57680,55150,52630,50100,47580,45050,42530,40000,37480],[387501,65400,62880,60350,57830,55300,52780,50250,47730,45200,42680,40150,37630],[388001,65550,63030,60500,57980,55450,52930,50400,47880,45350,42830,40300,37780],[388501,65700,63180,60650,58130,55600,53080,50550,48030,45500,42980,40450,37930],[389001,65850,63330,60800,58280,55750,53230,50700,48180,45650,43130,40600,38080],[389501,66000,63480,60950,58430,55900,53380,50850,48330,45800,43280,40750,38230],[390001,66150,63630,61100,58580,56050,53530,51000,48480,45950,43430,40900,38380],[390501,66300,63780,61250,58730,56200,53680,51150,48630,46100,43580,41050,38530],[391001,66450,63930,61400,58880,56350,53830,51300,48780,46250,43730,41200,38680],[391501,66600,64080,61550,59030,56500,53980,51450,48930,46400,43880,41350,38830],[392001,66750,64230,61700,59180,56650,54130,51600,49080,46550,44030,41500,38980],[392501,66900,64380,61850,59330,56800,54280,51750,49230,46700,44180,41650,39130],[393001,67050,64530,62000,59480,56950,54430,51900,49380,46850,44330,41800,39280],[393501,67200,64680,62150,59630,57100,54580,52050,49530,47000,44480,41950,39430],[394001,67350,64830,62300,59780,57250,54730,52200,49680,47150,44630,42100,39580],[394501,67500,64980,62450,59930,57400,54880,52350,49830,47300,44780,42250,39730],[395001,67650,65130,62600,60080,57550,55030,52500,49980,47450,44930,42400,39880],[395501,67800,65280,62750,60230,57700,55180,52650,50130,47600,45080,42550,40030],[396001,67950,65430,62900,60380,57850,55330,52800,50280,47750,45230,42700,40180],[396501,68100,65580,63050,60530,58000,55480,52950,50430,47900,45380,42850,40330],[397001,68250,65730,63200,60680,58150,55630,53100,50580,48050,45530,43000,40480],[397501,68400,65880,63350,60830,58300,55780,53250,50730,48200,45680,43150,40630],[398001,68550,66030,63500,60980,58450,55930,53400,50880,48350,45830,43300,40780],[398501,68700,66180,63650,61130,58600,56080,53550,51030,48500,45980,43450,40930],[399001,68850,66330,63800,61280,58750,56230,53700,51180,48650,46130,43600,41080],[399501,69000,66480,63950,61430,58900,56380,53850,51330,48800,46280,43750,41230],[400001,69150,66630,64100,61580,59050,56530,54000,51480,48950,46430,43900,41380],[400501,69300,66780,64250,61730,59200,56680,54150,51630,49100,46580,44050,41530],[401001,69450,66930,64400,61880,59350,56830,54300,51780,49250,46730,44200,41680],[401501,69600,67080,64550,62030,59500,56980,54450,51930,49400,46880,44350,41830],[402001,69750,67230,64700,62180,59650,57130,54600,52080,49550,47030,44500,41980],[402501,69900,67380,64850,62330,59800,57280,54750,52230,49700,47180,44650,42130],[403001,70050,67530,65000,62480,59950,57430,54900,52380,49850,47330,44800,42280],[403501,70200,67680,65150,62630,60100,57580,55050,52530,50000,47480,44950,42430],[404001,70350,67830,65300,62780,60250,57730,55200,52680,50150,47630,45100,42580],[404501,70500,67980,65450,62930,60400,57880,55350,52830,50300,47780,45250,42730],[405001,70650,68130,65600,63080,60550,58030,55500,52980,50450,47930,45400,42880],[405501,70800,68280,65750,63230,60700,58180,55650,53130,50600,48080,45550,43030],[406001,70950,68430,65900,63380,60850,58330,55800,53280,50750,48230,45700,43180],[406501,71100,68580,66050,63530,61000,58480,55950,53430,50900,48380,45850,43330],[407001,71250,68730,66200,63680,61150,58630,56100,53580,51050,48530,46000,43480],[407501,71400,68880,66350,63830,61300,58780,56250,53730,51200,48680,46150,43630],[408001,71550,69030,66500,63980,61450,58930,56400,53880,51350,48830,46300,43780],[408501,71700,69180,66650,64130,61600,59080,56550,54030,51500,48980,46450,43930],[409001,71850,69330,66800,64280,61750,59230,56700,54180,51650,49130,46600,44080],[409501,72000,69480,66950,64430,61900,59380,56850,54330,51800,49280,46750,44230],[410001,72150,69630,67100,64580,62050,59530,57000,54480,51950,49430,46900,44380],[410501,72300,69780,67250,64730,62200,59680,57150,54630,52100,49580,47050,44530],[411001,72450,69930,67400,64880,62350,59830,57300,54780,52250,49730,47200,44680],[411501,72600,70080,67550,65030,62500,59980,57450,54930,52400,49880,47350,44830],[412001,72750,70230,67700,65180,62650,60130,57600,55080,52550,50030,47500,44980],[412501,72900,70380,67850,65330,62800,60280,57750,55230,52700,50180,47650,45130],[413001,73050,70530,68000,65480,62950,60430,57900,55380,52850,50330,47800,45280],[413501,73200,70680,68150,65630,63100,60580,58050,55530,53000,50480,47950,45430],[414001,73350,70830,68300,65780,63250,60730,58200,55680,53150,50630,48100,45580],[414501,73500,70980,68450,65930,63400,60880,58350,55830,53300,50780,48250,45730],[415001,73650,71130,68600,66080,63550,61030,58500,55980,53450,50930,48400,45880],[415501,73800,71280,68750,66230,63700,61180,58650,56130,53600,51080,48550,46030],[416001,73950,71430,68900,66380,63850,61330,58800,56280,53750,51230,48700,46180],[416501,74100,71580,69050,66530,64000,61480,58950,56430,53900,51380,48850,46330],[417001,74250,71730,69200,66680,64150,61630,59100,56580,54050,51530,49000,46480],[417501,74400,71880,69350,66830,64300,61780,59250,56730,54200,51680,49150,46630],[418001,74550,72030,69500,66980,64450,61930,59400,56880,54350,51830,49300,46780],[418501,74700,72180,69650,67130,64600,62080,59550,57030,54500,51980,49450,46930],[419001,74850,72330,69800,67280,64750,62230,59700,57180,54650,52130,49600,47080],[419501,75000,72480,69950,67430,64900,62380,59850,57330,54800,52280,49750,47230],[420001,75150,72630,70100,67580,65050,62530,60000,57480,54950,52430,49900,47380],[420501,75300,72780,70250,67730,65200,62680,60150,57630,55100,52580,50050,47530],[421001,75450,72930,70400,67880,65350,62830,60300,57780,55250,52730,50200,47680],[421501,75600,73080,70550,68030,65500,62980,60450,57930,55400,52880,50350,47830],[422001,75750,73230,70700,68180,65650,63130,60600,58080,55550,53030,50500,47980],[422501,75900,73380,70850,68330,65800,63280,60750,58230,55700,53180,50650,48130],[423001,76050,73530,71000,68480,65950,63430,60900,58380,55850,53330,50800,48280],[423501,76200,73680,71150,68630,66100,63580,61050,58530,56000,53480,50950,48430],[424001,76350,73830,71300,68780,66250,63730,61200,58680,56150,53630,51100,48580],[424501,76500,73980,71450,68930,66400,63880,61350,58830,56300,53780,51250,48730],[425001,76650,74130,71600,69080,66550,64030,61500,58980,56450,53930,51400,48880],[425501,76800,74280,71750,69230,66700,64180,61650,59130,56600,54080,51550,49030],[426001,76950,74430,71900,69380,66850,64330,61800,59280,56750,54230,51700,49180],[426501,77100,74580,72050,69530,67000,64480,61950,59430,56900,54380,51850,49330],[427001,77250,74730,72200,69680,67150,64630,62100,59580,57050,54530,52000,49480],[427501,77400,74880,72350,69830,67300,64780,62250,59730,57200,54680,52150,49630],[428001,77550,75030,72500,69980,67450,64930,62400,59880,57350,54830,52300,49780],[428501,77700,75180,72650,70130,67600,65080,62550,60030,57500,54980,52450,49930],[429001,77850,75330,72800,70280,67750,65230,62700,60180,57650,55130,52600,50080],[429501,78000,75480,72950,70430,67900,65380,62850,60330,57800,55280,52750,50230],[430001,78150,75630,73100,70580,68050,65530,63000,60480,57950,55430,52900,50380],[430501,78300,75780,73250,70730,68200,65680,63150,60630,58100,55580,53050,50530],[431001,78450,75930,73400,70880,68350,65830,63300,60780,58250,55730,53200,50680],[431501,78600,76080,73550,71030,68500,65980,63450,60930,58400,55880,53350,50830],[432001,78750,76230,73700,71180,68650,66130,63600,61080,58550,56030,53500,50980],[432501,78900,76380,73850,71330,68800,66280,63750,61230,58700,56180,53650,51130],[433001,79050,76530,74000,71480,68950,66430,63900,61380,58850,56330,53800,51280],[433501,79200,76680,74150,71630,69100,66580,64050,61530,59000,56480,53950,51430],[434001,79350,76830,74300,71780,69250,66730,64200,61680,59150,56630,54100,51580],[434501,79500,76980,74450,71930,69400,66880,64350,61830,59300,56780,54250,51730],[435001,79650,77130,74600,72080,69550,67030,64500,61980,59450,56930,54400,51880],[435501,79800,77280,74750,72230,69700,67180,64650,62130,59600,57080,54550,52030],[436001,79950,77430,74900,72380,69850,67330,64800,62280,59750,57230,54700,52180],[436501,80100,77580,75050,72530,70000,67480,64950,62430,59900,57380,54850,52330],[437001,80250,77730,75200,72680,70150,67630,65100,62580,60050,57530,55000,52480],[437501,80400,77880,75350,72830,70300,67780,65250,62730,60200,57680,55150,52630],[438001,80550,78030,75500,72980,70450,67930,65400,62880,60350,57830,55300,52780],[438501,80700,78180,75650,73130,70600,68080,65550,63030,60500,57980,55450,52930],[439001,80850,78330,75800,73280,70750,68230,65700,63180,60650,58130,55600,53080],[439501,81000,78480,75950,73430,70900,68380,65850,63330,60800,58280,55750,53230],[440001,81150,78630,76100,73580,71050,68530,66000,63480,60950,58430,55900,53380],[440501,81300,78780,76250,73730,71200,68680,66150,63630,61100,58580,56050,53530],[441001,81450,78930,76400,73880,71350,68830,66300,63780,61250,58730,56200,53680],[441501,81600,79080,76550,74030,71500,68980,66450,63930,61400,58880,56350,53830],[442001,81750,79230,76700,74180,71650,69130,66600,64080,61550,59030,56500,53980],[442501,81900,79380,76850,74330,71800,69280,66750,64230,61700,59180,56650,54130],[443001,82050,79530,77000,74480,71950,69430,66900,64380,61850,59330,56800,54280],[443501,82200,79680,77150,74630,72100,69580,67050,64530,62000,59480,56950,54430],[444001,82350,79830,77300,74780,72250,69730,67200,64680,62150,59630,57100,54580],[444501,82500,79980,77450,74930,72400,69880,67350,64830,62300,59780,57250,54730],[445001,82650,80130,77600,75080,72550,70030,67500,64980,62450,59930,57400,54880],[445501,82800,80280,77750,75230,72700,70180,67650,65130,62600,60080,57550,55030],[446001,82950,80430,77900,75380,72850,70330,67800,65280,62750,60230,57700,55180],[446501,83100,80580,78050,75530,73000,70480,67950,65430,62900,60380,57850,55330],[447001,83250,80730,78200,75680,73150,70630,68100,65580,63050,60530,58000,55480],[447501,83400,80880,78350,75830,73300,70780,68250,65730,63200,60680,58150,55630],[448001,83550,81030,78500,75980,73450,70930,68400,65880,63350,60830,58300,55780],[448501,83700,81180,78650,76130,73600,71080,68550,66030,63500,60980,58450,55930],[449001,83850,81330,78800,76280,73750,71230,68700,66180,63650,61130,58600,56080],[449501,84000,81480,78950,76430,73900,71380,68850,66330,63800,61280,58750,56230],[450001,84150,81630,79100,76580,74050,71530,69000,66480,63950,61430,58900,56380],[450501,84300,81780,79250,76730,74200,71680,69150,66630,64100,61580,59050,56530],[451001,84450,81930,79400,76880,74350,71830,69300,66780,64250,61730,59200,56680],[451501,84600,82080,79550,77030,74500,71980,69450,66930,64400,61880,59350,56830],[452001,84750,82230,79700,77180,74650,72130,69600,67080,64550,62030,59500,56980],[452501,84900,82380,79850,77330,74800,72280,69750,67230,64700,62180,59650,57130],[453001,85050,82530,80000,77480,74950,72430,69900,67380,64850,62330,59800,57280],[453501,85200,82680,80150,77630,75100,72580,70050,67530,65000,62480,59950,57430],[454001,85350,82830,80300,77780,75250,72730,70200,67680,65150,62630,60100,57580],[454501,85500,82980,80450,77930,75400,72880,70350,67830,65300,62780,60250,57730],[455001,85650,83130,80600,78080,75550,73030,70500,67980,65450,62930,60400,57880],[455501,85800,83280,80750,78230,75700,73180,70650,68130,65600,63080,60550,58030],[456001,85950,83430,80900,78380,75850,73330,70800,68280,65750,63230,60700,58180],[456501,86100,83580,81050,78530,76000,73480,70950,68430,65900,63380,60850,58330],[457001,86250,83730,81200,78680,76150,73630,71100,68580,66050,63530,61000,58480],[457501,86400,83880,81350,78830,76300,73780,71250,68730,66200,63680,61150,58630],[458001,86550,84030,81500,78980,76450,73930,71400,68880,66350,63830,61300,58780],[458501,86700,84180,81650,79130,76600,74080,71550,69030,66500,63980,61450,58930],[459001,86850,84330,81800,79280,76750,74230,71700,69180,66650,64130,61600,59080],[459501,87000,84480,81950,79430,76900,74380,71850,69330,66800,64280,61750,59230],[460001,87150,84630,82100,79580,77050,74530,72000,69480,66950,64430,61900,59380],[460501,87300,84780,82250,79730,77200,74680,72150,69630,67100,64580,62050,59530],[461001,87450,84930,82400,79880,77350,74830,72300,69780,67250,64730,62200,59680],[461501,87600,85080,82550,80030,77500,74980,72450,69930,67400,64880,62350,59830],[462001,87750,85230,82700,80180,77650,75130,72600,70080,67550,65030,62500,59980],[462501,87900,85380,82850,80330,77800,75280,72750,70230,67700,65180,62650,60130],[463001,88050,85530,83000,80480,77950,75430,72900,70380,67850,65330,62800,60280],[463501,88200,85680,83150,80630,78100,75580,73050,70530,68000,65480,62950,60430],[464001,88350,85830,83300,80780,78250,75730,73200,70680,68150,65630,63100,60580],[464501,88500,85980,83450,80930,78400,75880,73350,70830,68300,65780,63250,60730],[465001,88650,86130,83600,81080,78550,76030,73500,70980,68450,65930,63400,60880],[465501,88800,86280,83750,81230,78700,76180,73650,71130,68600,66080,63550,61030],[466001,88950,86430,83900,81380,78850,76330,73800,71280,68750,66230,63700,61180],[466501,89100,86580,84050,81530,79000,76480,73950,71430,68900,66380,63850,61330],[467001,89250,86730,84200,81680,79150,76630,74100,71580,69050,66530,64000,61480],[467501,89400,86880,84350,81830,79300,76780,74250,71730,69200,66680,64150,61630],[468001,89550,87030,84500,81980,79450,76930,74400,71880,69350,66830,64300,61780],[468501,89700,87180,84650,82130,79600,77080,74550,72030,69500,66980,64450,61930],[469001,89850,87330,84800,82280,79750,77230,74700,72180,69650,67130,64600,62080],[469501,90000,87480,84950,82430,79900,77380,74850,72330,69800,67280,64750,62230],[470001,90150,87630,85100,82580,80050,77530,75000,72480,69950,67430,64900,62380],[470501,90300,87780,85250,82730,80200,77680,75150,72630,70100,67580,65050,62530],[471001,90450,87930,85400,82880,80350,77830,75300,72780,70250,67730,65200,62680],[471501,90600,88080,85550,83030,80500,77980,75450,72930,70400,67880,65350,62830],[472001,90750,88230,85700,83180,80650,78130,75600,73080,70550,68030,65500,62980],[472501,90900,88380,85850,83330,80800,78280,75750,73230,70700,68180,65650,63130],[473001,91050,88530,86000,83480,80950,78430,75900,73380,70850,68330,65800,63280],[473501,91200,88680,86150,83630,81100,78580,76050,73530,71000,68480,65950,63430],[474001,91350,88830,86300,83780,81250,78730,76200,73680,71150,68630,66100,63580],[474501,91500,88980,86450,83930,81400,78880,76350,73830,71300,68780,66250,63730],[475001,91650,89130,86600,84080,81550,79030,76500,73980,71450,68930,66400,63880],[475501,91800,89280,86750,84230,81700,79180,76650,74130,71600,69080,66550,64030],[476001,91950,89430,86900,84380,81850,79330,76800,74280,71750,69230,66700,64180],[476501,92100,89580,87050,84530,82000,79480,76950,74430,71900,69380,66850,64330],[477001,92250,89730,87200,84680,82150,79630,77100,74580,72050,69530,67000,64480],[477501,92400,89880,87350,84830,82300,79780,77250,74730,72200,69680,67150,64630],[478001,92550,90030,87500,84980,82450,79930,77400,74880,72350,69830,67300,64780],[478501,92700,90180,87650,85130,82600,80080,77550,75030,72500,69980,67450,64930],[479001,92850,90330,87800,85280,82750,80230,77700,75180,72650,70130,67600,65080],[479501,93000,90480,87950,85430,82900,80380,77850,75330,72800,70280,67750,65230],[480001,93150,90630,88100,85580,83050,80530,78000,75480,72950,70430,67900,65380],[480501,93300,90780,88250,85730,83200,80680,78150,75630,73100,70580,68050,65530],[481001,93450,90930,88400,85880,83350,80830,78300,75780,73250,70730,68200,65680],[481501,93600,91080,88550,86030,83500,80980,78450,75930,73400,70880,68350,65830],[482001,93750,91230,88700,86180,83650,81130,78600,76080,73550,71030,68500,65980],[482501,93900,91380,88850,86330,83800,81280,78750,76230,73700,71180,68650,66130],[483001,94100,91530,89000,86480,83950,81430,78900,76380,73850,71330,68800,66280],[483501,94300,91680,89150,86630,84100,81580,79050,76530,74000,71480,68950,66430],[484001,94500,91830,89300,86780,84250,81730,79200,76680,74150,71630,69100,66580],[484501,94700,91980,89450,86930,84400,81880,79350,76830,74300,71780,69250,66730],[485001,94900,92130,89600,87080,84550,82030,79500,76980,74450,71930,69400,66880],[485501,95100,92280,89750,87230,84700,82180,79650,77130,74600,72080,69550,67030],[486001,95300,92430,89900,87380,84850,82330,79800,77280,74750,72230,69700,67180],[486501,95500,92580,90050,87530,85000,82480,79950,77430,74900,72380,69850,67330],[487001,95700,92730,90200,87680,85150,82630,80100,77580,75050,72530,70000,67480],[487501,95900,92880,90350,87830,85300,82780,80250,77730,75200,72680,70150,67630],[488001,96100,93030,90500,87980,85450,82930,80400,77880,75350,72830,70300,67780],[488501,96300,93180,90650,88130,85600,83080,80550,78030,75500,72980,70450,67930],[489001,96500,93330,90800,88280,85750,83230,80700,78180,75650,73130,70600,68080],[489501,96700,93480,90950,88430,85900,83380,80850,78330,75800,73280,70750,68230],[490001,96900,93630,91100,88580,86050,83530,81000,78480,75950,73430,70900,68380],[490501,97100,93780,91250,88730,86200,83680,81150,78630,76100,73580,71050,68530],[491001,97300,93940,91400,88880,86350,83830,81300,78780,76250,73730,71200,68680],[491501,97500,94140,91550,89030,86500,83980,81450,78930,76400,73880,71350,68830],[492001,97700,94340,91700,89180,86650,84130,81600,79080,76550,74030,71500,68980],[492501,97900,94540,91850,89330,86800,84280,81750,79230,76700,74180,71650,69130],[493001,98100,94740,92000,89480,86950,84430,81900,79380,76850,74330,71800,69280],[493501,98300,94940,92150,89630,87100,84580,82050,79530,77000,74480,71950,69430],[494001,98500,95140,92300,89780,87250,84730,82200,79680,77150,74630,72100,69580],[494501,98700,95340,92450,89930,87400,84880,82350,79830,77300,74780,72250,69730],[495001,98900,95540,92600,90080,87550,85030,82500,79980,77450,74930,72400,69880],[495501,99100,95740,92750,90230,87700,85180,82650,80130,77600,75080,72550,70030],[496001,99300,95940,92900,90380,87850,85330,82800,80280,77750,75230,72700,70180],[496501,99500,96140,93050,90530,88000,85480,82950,80430,77900,75380,72850,70330],[497001,99700,96340,93200,90680,88150,85630,83100,80580,78050,75530,73000,70480],[497501,99900,96540,93350,90830,88300,85780,83250,80730,78200,75680,73150,70630],[498001,100100,96740,93500,90980,88450,85930,83400,80880,78350,75830,73300,70780],[498501,100300,96940,93650,91130,88600,86080,83550,81030,78500,75980,73450,70930],[499001,100500,97140,93800,91280,88750,86230,83700,81180,78650,76130,73600,71080],[499501,100700,97340,93970,91430,88900,86380,83850,81330,78800,76280,73750,71230]];
+
+  var ROW_SPAN = 500;          // 每列涵蓋 500 元
+  var TBL_MIN = 80001;
+  var RATE_5 = 0.05;
+  var THRESHOLD_MONTHLY = 40020;   // 按月 5%：2,000 ÷ 5%
+  var THRESHOLD_PARTTIME = 90501;  // 兼職／非每月：無扶養者起扣點
+
+  var nf = new Intl.NumberFormat("zh-TW");
+  var money = function(n){ return nf.format(Math.round(n)); };
+
+  var el = {
+    salary: document.getElementById("salary"),
+    dep: document.getElementById("dep"),
+    depField: document.getElementById("depField"),
+    mFilled: document.getElementById("mFilled"),
+    mNotFilled: document.getElementById("mNotFilled"),
+    mPartTime: document.getElementById("mPartTime"),
+    chips: document.getElementById("chips"),
+    pickNote: document.getElementById("pickNote"),
+    taxAmt: document.getElementById("taxAmt"),
+    taxBrk: document.getElementById("taxBrk"),
+    netAmt: document.getElementById("netAmt"),
+    netBrk: document.getElementById("netBrk"),
+    detailBody: document.getElementById("detailBody"),
+    detailHead: document.getElementById("detailHead"),
+    warnBox: document.getElementById("warnBox"),
+    copyBtn: document.getElementById("copyBtn"),
+    barTax: document.getElementById("barTax"),
+    barNet: document.getElementById("barNet"),
+    barRate: document.getElementById("barRate")
+  };
+
+  var state = { mode: "filled", last: null };
+  var CHIPS = [40000, 50000, 60000, 80000, 100000, 150000, 200000];
+
+  /* ---- 查表：二分搜尋最大 low <= salary ---- */
+  function lookupTable(salary, dep){
+    if (salary < TBL_MIN) return null;
+    var lo = 0, hi = TABLE.length - 1, idx = -1;
+    while (lo <= hi){
+      var mid = (lo + hi) >> 1;
+      if (TABLE[mid][0] <= salary){ idx = mid; lo = mid + 1; }
+      else { hi = mid - 1; }
+    }
+    if (idx < 0) return null;
+    var row = TABLE[idx];
+    var amt = row[1 + dep];
+    if (amt === undefined) amt = 0;
+    return {
+      low: row[0],
+      high: row[0] + ROW_SPAN - 1,
+      amt: amt,
+      capped: salary > TABLE[TABLE.length - 1][0] + ROW_SPAN - 1
+    };
+  }
+
+  /* ---- 主計算 ---- */
+  function calc(salary, mode, dep){
+    var tax = 0, rate = "查表", threshold = 0, note = "", row = null;
+
+    if (mode === "filled"){
+      rate = "查表";
+      threshold = 0;   // 表已內含 2,000 門檻
+      row = lookupTable(salary, dep);
+      tax = row ? row.amt : 0;
+      note = "依稅額表查得（" + dep + " 位扶養親屬）";
+      if (!row) note = "月薪未達 80,001 元，稅額為 0";
+    } else if (mode === "notFilled"){
+      rate = "5%";
+      threshold = THRESHOLD_MONTHLY;
+      tax = (salary >= threshold) ? Math.floor(salary * RATE_5) : 0;
+      note = (salary >= threshold)
+        ? "全月給付總額 × 5%"
+        : "未達起扣點 40,020 元（稅額 ≤ 2,000 免扣）";
+    } else {
+      rate = "5%";
+      threshold = THRESHOLD_PARTTIME;
+      tax = (salary >= threshold) ? Math.floor(salary * RATE_5) : 0;
+      note = (salary >= threshold)
+        ? "每次給付額 × 5%"
+        : "未達起扣點 90,501 元，免扣";
+    }
+
+    return {
+      salary: salary, mode: mode, dep: dep,
+      tax: tax, net: salary - tax,
+      rate: rate, threshold: threshold, note: note, row: row
+    };
+  }
+
+  function render(){
+    var salary = parseFloat(el.salary.value);
+    if (!isFinite(salary) || salary < 0) salary = 0;
+    var dep = parseInt(el.dep.value, 10) || 0;
+    var mode = state.mode;
+
+    var r = calc(salary, mode, dep);
+    state.last = r;
+
+    el.taxAmt.innerHTML = money(r.tax) + "<small>元／月</small>";
+    el.netAmt.innerHTML = money(r.net) + "<small>元／月</small>";
+
+    // 左卡明細
+    var taxLines = "";
+    if (mode === "filled" && r.row){
+      taxLines += "<div><span>查表區間</span><span>" + money(r.row.low) + " ～ " + money(r.row.high) + "</span></div>";
+      taxLines += "<div><span>扶養親屬</span><span>" + dep + " 人</span></div>";
+    } else {
+      taxLines += "<div><span>扣繳率</span><span>" + r.rate + "</span></div>";
+      taxLines += "<div><span>起扣點</span><span>" + money(r.threshold) + "</span></div>";
+    }
+    taxLines += "<div><span>是否扣繳</span><span>" + (r.tax > 0 ? "應扣繳" : "免扣繳") + "</span></div>";
+    el.taxBrk.innerHTML = taxLines;
+
+    // 右卡明細
+    el.netBrk.innerHTML =
+        "<div><span>薪資總額</span><span>" + money(r.salary) + "</span></div>"
+      + "<div><span>扣繳稅額</span><span>" + (r.tax ? "− " + money(r.tax) : "0") + "</span></div>"
+      + "<div><span>實領金額</span><span>" + money(r.net) + "</span></div>";
+
+    // 明細表
+    var rows = [
+      ["每月薪資總額", '<span class="rate">全月給付總額</span>', money(r.salary), "—"],
+      ["扣繳方式", '<span class="rate">' + modeLabel(mode) + "</span>", r.rate, r.note],
+      ["應扣繳稅額", '<span class="rate">元以下捨去</span>', money(r.tax), r.tax > 0 ? "次月 10 日前繳國庫" : "免扣，仍須列單申報"],
+      ["員工實領", '<span class="rate">薪資 − 扣繳稅額</span>', money(r.net), "公司發給員工"]
+    ];
+
+    var html = "";
+    rows.forEach(function(row, i){
+      html += "<tr>"
+        + "<td>" + row[0] + row[1] + "</td>"
+        + "<td>" + row[2] + "</td>"
+        + "<td>" + row[3] + "</td>"
+        + "</tr>";
+    });
+    el.detailBody.innerHTML = html;
+
+    el.detailHead.textContent = modeLabel(mode) + " ・ " + money(r.salary) + " 元";
+
+    // 固定列
+    el.barTax.textContent = money(r.tax);
+    el.barNet.textContent = money(r.net);
+    el.barRate.textContent = r.rate;
+
+    // 提示
+    var tips = [];
+    if (mode === "filled"){
+      if (!r.row){
+        tips.push("月薪 <b>" + money(salary) + " 元</b> 未達稅額表起點（80,001 元），<b>免扣繳</b>。");
+      } else if (r.tax === 0){
+        tips.push("查表結果為 0：月薪 <b>" + money(salary) + " 元</b>、扶養 <b>" + dep + " 人</b> 的應扣繳稅額未達 2,000 元，<b>免扣繳</b>。");
+      } else {
+        tips.push("月薪 <b>" + money(salary) + " 元</b>、扶養 <b>" + dep + " 人</b> → 查表得應扣繳 <b>" + money(r.tax) + " 元</b>，員工實領 <b>" + money(r.net) + " 元</b>。");
+      }
+    } else {
+      if (r.tax === 0){
+        tips.push("月薪 <b>" + money(salary) + " 元</b> 未達起扣點 <b>" + money(r.threshold) + " 元</b>，<b>免扣繳</b>。");
+      } else {
+        tips.push("按 <b>5%</b> 計算，應扣繳 <b>" + money(r.tax) + " 元</b>，員工實領 <b>" + money(r.net) + " 元</b>。");
+      }
+    }
+    el.pickNote.innerHTML = tips.join(" ");
+    el.pickNote.style.display = tips.length ? "" : "none";
+
+    // 警告
+    var warns = [];
+    if (mode === "filled" && r.row && r.row.capped){
+      warns.push("月薪超過 <b>500,000 元</b>，已以稅額表最高列（499,501～500,000）計算，實際金額請洽會計師或稽徵機關。");
+    }
+    if (mode === "filled" && dep > 0 && r.tax === 0 && salary >= TBL_MIN){
+      warns.push("扶養親屬人數較多時起扣點會提高。若員工<b>未實際填寫免稅額申報表</b>，公司不得逕行按扶養人數查表，應改用 5% 方式。");
+    }
+    if (warns.length){
+      el.warnBox.innerHTML = warns.join("<br>");
+      el.warnBox.style.display = "";
+    } else {
+      el.warnBox.style.display = "none";
+    }
+
+    // chip 高亮
+    Array.prototype.forEach.call(el.chips.children, function(b){
+      b.classList.toggle("on", parseInt(b.dataset.v, 10) === Math.round(salary));
+    });
+  }
+
+  function modeLabel(m){
+    if (m === "filled") return "有填免稅額申報表";
+    if (m === "notFilled") return "未填／免填申報表";
+    return "兼職／非每月給付";
+  }
+
+  function setMode(m){
+    state.mode = m;
+    el.mFilled.classList.toggle("on", m === "filled");
+    el.mNotFilled.classList.toggle("on", m === "notFilled");
+    el.mPartTime.classList.toggle("on", m === "partTime");
+    // 只有查表模式需要扶養人數
+    el.depField.style.opacity = (m === "filled") ? "1" : ".4";
+    el.dep.disabled = (m === "filled") ? false : true;
+    render();
+  }
+
+  function buildChips(){
+    CHIPS.forEach(function(v){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.v = v;
+      b.textContent = nf.format(v);
+      b.addEventListener("click", function(){
+        el.salary.value = v;
+        render();
+      });
+      el.chips.appendChild(b);
+    });
+  }
+
+  function copyResult(){
+    var r = state.last;
+    if (!r) return;
+    var lines = [];
+    lines.push("【115 年度薪資所得扣繳試算】");
+    lines.push("扣繳方式：" + modeLabel(r.mode));
+    if (r.mode === "filled") lines.push("扶養親屬：" + r.dep + " 人");
+    lines.push("");
+    lines.push("每月薪資總額：" + money(r.salary) + " 元");
+    if (r.row) lines.push("查表區間：" + money(r.row.low) + " ～ " + money(r.row.high));
+    lines.push("應扣繳稅額：" + money(r.tax) + " 元");
+    lines.push("員工實領：" + money(r.net) + " 元");
+    lines.push("");
+    lines.push("※ 扣繳稅款應於次月 10 日前繳清；免扣者仍須列單申報。");
+    lines.push("※ 資料來源：財政部中區國稅局 115 年度薪資所得扣繳稅額表。");
+
+    var text = lines.join("\n");
+    var done = function(){
+      var b = el.copyBtn;
+      b.textContent = "已複製 ✓";
+      b.classList.add("done");
+      clearTimeout(b._t);
+      b._t = setTimeout(function(){
+        b.textContent = "複製試算結果";
+        b.classList.remove("done");
+      }, 1800);
+    };
+    var fallback = function(){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { window.prompt("請手動複製：", text); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  el.mFilled.addEventListener("click", function(){ setMode("filled"); });
+  el.mNotFilled.addEventListener("click", function(){ setMode("notFilled"); });
+  el.mPartTime.addEventListener("click", function(){ setMode("partTime"); });
+  el.salary.addEventListener("input", render);
+  el.dep.addEventListener("change", render);
+  el.copyBtn.addEventListener("click", copyResult);
+
+  buildChips();
+  setMode("filled");
+})();
+</script>
+</body>
+</html>
