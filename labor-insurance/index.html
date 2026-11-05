@@ -134,6 +134,12 @@
   tr.total td{background:#f8fafc;font-weight:900;font-size:15px;border-top:2px solid var(--line)}
   .rate{display:block;font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:0}
   .zero{color:#cbd5e1}
+  /* 已達上限標籤 */
+  .cap{
+    display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.02em;
+    background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;
+    padding:0 6px;border-radius:5px;margin-left:5px;vertical-align:1px;
+  }
   .ref tbody tr{cursor:pointer;transition:background .12s}
   .ref tbody tr:hover{background:#eff6ff}
   .ref tbody tr.sel{background:#dbeafe;box-shadow:inset 3px 0 0 var(--brand)}
@@ -445,7 +451,9 @@
       積欠工資墊償基金萬分之 2.5（雇主全額，按勞保投保薪資總額計）。
     </p>
     <p class="basis">
-      <b>級距上下限（各項不同，低於下限者以該項下限計）：</b>勞保 11,100～45,800；健保 29,500～313,000；勞退提繳 1,500～150,000；職災 29,500～72,800。
+      <b>各項投保金額上下限（四項各自獨立，不是同一個級距）：</b>
+      勞保 11,100～<b>45,800</b>；健保 29,500～<b>313,000</b>；勞退提繳 1,500～<b>150,000</b>；職災 29,500～<b>72,800</b>。
+      所以月薪 313,000 元時，只有健保按 313,000 計，勞保仍以 45,800 計、勞退以 150,000 計。
       例如月薪 20,000 元：勞保與勞退按 20,008 元計，但<b>健保仍以 29,500 元計</b>（健保下限），
       所以健保費不會隨薪資降到 29,500 元以下而繼續減少。
     </p>
@@ -692,6 +700,12 @@
     });
   }
 
+  /* ---- 上限標籤：投保金額等於上限時加註 ---- */
+  function capTag(base, cap){
+    if (base >= cap) return ' <span class="cap">已達上限 ' + money(cap) + '</span>';
+    return '';
+  }
+
   /* ---- 主渲染 ---- */
   function render(){
     var r = ROWS[selIdx];
@@ -748,13 +762,13 @@
 
     // 明細表
     var rows = [
-      ["勞工保險（含就業保險）", '<span class="rate">投保金額 ' + money(B.labor) + '｜費率 12.5%｜勞工 20%、雇主 70%</span>', wIns, eIns],
-      ['全民健康保險', '<span class="rate">投保金額 ' + money(B.health) + '｜費率 5.17%｜勞工 30%、雇主 60%</span>', wHi, eHi],
-      ['勞工退休金（新制）', '<span class="rate">提繳金額 ' + money(B.pension) + '｜6%｜雇主全額負擔</span>', 0, eLp],
-      ['工資墊償基金', '<span class="rate">投保金額 ' + money(B.labor) + '｜0.025%｜雇主全額負擔</span>', 0, eWf]
+      ["勞工保險（含就業保險）", '<span class="rate">投保金額 ' + money(B.labor) + capTag(B.labor, 45800) + '｜費率 12.5%｜勞工 20%、雇主 70%</span>', wIns, eIns],
+      ['全民健康保險', '<span class="rate">投保金額 ' + money(B.health) + capTag(B.health, 313000) + '｜費率 5.17%｜勞工 30%、雇主 60%</span>', wHi, eHi],
+      ['勞工退休金（新制）', '<span class="rate">提繳金額 ' + money(B.pension) + capTag(B.pension, 150000) + '｜6%｜雇主全額負擔</span>', 0, eLp],
+      ['工資墊償基金', '<span class="rate">投保金額 ' + money(B.labor) + capTag(B.labor, 45800) + '｜0.025%｜雇主全額負擔</span>', 0, eWf]
     ];
     if (eOa > 0){
-      rows.push(['職業災害保險（選填）', '<span class="rate">投保金額 ' + money(B.oa) + '｜費率 ' + el.oaRate.value + '%｜雇主全額負擔</span>', 0, eOa]);
+      rows.push(['職業災害保險（選填）', '<span class="rate">投保金額 ' + money(B.oa) + capTag(B.oa, 72800) + '｜費率 ' + el.oaRate.value + '%｜雇主全額負擔</span>', 0, eOa]);
     }
 
     var html = "";
