@@ -1,13 +1,58 @@
-# 2026 勞健保三合一保費試算（單位應繳／員工應繳）
+# 勞動法規小工具（labor.kscpb.com）
 
-**線上版：<https://labor.kscpb.com/>**（備用：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>）
+台灣勞動法規相關試算工具的集合站。**一個網域、多個子路徑** —— 新增工具不必再動 DNS。
 
-單檔網頁，免安裝、免網路即可使用：**直接用瀏覽器打開 `index.html`**（或把單一 HTML 檔傳給客戶）。
+**線上版：<https://labor.kscpb.com/>**
+（備用：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>）
 
-- 檔案：`index.html`（HTML + CSS + JS 全部內嵌，無外部依賴）
-- 預覽：`preview.png`
+## 網站結構
+
+```
+labor.kscpb.com/            工具選單首頁（根目錄 index.html）
+labor.kscpb.com/insurance/  勞健保三合一保費試算  ← 目前唯一工具
+labor.kscpb.com/<工具名>/    以後新增的工具放這裡
+```
+
+| 路徑 | 檔案 | 說明 |
+|---|---|---|
+| `/` | `index.html` | 工具選單首頁 |
+| `/insurance/` | `insurance/index.html` | 勞健保保費試算（單檔、可離線使用） |
+| `/verify/` | `verify/verify_official.py` | 官方資料核對腳本（不影響網站） |
+
+## 新增一個工具（不用碰 DNS）
+
+1. 在專案根目錄建一個資料夾，例如 `overtime/`。
+2. 把工具做成單一 `overtime/index.html`（CSS/JS 全部內嵌，無外部依賴）。
+3. 打開根目錄的 `index.html`，找到 `<!-- 新增工具 -->` 註解下方，複製整段 `<a class="tool"> … </a>`，
+   改 `href="overtime/"`、標題、說明與標籤即可。工具數量會自動更新。
+4. 執行 `git add -A && git commit -m "新增加班費試算" && git push`。
+
+網址就是 `https://labor.kscpb.com/overtime/`，**不需要在 Namecheap 加任何記錄**。
+
+## 網域設定（只需做一次）
+
+`CNAME` 檔內容固定為 `labor.kscpb.com`，GitHub Pages 靠它判斷自訂網域。
+
+DNS 在 Namecheap → Advanced DNS：
+
+| Type | Host | Value | TTL |
+|---|---|---|---|
+| CNAME Record | `labor` | `elanhuang-sudo.github.io` | Automatic |
+
+⚠️ 值是 `elanhuang-sudo.github.io`，**不要**寫成 repo 名稱或加上路徑。
+
+> ⚠️ **不要加 `*.kscpb.com` 的 wildcard CNAME。**
+> GitHub Pages 一個 repo 只認一個網域，wildcard 不但無法讓多個 repo 共用，
+> 還會把現有的 `status` / `pic` / `n8n`（指向 VPS `84.247.159.214`）全部蓋掉。
+> 本專案用「單一網域 + 子路徑」就是為了避開這個問題。
+
+---
+
+# 工具一：勞健保三合一保費試算（`/insurance/`）
+
 - 適用年度：2026 年（民國 115 年），各表自 **115 年 1 月 1 日** 起適用
-- 資料性質：全部取自政府公開資料（勞動部勞工保險局、衛生福利部中央健康保險署、全國法規資料庫），未轉載任何民間整理表
+- 資料性質：全部取自政府公開資料，未轉載任何民間整理表
+- 單檔免安裝：`insurance/index.html` 可直接雙擊開啟，或傳給客戶
 
 ## 資料來源（官方）
 
@@ -53,7 +98,7 @@
 python verify\verify_official.py
 ```
 
-腳本會把 `index.html` 的 82 列，逐筆比對：
+腳本會把 `insurance/index.html` 的 82 列，逐筆比對：
 
 - **勞保**：與勞保局 ODS 分擔金額表比對 28 級（11,100～45,800）
 - **健保**：與健保署負擔金額表比對 58 級（29,500～313,000）
@@ -63,43 +108,21 @@ python verify\verify_official.py
 
 最新結果見 `verify/report.txt`（目前 **0 錯誤**）。
 
-- `verify/official-bli-115.json`：勞保局 ODS 解析出的 28 級金額
-- `verify/official-nhi-115.txt`：健保署負擔金額表(三) 全文
+另有快速檢查（不需官方快照檔）：
 
-## 網域設定（自訂網域）
-
-本專案使用 `labor.kscpb.com`。`CNAME` 檔內容即自訂網域，GitHub Pages 靠它判斷。
-
-DNS 需在 Namecheap 加一筆：
-
-| Type | Host | Value | TTL |
-|---|---|---|---|
-| CNAME Record | `labor` | `elanhuang-sudo.github.io` | Automatic |
-
-⚠️ 值是 `elanhuang-sudo.github.io`，**不要**寫成 `taiwan-labor-insurance` 或整條 repo 路徑。
-
-設定後到 GitHub repo → Settings → Pages → Custom domain 確認顯示 `labor.kscpb.com`，
-並勾選 **Enforce HTTPS**。憑證由 GitHub 自動申請（Let's Encrypt），簽發可能需要數分鐘至數小時。
-
-若日後在 Namecheap 加了 `*.kscpb.com` 的 wildcard 記錄，明確的 `labor` CNAME 仍會優先，不受影響。
+```powershell
+node insurance\_verify.js
+```
 
 ## 更新資料（換年度時）
 
-1. 用編輯器打開 `index.html`，找到 `var ROWS = [`。
+1. 打開 `insurance/index.html`，找到 `var ROWS = [`。
 2. 每列格式：
    `[級數, 投保級距, 勞保-勞工, 勞保-雇主, 墊償-雇主, 健保-勞工, 健保-雇主, 勞退-雇主, 合計-勞工, 合計-雇主, "備註"]`
    級數填 `0` 表示「低薪／部分工時級」（無級數編號）。
-3. 存檔後執行快速驗證：
-
-   ```powershell
-   node .\_verify.js
-   ```
-
-   會檢查：欄位數、級距是否遞增、合計是否等於各項加總、級數是否連續、
-   與法定公式回推是否相符（±1 元）、級距判定邏輯、抽樣對照。
-
-4. 換年度時同步更新 `verify/` 內的官方快照，重跑 `verify\verify_official.py`。
-5. 更新頁尾的「試算基礎」費率、`<title>` 與頁首年份。
+3. 存檔後執行 `node insurance\_verify.js`（欄位數、級距遞增、合計、級數連續、公式回推）。
+4. 換年度時同步更新 `verify/` 內的官方快照，重跑 `python verify\verify_official.py`。
+5. 更新 `insurance/index.html` 頁尾的費率、`<title>` 與頁首年份，以及根目錄首頁的「115 年適用」標籤。
 
 ## 注意
 
