@@ -2,7 +2,7 @@
 
 輸入或選擇投保金額，即時算出**單位應繳**與**員工應繳**的勞保、健保、勞退與墊償金額。
 
-**線上版：<https://elanhuang-sudo.github.io/info-kscpb/>**
+**線上版：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>**
 
 - 檔案：`index.html`（HTML + CSS + JS 全部內嵌，無外部依賴、免安裝）
 - 預覽：`preview.png`
