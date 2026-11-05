@@ -361,7 +361,10 @@
       <h4>一、租金扣繳（所得稅）</h4>
       <ul>
         <li>公司（扣繳義務人）給付租金給<b>境內居住者</b>，按給付額扣取 <b>10%</b>；給付<b>非居住者</b>扣取 <b>20%</b>。</li>
-        <li>每次應扣繳稅額<b>不超過 2,000 元</b>者，免予扣繳 → 換算租金未達 <b>20,010 元</b>（10% 情境）時免扣。</li>
+        <li>每次應扣繳稅額<b>不超過 2,000 元</b>者，免予扣繳。稅額<b>元以下捨去</b>後再比：
+          租金 20,009 元 → 稅額 2,000.9 捨去為 2,000，不超過 2,000 → <b>免扣</b>；
+          租金 <b>20,010 元</b> → 稅額 2,001 → <b>要扣</b>。
+          所以實務上說「單筆 20,010 元起，所得稅與補充保費兩者皆扣」。</li>
         <li>扣繳稅款應於給付日的<b>次月 10 日前</b>向國庫繳清，並於次年 1 月底前申報扣繳憑單。</li>
       </ul>
 
@@ -370,6 +373,9 @@
         <li>租金收入屬補充保險費計費範圍，費率 <b>2.11%</b>，由<b>扣費義務人（公司）</b>於給付時代為扣取。</li>
         <li><b>單次給付金額達 20,000 元</b>才需扣取；未達者免扣。</li>
         <li>款項應於給付日的<b>次月底前</b>繳納健保署。</li>
+        <li><b>非居住者</b>：依全民健康保險法第 31 條，扣費對象為「保險對象」。
+          非居住者原則上<b>不是</b>健保保險對象，故<b>不扣</b>補充保費（本頁選 20% 時會自動歸零）。
+          但若該房東<b>仍具健保身分</b>（例如持居留證受僱、依法應參加健保），仍應扣取 2.11%，請自行改回。</li>
       </ul>
 
       <h4>三、兩種情境的算法</h4>
@@ -465,16 +471,30 @@
     if (mode === "gross"){
       // 金額就是給付總額
       total = amount;
-      var whRaw = total * whRate;
-      wh = (whRaw > WH_TAX_FREE) ? Math.floor(whRaw) : 0;
+      // 先算出應扣稅額（元以下捨去），再看是否超過 2,000 元的免扣門檻
+      var whCalc = Math.floor(total * whRate);
+      wh = (whCalc > WH_TAX_FREE) ? whCalc : 0;
       sh = (total >= SH_MIN_BASE) ? Math.round(total * shRate) : 0;
       net = total - wh - sh;
     } else {
       // 金額是房東實拿，回推總額
+      //
+      // 關鍵：若「實拿金額」本身低於補充保費門檻（20,000），
+      // 則總額 = 實拿金額 時，補充保費不觸發；
+      // 而該金額的 10% 必 <= 2,000，扣繳也不觸發 → 完全無稅費。
+      // 此時不應回推（否則會算出遠高於必要的總額）。
+      if (amount < SH_MIN_BASE){
+        total = amount; wh = 0; sh = 0; net = amount;
+        return {
+          mode: mode, total: total, wh: wh, sh: sh,
+          net: net, cost: total, taxTotal: 0
+        };
+      }
+
       // 先假設兩者都扣
       total = amount / (1 - whRate - shRate);
-      var whRaw = total * whRate;
-      var whApplies = whRaw > WH_TAX_FREE;
+      // 同樣先捨去再判門檻（與含稅模式一致）
+      var whApplies = Math.floor(total * whRate) > WH_TAX_FREE;
       var shApplies = total >= SH_MIN_BASE;
 
       if (!shApplies && !whApplies){
@@ -712,7 +732,29 @@
   el.modeNet.addEventListener("click", function(){ setMode("net"); });
   el.modeGross.addEventListener("click", function(){ setMode("gross"); });
   el.amount.addEventListener("input", render);
-  el.whRate.addEventListener("change", render);
+  el.whRate.addEventListener("change", function(){
+    // 非居住者原則上不是健保保險對象，不扣補充保費
+    var isNonResident = (parseFloat(el.whRate.value) === 0.20);
+    if (isNonResident){
+      el.shRate.value = "0";
+      if (!el.nrHintShown){
+        el.nrHintShown = true;
+        // 提示放在說明區下方，不打斷操作
+        var box = el.warnBox;
+        if (box){
+          box.innerHTML = "・已將補充保費設為 0：<b>非居住者原則上不是健保保險對象</b>，"
+            + "依全民健康保險法第 31 條不扣取補充保費。<br>"
+            + "・但若該房東<b>仍具健保保險對象身分</b>（例如持居留證受僱、依法應參加健保），"
+            + "仍應扣取，請自行把費率改回 2.11%。";
+          box.style.display = "";
+        }
+      }
+    } else {
+      el.nrHintShown = false;
+      if (el.shRate.value === "0") el.shRate.value = "2.11";
+    }
+    render();
+  });
   el.shRate.addEventListener("input", render);
   el.months.addEventListener("change", render);
   el.copyBtn.addEventListener("click", copyResult);

@@ -445,7 +445,9 @@
       積欠工資墊償基金萬分之 2.5（雇主全額，按勞保投保薪資總額計）。
     </p>
     <p class="basis">
-      <b>級距上下限：</b>勞保 11,100～45,800；健保 29,500～313,000；勞退提繳 1,500～150,000；職災 29,500～72,800。
+      <b>級距上下限（各項不同，低於下限者以該項下限計）：</b>勞保 11,100～45,800；健保 29,500～313,000；勞退提繳 1,500～150,000；職災 29,500～72,800。
+      例如月薪 20,000 元：勞保與勞退按 20,008 元計，但<b>健保仍以 29,500 元計</b>（健保下限），
+      所以健保費不會隨薪資降到 29,500 元以下而繼續減少。
     </p>
     <p class="basis">
       <b>提醒：</b>本頁僅供參考與內部估算，實際應繳金額以勞保局、健保署核定為準。
@@ -611,6 +613,22 @@
 
   function depMult(n){ return 1 + Math.min(Math.max(n, 0), 3); }
 
+  /* ---- 各項保險各自適用的投保金額 ----
+     勞保下限 11,100、上限 45,800
+     健保下限 29,500、上限 313,000
+     勞退下限  1,500、上限 150,000
+     職災下限 29,500、上限  72,800
+     原表的「級距 lv」是勞保投保薪資，低於各項下限時該項會用其下限計算，
+     所以不能只用一個「投保級距」代表全部。 */
+  function bases(lv){
+    return {
+      labor: Math.min(Math.max(lv, 11100), 45800),
+      health: Math.min(Math.max(lv, 29500), 313000),
+      pension: Math.min(Math.max(lv, 1500), 150000),
+      oa: Math.min(Math.max(lv, 29500), 72800)
+    };
+  }
+
   function oaBase(lv){ return Math.min(Math.max(lv, 29500), 72800); }
 
   /* ---- 初始化下拉選單 ---- */
@@ -715,6 +733,9 @@
       + "<div><span>工資墊償</span><span>" + money(eWf) + "</span></div>"
       + (eOa > 0 ? "<div><span>職災保險（概估）</span><span>" + money(eOa) + "</span></div>" : "");
 
+    // 各項保險實際投保金額（供明細表與說明使用）
+    var B = bases(lv);
+
     // 合計
     el.totalAmt.textContent = "NT$ " + money(wTotal + eTotal);
     el.stripWorker.textContent = money(wTotal);
@@ -727,13 +748,13 @@
 
     // 明細表
     var rows = [
-      ["勞工保險（含就業保險）", '<span class="rate">費率 12.5%｜勞工 20%、雇主 70%</span>', wIns, eIns],
-      ['全民健康保險', '<span class="rate">費率 5.17%｜勞工 30%、雇主 60%（含平均眷口 0.56）</span>', wHi, eHi],
-      ['勞工退休金（新制）', '<span class="rate">6%｜雇主全額負擔</span>', 0, eLp],
-      ['工資墊償基金', '<span class="rate">0.025%｜雇主全額負擔</span>', 0, eWf]
+      ["勞工保險（含就業保險）", '<span class="rate">投保金額 ' + money(B.labor) + '｜費率 12.5%｜勞工 20%、雇主 70%</span>', wIns, eIns],
+      ['全民健康保險', '<span class="rate">投保金額 ' + money(B.health) + '｜費率 5.17%｜勞工 30%、雇主 60%</span>', wHi, eHi],
+      ['勞工退休金（新制）', '<span class="rate">提繳金額 ' + money(B.pension) + '｜6%｜雇主全額負擔</span>', 0, eLp],
+      ['工資墊償基金', '<span class="rate">投保金額 ' + money(B.labor) + '｜0.025%｜雇主全額負擔</span>', 0, eWf]
     ];
     if (eOa > 0){
-      rows.push(['職業災害保險（選填）', '<span class="rate">費率 ' + el.oaRate.value + '%｜雇主全額負擔</span>', 0, eOa]);
+      rows.push(['職業災害保險（選填）', '<span class="rate">投保金額 ' + money(B.oa) + '｜費率 ' + el.oaRate.value + '%｜雇主全額負擔</span>', 0, eOa]);
     }
 
     var html = "";
@@ -750,23 +771,36 @@
     el.detailHead.textContent = (r[F.no] > 0 ? "第 " + r[F.no] + " 級 ・ " : "低薪／部分工時級 ・ ")
       + "投保級距 " + money(lv) + " 元" + (mult > 1 ? " ・ 眷屬 " + Math.min(dep, 3) + " 人" : "");
 
-    // 判定說明
-    if (isFinite(wageVal) && wageVal > 0 && wageVal !== lv){
-      var msg;
+    // 判定說明：分別說明「級距判定」與「各項實際投保金額」
+    var parts = [];
+    if (isFinite(wageVal) && wageVal > 0){
       if (wageVal > ROWS[ROWS.length - 1][F.lv]){
-        msg = "<b>輸入 " + money(wageVal) + " 元</b> 超過健保最高級距，以最高級 <b>" + money(ROWS[ROWS.length - 1][F.lv]) + " 元</b> 計算。";
-      } else if (wageVal < ROWS[0][F.lv]){
-        msg = "<b>輸入 " + money(wageVal) + " 元</b> 低於最低級距，以 <b>" + money(ROWS[0][F.lv]) + " 元</b>（部分工時級）計算。";
+        parts.push("<b>輸入 " + money(wageVal) + " 元</b> 超過級距表上限，各項保險分別以其上限計算。");
+      } else if (wageVal < 11100 || wageVal < ROWS[0][F.lv]){
+        parts.push("<b>輸入 " + money(wageVal) + " 元</b> 低於勞保最低投保級距 11,100 元，各項保險分別以下限計算。");
+      } else if (wageVal !== lv){
+        parts.push("<b>輸入 " + money(wageVal) + " 元</b> 未達整級，依規定以較高級數 <b>" + money(lv) + " 元</b> 投保。");
       } else {
-        msg = "<b>輸入 " + money(wageVal) + " 元</b> 未達整級，依規定以較高級數 <b>" + money(lv) + " 元</b> 投保。";
+        parts.push("投保級距 <b>" + money(lv) + " 元</b>" + (r[F.memo] ? "（" + r[F.memo] + "）" : "") + "。");
       }
-      el.pickNote.innerHTML = msg;
-      el.pickNote.style.display = "";
-    } else {
-      el.pickNote.innerHTML = "目前為投保級距 <b>" + money(lv) + " 元</b>"
-        + (r[F.memo] ? "（" + r[F.memo] + "）" : "") + "。";
-      el.pickNote.style.display = "";
     }
+    // 各項投保金額若與級距不同，逐一標示（這是最常被誤解的地方）
+    var diffs = [];
+    if (B.labor !== lv) diffs.push("勞保 <b>" + money(B.labor) + "</b>");
+    if (B.health !== lv) diffs.push("健保 <b>" + money(B.health) + "</b>");
+    if (B.pension !== lv) diffs.push("勞退 <b>" + money(B.pension) + "</b>");
+    if (diffs.length){
+      var why = [];
+      if (B.labor === 11100 && lv < 11100) why.push("勞保最低 11,100");
+      if (B.labor === 45800 && lv > 45800) why.push("勞保上限 45,800");
+      if (B.health === 29500 && lv < 29500) why.push("健保最低 29,500");
+      if (B.pension === 1500 && lv < 1500) why.push("勞退最低 1,500");
+      if (B.pension === 150000 && lv > 150000) why.push("勞退上限 150,000");
+      parts.push("實算投保金額：" + diffs.join("、")
+        + (why.length ? "（" + why.join("；") + "）" : "") + "。");
+    }
+    el.pickNote.innerHTML = parts.join(" ");
+    el.pickNote.style.display = parts.length ? "" : "none";
 
     // 級距表高亮
     var prev = el.refBody.querySelector("tr.sel");
