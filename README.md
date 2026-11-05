@@ -1,78 +1,14 @@
-# 勞動法規小工具（info.kscpb.com）
+# 2026 勞健保三合一保費試算（單位應繳／員工應繳）
 
-台灣勞動法規相關試算工具的集合站。**一個網域、多個子路徑** —— 新增工具不必再動 DNS。
+輸入或選擇投保金額，即時算出**單位應繳**與**員工應繳**的勞保、健保、勞退與墊償金額。
 
-**線上版：<https://info.kscpb.com/>**
-（GitHub 原始碼：<https://github.com/elanhuang-sudo/info-kscpb>）
+**線上版：<https://elanhuang-sudo.github.io/info-kscpb/>**
 
-## 給客戶的短網址
-
-使用自有的短網址服務 **`g.kscpb.com`（Rebrandly）**，不使用第三方免費短網址。
-
-| 短網址 | 指向 | 用途 |
-|---|---|---|
-| `https://g.kscpb.com/labor` | `https://info.kscpb.com/labor/` | 勞健保保費試算，直接傳給客戶（**待建立**）|
-
-建立方式（Rebrandly 後台）：
-
-1. 登入 <https://app.rebrandly.com>
-2. **Create link** → Destination 填 `https://info.kscpb.com/labor/`
-3. Domain 選 `g.kscpb.com`，Slashing 填 `labor`
-4. 存檔後即為 `https://g.kscpb.com/labor`
-
-> ⚠️ 建立前請先確認 `https://info.kscpb.com/labor/` 已能正常開啟，
-> 否則會建出一條連到死頁的短網址。
-> 短網址為外部服務，若目標網址日後變更，需回 Rebrandly 修改或重建。
-
-## 網站結構
-
-```
-info.kscpb.com/            工具選單首頁（根目錄 index.html）
-info.kscpb.com/labor/      勞健保三合一保費試算  ← 目前唯一工具
-info.kscpb.com/<工具名>/    以後新增的工具放這裡
-```
-
-| 路徑 | 檔案 | 說明 |
-|---|---|---|
-| `/` | `index.html` | 工具選單首頁 |
-| `/labor/` | `labor/index.html` | 勞健保保費試算（單檔、可離線使用） |
-| `/verify/` | `verify/verify_official.py` | 官方資料核對腳本（不影響網站） |
-
-## 新增一個工具（不用碰 DNS）
-
-1. 在專案根目錄建一個資料夾，例如 `overtime/`。
-2. 把工具做成單一 `overtime/index.html`（CSS/JS 全部內嵌，無外部依賴）。
-3. 打開根目錄的 `index.html`，找到 `<!-- 新增工具 -->` 註解下方，複製整段 `<a class="tool"> … </a>`，
-   改 `href="overtime/"`、標題、說明與標籤即可。工具數量會自動更新。
-4. 執行 `git add -A` → `git commit -m "新增加班費試算"` → `git push`。
-
-網址就是 `https://info.kscpb.com/overtime/`，**不需要在 Namecheap 加任何記錄**。
-
-## 網域設定（只需做一次）
-
-`CNAME` 檔內容固定為 `info.kscpb.com`，GitHub Pages 靠它判斷自訂網域。
-
-DNS 在 Namecheap → Advanced DNS：
-
-| Type | Host | Value | TTL |
-|---|---|---|---|
-| CNAME Record | `info` | `elanhuang-sudo.github.io` | Automatic |
-
-⚠️ 值是 `elanhuang-sudo.github.io`，**不要**寫成 repo 名稱或加上路徑。
-⚠️ Host 只填 `info`，不要填 `info.kscpb.com`（Namecheap 會自動接上網域）。
-
-> ⚠️ **不要加 `*.kscpb.com` 的 wildcard CNAME。**
-> GitHub Pages 一個 repo 只認一個網域，wildcard 不但無法讓多個 repo 共用，
-> 還會把現有的 `status` / `pic` / `n8n`（指向 VPS `84.247.159.214`）全部蓋掉。
-> 本專案採「單一網域 + 子路徑」就是為了避開這個問題，也省去每個工具都要加 DNS 的麻煩。
-
----
-
-# 工具一：勞健保三合一保費試算（`/labor/`）
-
+- 檔案：`index.html`（HTML + CSS + JS 全部內嵌，無外部依賴、免安裝）
+- 預覽：`preview.png`
 - 適用年度：2026 年（民國 115 年），各表自 **115 年 1 月 1 日** 起適用
 - 資料性質：全部取自政府公開資料，未轉載任何民間整理表
-- 單檔免安裝：`labor/index.html` 可直接雙擊開啟，或傳給客戶
+- 網域：使用 GitHub Pages 預設網址，**未綁定自訂網域**；對外分享時另以自有短網址服務指向即可
 
 ## 資料來源（官方）
 
@@ -118,7 +54,7 @@ DNS 在 Namecheap → Advanced DNS：
 python verify\verify_official.py
 ```
 
-腳本會把 `labor/index.html` 的 82 列，逐筆比對：
+腳本會把 `index.html` 的 82 列，逐筆比對：
 
 - **勞保**：與勞保局 ODS 分擔金額表比對 28 級（11,100～45,800）
 - **健保**：與健保署負擔金額表比對 58 級（29,500～313,000）
@@ -131,18 +67,18 @@ python verify\verify_official.py
 另有快速檢查（不需官方快照檔）：
 
 ```powershell
-node labor\_verify.js
+node _verify.js
 ```
 
 ## 更新資料（換年度時）
 
-1. 打開 `labor/index.html`，找到 `var ROWS = [`。
+1. 打開 `index.html`，找到 `var ROWS = [`。
 2. 每列格式：
    `[級數, 投保級距, 勞保-勞工, 勞保-雇主, 墊償-雇主, 健保-勞工, 健保-雇主, 勞退-雇主, 合計-勞工, 合計-雇主, "備註"]`
    級數填 `0` 表示「低薪／部分工時級」（無級數編號）。
-3. 存檔後執行 `node labor\_verify.js`（欄位數、級距遞增、合計、級數連續、公式回推）。
+3. 存檔後執行 `node _verify.js`（欄位數、級距遞增、合計、級數連續、公式回推）。
 4. 換年度時同步更新 `verify/` 內的官方快照，重跑 `python verify\verify_official.py`。
-5. 更新 `labor/index.html` 頁尾的費率、`<title>` 與頁首年份，以及根目錄首頁的「115 年適用」標籤。
+5. 更新頁尾的費率、`<title>` 與頁首年份。
 
 ## 注意
 
