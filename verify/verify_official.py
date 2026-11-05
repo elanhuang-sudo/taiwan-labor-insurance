@@ -6,7 +6,7 @@ import json, re, io, sys, os
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ODS_JSON = os.path.join(BASE, "verify", "official-bli-115.json")
 NHI_TXT = os.path.join(BASE, "verify", "official-nhi-115.txt")
-HTML = os.path.join(BASE, "index.html")
+HTML = os.path.join(BASE, "labor-insurance", "index.html")
 REPORT = os.path.join(BASE, "verify", "report.txt")
 
 lines = []
