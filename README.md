@@ -37,8 +37,9 @@ DNS 在 Namecheap → Advanced DNS：
 ⚠️ Target 是 `elanhuang-sudo.github.io`，**不要**寫成 repo 名稱或加上路徑。
 ⚠️ Host 只填 `tool`，不要填 `tool.kscpb.com`（Namecheap 會自動接上網域）。
 
-設定後到 GitHub repo → Settings → Pages 確認顯示 `tool.kscpb.com`，
-並勾選 **Enforce HTTPS**（需等憑證簽發完成才勾）。
+**已完成（2026-11-05）**：DNS 已設定、憑證已簽發、Enforce HTTPS 已開啟。
+
+驗證結果：`https://tool.kscpb.com/labor-insurance/` → HTTP 200；`http://` → 301 自動升級 HTTPS。
 
 > ⚠️ **不要加 `*.kscpb.com` wildcard CNAME。** GitHub Pages 一個 repo 只認一個網域，
 > wildcard 蓋不掉問題，反而會把 `status`／`pic`／`n8n` 等現有服務全導到 GitHub。
