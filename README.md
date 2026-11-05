@@ -4,11 +4,16 @@
 
 **線上版：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>**
 
+**給客戶的短網址：<https://g.kscpb.com/taiwan-labor-insurance>**
+
 - 檔案：`index.html`（HTML + CSS + JS 全部內嵌，無外部依賴、免安裝）
 - 預覽：`preview.png`
 - 適用年度：2026 年（民國 115 年），各表自 **115 年 1 月 1 日** 起適用
 - 資料性質：全部取自政府公開資料，未轉載任何民間整理表
-- 網域：使用 GitHub Pages 預設網址，**未綁定自訂網域**；對外分享時另以自有短網址服務指向即可
+- 網域：使用 GitHub Pages 預設網址，**未綁定自訂網域**；對外分享走自有短網址服務
+
+> ⚠️ 短網址指向 GitHub Pages 網址。**若日後 repo 改名或綁定自訂網域，短連結需同步更新**
+> （GitHub 只會轉址 repo 頁面，不會轉址 Pages 網站）。管理方式見 `secrets/12-短網址-Rebrandly.md`。
 
 ## 資料來源（官方）
 
