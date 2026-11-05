@@ -18,6 +18,12 @@ const RATE_5 = 0.05;
 const THRESHOLD_MONTHLY = 40020;
 const THRESHOLD_PARTTIME = 90501;
 
+// 非居住者：各類所得扣繳率標準第 3 條
+const NR_BASE_WAGE = 29500;
+const NR_THRESHOLD = NR_BASE_WAGE * 1.5;   // 44,250
+const NR_LOW = 0.06;
+const NR_HIGH = 0.18;
+
 function lookupTable(salary, dep) {
   if (salary < TBL_MIN) return null;
   let lo = 0, hi = TABLE.length - 1, idx = -1;
@@ -33,7 +39,14 @@ function lookupTable(salary, dep) {
   return { low: row[0], high: row[0] + ROW_SPAN - 1, amt };
 }
 
-function calc(salary, mode, dep) {
+function calc(salary, mode, dep, identity) {
+  // 非居住者
+  if (identity === "nonResident") {
+    const applied = (salary <= NR_THRESHOLD) ? NR_LOW : NR_HIGH;
+    const tax = Math.floor(salary * applied);
+    return { tax, net: salary - tax, appliedRate: applied };
+  }
+  // 居住者
   let tax = 0;
   if (mode === "filled") {
     const r = lookupTable(salary, dep);
@@ -43,7 +56,7 @@ function calc(salary, mode, dep) {
   } else {
     tax = salary >= THRESHOLD_PARTTIME ? Math.floor(salary * RATE_5) : 0;
   }
-  return { tax, net: salary - tax };
+  return { tax, net: salary - tax, appliedRate: null };
 }
 
 let errors = 0;
@@ -98,6 +111,39 @@ check("兼職 90,501 → 4,525", calc(90501, "partTime", 0).tax, 4525);
 check("兼職 100,000 → 5,000", calc(100000, "partTime", 0).tax, 5000);
 console.log();
 
+console.log("=== 非居住者：6% / 18% 門檻 ===");
+// 門檻 = 29,500 × 1.5 = 44,250
+check("NR 門檻值", NR_THRESHOLD, 44250);
+check("NR 29,500 → 6%（1,770）", calc(29500, "x", 0, "nonResident").tax, 1770);
+check("NR 44,250（剛好門檻）→ 6%（2,655）", calc(44250, "x", 0, "nonResident").tax, 2655);
+check("NR 44,251（超過 1 元）→ 18%（7,965）", calc(44251, "x", 0, "nonResident").tax, 7965);
+check("NR 30,000 → 6%（1,800）", calc(30000, "x", 0, "nonResident").tax, 1800);
+check("NR 50,000 → 18%（9,000）", calc(50000, "x", 0, "nonResident").tax, 9000);
+check("NR 100,000 → 18%（18,000）", calc(100000, "x", 0, "nonResident").tax, 18000);
+check("NR 20,000 → 6%（1,200）", calc(20000, "x", 0, "nonResident").tax, 1200);
+check("NR 0 → 0", calc(0, "x", 0, "nonResident").tax, 0);
+// 非居住者沒有 2,000 免扣門檻（就算稅額很小也要扣）
+r = calc(10000, "x", 0, "nonResident");
+check("NR 10,000 → 600（無免扣門檻）", r.tax, 600);
+check("NR 10,000 適用率", r.appliedRate, NR_LOW);
+// 邊界：適用率切換
+check("NR 44,250 適用率 = 6%", calc(44250, "x", 0, "nonResident").appliedRate, NR_LOW);
+check("NR 44,251 適用率 = 18%", calc(44251, "x", 0, "nonResident").appliedRate, NR_HIGH);
+console.log();
+
+console.log("=== 居住者 vs 非居住者：同金額結果不同 ===");
+// 50,000：居住者查表 vs 非居住者 18%
+const res50k = calc(50000, "filled", 0, "resident");
+const nr50k = calc(50000, "x", 0, "nonResident");
+console.log(`  50,000 居住者查表 = ${res50k.tax}　非居住者 18% = ${nr50k.tax}`);
+check("  非居住者稅額應高於居住者", nr50k.tax > res50k.tax, true);
+// 30,000：居住者查表低於表首 → 0；非居住者 6% → 1,800
+const res30k = calc(30000, "filled", 0, "resident");
+const nr30k = calc(30000, "x", 0, "nonResident");
+console.log(`  30,000 居住者查表 = ${res30k.tax}　非居住者 6% = ${nr30k.tax}`);
+check("  30,000 居住者免扣", res30k.tax, 0);
+check("  30,000 非居住者應扣 1,800", nr30k.tax, 1800);
+console.log();
 console.log("=== 結構完整性 ===");
 let structErr = 0;
 for (let i = 1; i < TABLE.length; i++) {

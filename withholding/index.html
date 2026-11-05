@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>薪資所得扣繳稅額試算｜tool.kscpb.com</title>
-<meta name="description" content="115 年度薪資所得扣繳稅額試算。依財政部中區國稅局官方「薪資所得扣繳稅額表」，輸入月薪與扶養親屬人數即算出每月應扣繳稅額與實領金額，並提供免稅額申報表下載。" />
+<title>薪資所得扣繳稅額試算（居住者／非居住者）｜tool.kscpb.com</title>
+<meta name="description" content="115 年度薪資所得扣繳試算。居住者依財政部官方「薪資所得扣繳稅額表」查表；非居住者依基本工資 1.5 倍門檻判斷 6% 或 18%。並提供免稅額申報表下載。" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧾</text></svg>" />
 <style>
   :root{
@@ -65,6 +65,32 @@
   h2.sec{font-size:15px;margin:0 0 14px;color:var(--ink-2);letter-spacing:.06em;font-weight:800;display:flex;align-items:center;gap:9px}
   h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--tax),var(--brand-2))}
   h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
+
+  /* ---------- 身分選擇 ---------- */
+  .ids{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .idbtn{
+    border:2px solid var(--line);background:#f8fafc;border-radius:14px;padding:14px 16px;
+    cursor:pointer;font-family:inherit;text-align:left;transition:.15s;display:grid;gap:3px;
+  }
+  .idbtn:hover{border-color:#c7d2fe;background:#eef2ff}
+  .idbtn.on{border-color:var(--tax);background:var(--tax-bg);box-shadow:0 0 0 4px rgba(67,56,202,.10)}
+  .idbtn .idname{font-size:15px;font-weight:800;color:var(--ink)}
+  .idbtn.on .idname{color:var(--tax)}
+  .idbtn .iddesc{font-size:11.5px;color:var(--muted);line-height:1.5}
+
+  /* ---------- 非居住者費率框 ---------- */
+  .nrbox{
+    border:1px solid #c7d2fe;background:#eef2ff;border-radius:14px;padding:16px 18px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .nrbox .nrl{display:grid;gap:2px}
+  .nrbox .nrt{font-size:14px;font-weight:800;color:var(--tax)}
+  .nrbox .nrd{font-size:12px;color:#475569;line-height:1.6}
+  .nrbox .nrr{
+    font-size:34px;font-weight:900;color:var(--tax);font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em;line-height:1.1;
+  }
+  .nrbox .nrr small{font-size:13px;font-weight:700;color:var(--muted);display:block;letter-spacing:0;text-align:right}
 
   /* ---------- mode cards ---------- */
   .modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
@@ -248,37 +274,58 @@
   <header class="hero">
     <button class="btn-print" onclick="window.print()">列印／存 PDF</button>
     <div class="backwrap"><a class="backlink" href="../">← 回工具列表</a></div>
-    <div class="year-tag">115 年度 ・ 財政部中區國稅局官方稅額表</div>
+    <div class="year-tag">115 年度 ・ 居住者查表／非居住者 6% 或 18%</div>
     <h1>薪資所得扣繳稅額試算</h1>
-    <p>每月發薪水要扣多少所得稅？選好扣繳方式、輸入月薪與扶養親屬人數，立即查出應扣繳稅額與員工實領金額。</p>
+    <p>每月發薪水要扣多少所得稅？先選居住者或非居住者，再依身分選擇扣繳方式，立即算出應扣繳稅額與實領金額。</p>
   </header>
 
   <!-- 輸入 -->
   <section class="card pad">
-    <h2 class="sec">步驟 1 ・ 選擇扣繳方式</h2>
+    <h2 class="sec">步驟 1 ・ 選擇納稅義務人身分</h2>
 
-    <div class="modes">
-      <button class="mode on" id="mFilled" type="button">
-        <span class="badge">已選</span>
-        <span class="t">有填免稅額申報表</span>
-        <span class="d">員工已填表並載明扶養親屬 → 查稅額表</span>
+    <div class="ids">
+      <button class="idbtn on" id="idResident" type="button">
+        <span class="idname">居住者</span>
+        <span class="iddesc">本國人、持居留證者、一課稅年度在台居留滿 183 天</span>
       </button>
-      <button class="mode" id="mNotFilled" type="button">
-        <span class="badge">已選</span>
-        <span class="t">未填／免填申報表</span>
-        <span class="d">按全月給付總額扣 5%</span>
-      </button>
-      <button class="mode" id="mPartTime" type="button">
-        <span class="badge">已選</span>
-        <span class="t">兼職／非每月給付</span>
-        <span class="d">按每次給付扣 5%，起扣點較高</span>
+      <button class="idbtn" id="idNonResident" type="button">
+        <span class="idname">非居住者</span>
+        <span class="iddesc">一課稅年度在台居留、停留合計未滿 183 天</span>
       </button>
     </div>
 
-    <h2 class="sec" style="margin-top:22px">步驟 2 ・ 輸入金額</h2>
+    <div id="modeSection">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 選擇扣繳方式</h2>
+
+      <div class="modes">
+        <button class="mode on" id="mFilled" type="button">
+          <span class="badge">已選</span>
+          <span class="t">有填免稅額申報表</span>
+          <span class="d">員工已填表並載明扶養親屬 → 查稅額表</span>
+        </button>
+        <button class="mode" id="mNotFilled" type="button">
+          <span class="badge">已選</span>
+          <span class="t">未填／免填申報表</span>
+          <span class="d">按全月給付總額扣 5%</span>
+        </button>
+        <button class="mode" id="mPartTime" type="button">
+          <span class="badge">已選</span>
+          <span class="t">兼職／非每月給付</span>
+          <span class="d">按每次給付扣 5%，起扣點較高</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="nrSection" style="display:none">
+      <h2 class="sec" style="margin-top:22px">步驟 2 ・ 適用扣繳率</h2>
+      <div class="nrbox" id="nrBox"></div>
+    </div>
+
+    <h2 class="sec" style="margin-top:22px">步驟 3 ・ 輸入金額</h2>
+
     <div class="row2">
       <div class="field">
-        <label for="salary">每月薪資總額</label>
+        <label for="salary" id="salaryLabel">每月薪資總額</label>
         <div class="money">
           <span class="cur">NT$</span>
           <input id="salary" type="number" inputmode="numeric" min="0" step="1" value="100000" autocomplete="off" />
@@ -384,41 +431,60 @@
       <span class="arw">▾</span>
     </summary>
     <div class="body">
-      <h4>一、三種扣繳方式</h4>
+      <h4>一、居住者：三種扣繳方式</h4>
       <ul>
         <li><b>有填免稅額申報表</b>：依「薪資所得扣繳稅額表」，按全月薪資與配偶及受扶養親屬人數查表。表列金額已排除未達 2,000 元者。</li>
         <li><b>未填／免填申報表</b>：按全月給付總額扣取 <b>5%</b>。每月應扣繳稅額不超過 2,000 元者免予扣繳 → 起扣點 <b>40,020 元</b>。</li>
         <li><b>兼職所得／非每月給付之薪資</b>：按每次給付額扣取 <b>5%</b>。每次給付未達薪資所得扣繳稅額表「無配偶及受扶養親屬者之起扣點」者免扣 → 起扣點 <b>90,501 元</b>。</li>
       </ul>
 
-      <h4>二、為什麼有兩個 5% 卻不同起扣點</h4>
+      <h4>二、非居住者：一律按給付額扣，看金額決定 6% 或 18%</h4>
+      <p>依《各類所得扣繳率標準》第 3 條第 1 項第 2 款：非居住者之薪資按給付額扣取 <b>18%</b>；
+      但全月薪資給付總額在行政院核定每月基本工資 <b>1.5 倍以下</b>者，按給付額扣取 <b>6%</b>。</p>
+      <ul>
+        <li>115 年每月基本工資 <b>29,500 元</b> → 1.5 倍 = <b>44,250 元</b>。</li>
+        <li>全月給付總額 <b>≤ 44,250 元</b> → 扣 <b>6%</b>。</li>
+        <li>全月給付總額 <b>&gt; 44,250 元</b> → 扣 <b>18%</b>。</li>
+        <li>非居住者<b>不適用</b>免稅額申報表與扶養親屬人數，也<b>沒有</b> 2,000 元免扣門檻。</li>
+      </ul>
+
+      <h4>三、怎麼判斷「居住者」還是「非居住者」</h4>
+      <ul>
+        <li><b>居住者</b>：在中華民國境內有住所並經常居住，或一課稅年度內在台居留、停留<b>合計滿 183 天</b>。</li>
+        <li><b>非居住者</b>：上述以外之個人（常見於短期來台工作、未滿 183 天之外籍人士）。</li>
+        <li>同一年度中途可能由非居住者轉為居住者，<b>以給付當時的身分</b>判斷適用扣繳率。</li>
+      </ul>
+
+      <h4>四、為什麼有兩個 5% 卻不同起扣點</h4>
       <p>依《薪資所得扣繳辦法》第 7 條：</p>
       <ul>
         <li>按月給付之薪資：<b>每月</b>應扣繳稅額不超過 2,000 元者免扣（故 40,020 × 5% = 2,001 才開始扣）。</li>
         <li>兼職及非每月給付：<b>每次</b>給付金額未達「無配偶及無扶養親屬者之起扣點」（115 年度為 90,501 元）者免扣。</li>
       </ul>
 
-      <h4>三、免扣仍要列單申報</h4>
+      <h4>五、免扣仍要列單申報</h4>
       <p>依《薪資所得扣繳辦法》第 7 條第 3 項，免予扣繳之薪資，扣繳義務人仍應列單申報該管稽徵機關。但對同一納稅義務人<b>全年給付金額不超過 1,000 元</b>者，免予申報。</p>
 
-      <h4>四、繳納與申報期限</h4>
+      <h4>六、繳納與申報期限</h4>
       <ul>
-        <li>扣繳稅款：於給付日<b>次月 10 日前</b>向國庫繳清。</li>
-        <li>扣繳憑單：於次年 1 月底前申報（每年實際截止日依財政部公告）。</li>
+        <li><b>居住者</b>：扣繳稅款於給付日<b>次月 10 日前</b>向國庫繳清；扣繳憑單於次年 1 月底前申報（實際截止日依財政部公告）。</li>
+        <li><b>非居住者</b>：於<b>代扣稅款之日起 10 日內</b>向國庫繳清，並開立扣繳憑單向轄區稽徵機關申報——<b>期限比居住者更短</b>，別比照次月 10 日。</li>
       </ul>
 
-      <h4>五、本頁計算範圍</h4>
+      <h4>七、本頁計算範圍</h4>
       <ul>
         <li>查表模式僅適用月薪 <b>80,001～500,000 元</b>；低於 80,001 元者稅額為 0。</li>
         <li>查表用的薪資為<b>全月給付總額</b>（含獎金、津貼等具工資性質者）；非每月給付者請改用「兼職／非每月給付」模式。</li>
+        <li>非居住者模式僅計算<b>薪資所得</b>。非居住者的租金（20%）、佣金（20%）、執行業務報酬（20%）、股利（21%）等其他所得不在本頁範圍。</li>
         <li>本頁不計算勞健保費、勞退自提等其他扣除項，僅算所得稅扣繳。</li>
       </ul>
 
-      <h4>六、法源</h4>
+      <h4>八、法源</h4>
       <ul>
-        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340081" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>第 2 條</li>
+        <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340028" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>第 2 條（居住者）、第 3 條（非居住者）</li>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340009" target="_blank" rel="noopener noreferrer">薪資所得扣繳辦法</a>第 5～7 條</li>
-        <li><a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer">財政部中區國稅局 扣繳申報專區</a></li>
+        <li><a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer">財政部中區國稅局 扣繳申報專區</a>（稅額表與免稅額申報表下載）</li>
+        <li><a href="https://www.mof.gov.tw/singlehtml/384fb3077bb349ea973e7fc6f13b6974?cntId=dd1c8e641b594e6da94a69d613e4947f" target="_blank" rel="noopener noreferrer">財政部：115 年起基本工資調升，非居住者薪資扣繳基準同步調整</a></li>
       </ul>
     </div>
   </details>
@@ -453,16 +519,31 @@
   var THRESHOLD_MONTHLY = 40020;   // 按月 5%：2,000 ÷ 5%
   var THRESHOLD_PARTTIME = 90501;  // 兼職／非每月：無扶養者起扣點
 
+  /* 非居住者（各類所得扣繳率標準第 3 條）
+     全月給付總額 ≤ 基本工資 × 1.5 → 6%
+     超過                      → 18%
+     115 年基本工資 29,500 × 1.5 = 44,250 */
+  var NR_BASE_WAGE = 29500;
+  var NR_THRESHOLD = NR_BASE_WAGE * 1.5;   // 44,250
+  var NR_LOW = 0.06;
+  var NR_HIGH = 0.18;
+
   var nf = new Intl.NumberFormat("zh-TW");
   var money = function(n){ return nf.format(Math.round(n)); };
 
   var el = {
     salary: document.getElementById("salary"),
+    salaryLabel: document.getElementById("salaryLabel"),
     dep: document.getElementById("dep"),
     depField: document.getElementById("depField"),
     mFilled: document.getElementById("mFilled"),
     mNotFilled: document.getElementById("mNotFilled"),
     mPartTime: document.getElementById("mPartTime"),
+    idResident: document.getElementById("idResident"),
+    idNonResident: document.getElementById("idNonResident"),
+    modeSection: document.getElementById("modeSection"),
+    nrSection: document.getElementById("nrSection"),
+    nrBox: document.getElementById("nrBox"),
     chips: document.getElementById("chips"),
     pickNote: document.getElementById("pickNote"),
     taxAmt: document.getElementById("taxAmt"),
@@ -478,8 +559,9 @@
     barRate: document.getElementById("barRate")
   };
 
-  var state = { mode: "filled", last: null };
-  var CHIPS = [40000, 50000, 60000, 80000, 100000, 150000, 200000];
+  var state = { identity: "resident", mode: "filled", last: null };
+  var CHIPS_RESIDENT = [40000, 50000, 60000, 80000, 100000, 150000, 200000];
+  var CHIPS_NR = [30000, 38000, 40000, 44250, 50000, 60000, 80000];
 
   /* ---- 查表：二分搜尋最大 low <= salary ---- */
   function lookupTable(salary, dep){
@@ -503,8 +585,25 @@
   }
 
   /* ---- 主計算 ---- */
-  function calc(salary, mode, dep){
+  function calc(salary, mode, dep, identity){
     var tax = 0, rate = "查表", threshold = 0, note = "", row = null;
+
+    if (identity === "nonResident"){
+      // 非居住者：全月給付總額 ≤ 基本工資 1.5 倍 → 6%，超過 → 18%
+      var applied = (salary <= NR_THRESHOLD) ? NR_LOW : NR_HIGH;
+      rate = (applied === NR_LOW ? "6%" : "18%");
+      threshold = NR_THRESHOLD;
+      tax = Math.floor(salary * applied);
+      note = (applied === NR_LOW)
+        ? "全月給付總額未超過 " + money(NR_THRESHOLD) + " 元（基本工資 " + money(NR_BASE_WAGE) + " × 1.5），適用 6%"
+        : "全月給付總額超過 " + money(NR_THRESHOLD) + " 元（基本工資 × 1.5），適用 18%";
+      return {
+        salary: salary, mode: "nonResident", dep: 0, identity: identity,
+        tax: tax, net: salary - tax,
+        rate: rate, threshold: threshold, note: note, row: null,
+        appliedRate: applied
+      };
+    }
 
     if (mode === "filled"){
       rate = "查表";
@@ -530,9 +629,10 @@
     }
 
     return {
-      salary: salary, mode: mode, dep: dep,
+      salary: salary, mode: mode, dep: dep, identity: "resident",
       tax: tax, net: salary - tax,
-      rate: rate, threshold: threshold, note: note, row: row
+      rate: rate, threshold: threshold, note: note, row: row,
+      appliedRate: null
     };
   }
 
@@ -541,8 +641,9 @@
     if (!isFinite(salary) || salary < 0) salary = 0;
     var dep = parseInt(el.dep.value, 10) || 0;
     var mode = state.mode;
+    var identity = state.identity;
 
-    var r = calc(salary, mode, dep);
+    var r = calc(salary, mode, dep, identity);
     state.last = r;
 
     el.taxAmt.innerHTML = money(r.tax) + "<small>元／月</small>";
@@ -550,7 +651,11 @@
 
     // 左卡明細
     var taxLines = "";
-    if (mode === "filled" && r.row){
+    if (identity === "nonResident"){
+      taxLines += "<div><span>適用扣繳率</span><span>" + r.rate + "</span></div>";
+      taxLines += "<div><span>門檻</span><span>" + money(NR_THRESHOLD) + "</span></div>";
+      taxLines += "<div><span>全月給付總額</span><span>" + money(salary) + "</span></div>";
+    } else if (mode === "filled" && r.row){
       taxLines += "<div><span>查表區間</span><span>" + money(r.row.low) + " ～ " + money(r.row.high) + "</span></div>";
       taxLines += "<div><span>扶養親屬</span><span>" + dep + " 人</span></div>";
     } else {
@@ -569,13 +674,16 @@
     // 明細表
     var rows = [
       ["每月薪資總額", '<span class="rate">全月給付總額</span>', money(r.salary), "—"],
-      ["扣繳方式", '<span class="rate">' + modeLabel(mode) + "</span>", r.rate, r.note],
-      ["應扣繳稅額", '<span class="rate">元以下捨去</span>', money(r.tax), r.tax > 0 ? "次月 10 日前繳國庫" : "免扣，仍須列單申報"],
+      ["扣繳方式", '<span class="rate">' + modeLabel(mode, identity) + "</span>", r.rate, r.note],
+      ["應扣繳稅額", '<span class="rate">元以下捨去</span>', money(r.tax),
+        identity === "nonResident"
+          ? "代扣日起 10 日內繳國庫並申報"
+          : (r.tax > 0 ? "次月 10 日前繳國庫" : "免扣，仍須列單申報")],
       ["員工實領", '<span class="rate">薪資 − 扣繳稅額</span>', money(r.net), "公司發給員工"]
     ];
 
     var html = "";
-    rows.forEach(function(row, i){
+    rows.forEach(function(row){
       html += "<tr>"
         + "<td>" + row[0] + row[1] + "</td>"
         + "<td>" + row[2] + "</td>"
@@ -584,16 +692,37 @@
     });
     el.detailBody.innerHTML = html;
 
-    el.detailHead.textContent = modeLabel(mode) + " ・ " + money(r.salary) + " 元";
+    el.detailHead.textContent = modeLabel(mode, identity) + " ・ " + money(r.salary) + " 元";
 
     // 固定列
     el.barTax.textContent = money(r.tax);
     el.barNet.textContent = money(r.net);
     el.barRate.textContent = r.rate;
 
+    // 非居住者費率框
+    if (identity === "nonResident"){
+      var isLow = (salary <= NR_THRESHOLD);
+      el.nrBox.innerHTML =
+          '<div class="nrl">'
+        + '<span class="nrt">' + (isLow ? "適用 6% 扣繳率" : "適用 18% 扣繳率") + "</span>"
+        + '<span class="nrd">' + (isLow
+            ? "全月給付總額 " + money(salary) + " 元 ≤ " + money(NR_THRESHOLD) + " 元（基本工資 " + money(NR_BASE_WAGE) + " × 1.5）"
+            : "全月給付總額 " + money(salary) + " 元 > " + money(NR_THRESHOLD) + " 元（基本工資 × 1.5）")
+        + "</span></div>"
+        + '<div class="nrr">' + (isLow ? "6" : "18") + '%<small>扣繳率</small></div>';
+    }
+
     // 提示
     var tips = [];
-    if (mode === "filled"){
+    if (identity === "nonResident"){
+      if (salary <= NR_THRESHOLD){
+        tips.push("非居住者、月薪 <b>" + money(salary) + " 元</b> 未超過 <b>" + money(NR_THRESHOLD) +
+          " 元</b> → 按 <b>6%</b> 扣繳 <b>" + money(r.tax) + " 元</b>，實領 <b>" + money(r.net) + " 元</b>。");
+      } else {
+        tips.push("非居住者、月薪 <b>" + money(salary) + " 元</b> 超過 <b>" + money(NR_THRESHOLD) +
+          " 元</b> → 按 <b>18%</b> 扣繳 <b>" + money(r.tax) + " 元</b>，實領 <b>" + money(r.net) + " 元</b>。");
+      }
+    } else if (mode === "filled"){
       if (!r.row){
         tips.push("月薪 <b>" + money(salary) + " 元</b> 未達稅額表起點（80,001 元），<b>免扣繳</b>。");
       } else if (r.tax === 0){
@@ -613,14 +742,22 @@
 
     // 警告
     var warns = [];
-    if (mode === "filled" && r.row && r.row.capped){
-      warns.push("月薪超過 <b>500,000 元</b>，已以稅額表最高列（499,501～500,000）計算，實際金額請洽會計師或稽徵機關。");
-    }
-    if (mode === "filled" && dep > 0 && r.tax === 0 && salary >= TBL_MIN){
-      warns.push("扶養親屬人數較多時起扣點會提高。若員工<b>未實際填寫免稅額申報表</b>，公司不得逕行按扶養人數查表，應改用 5% 方式。");
+    if (identity === "nonResident"){
+      if (salary > 0 && salary <= NR_THRESHOLD && Math.floor(salary * NR_LOW) === 0){
+        warns.push("非居住者<b>沒有 2,000 元免扣門檻</b>：即使稅額為 0，仍應依規定辦理扣繳申報。");
+      }
+      warns.push("非居住者扣繳稅款應於<b>代扣之日起 10 日內</b>向國庫繳清，並開立扣繳憑單申報——期限比居住者（次月 10 日）更短。");
+      warns.push("「居住者」判斷以<b>一課稅年度在台居留、停留合計滿 183 天</b>為準；同一年度中途身分可能轉換，請留意給付時點。");
+    } else {
+      if (mode === "filled" && r.row && r.row.capped){
+        warns.push("月薪超過 <b>500,000 元</b>，已以稅額表最高列（499,501～500,000）計算，實際金額請洽會計師或稽徵機關。");
+      }
+      if (mode === "filled" && dep > 0 && r.tax === 0 && salary >= TBL_MIN){
+        warns.push("扶養親屬人數較多時起扣點會提高。若員工<b>未實際填寫免稅額申報表</b>，公司不得逕行按扶養人數查表，應改用 5% 方式。");
+      }
     }
     if (warns.length){
-      el.warnBox.innerHTML = warns.join("<br>");
+      el.warnBox.innerHTML = warns.map(function(w){ return "・" + w; }).join("<br>");
       el.warnBox.style.display = "";
     } else {
       el.warnBox.style.display = "none";
@@ -632,10 +769,30 @@
     });
   }
 
-  function modeLabel(m){
+  function modeLabel(m, identity){
+    if (identity === "nonResident") return "非居住者";
     if (m === "filled") return "有填免稅額申報表";
     if (m === "notFilled") return "未填／免填申報表";
     return "兼職／非每月給付";
+  }
+
+  /* ---- 身分切換 ---- */
+  function setIdentity(id){
+    state.identity = id;
+    el.idResident.classList.toggle("on", id === "resident");
+    el.idNonResident.classList.toggle("on", id === "nonResident");
+
+    var isNR = (id === "nonResident");
+    el.modeSection.style.display = isNR ? "none" : "";
+    el.nrSection.style.display = isNR ? "" : "none";
+    el.salaryLabel.textContent = isNR ? "每月薪資給付總額" : "每月薪資總額";
+
+    // 非居住者不適用免稅額申報表／扶養親屬
+    el.depField.style.opacity = (isNR || state.mode !== "filled") ? ".4" : "1";
+    el.dep.disabled = isNR || (state.mode !== "filled");
+
+    rebuildChips(isNR ? CHIPS_NR : CHIPS_RESIDENT);
+    render();
   }
 
   function setMode(m){
@@ -643,14 +800,16 @@
     el.mFilled.classList.toggle("on", m === "filled");
     el.mNotFilled.classList.toggle("on", m === "notFilled");
     el.mPartTime.classList.toggle("on", m === "partTime");
-    // 只有查表模式需要扶養人數
-    el.depField.style.opacity = (m === "filled") ? "1" : ".4";
-    el.dep.disabled = (m === "filled") ? false : true;
+    // 只有「查表」模式需要扶養人數
+    var needDep = (state.identity === "resident" && m === "filled");
+    el.depField.style.opacity = needDep ? "1" : ".4";
+    el.dep.disabled = !needDep;
     render();
   }
 
-  function buildChips(){
-    CHIPS.forEach(function(v){
+  function rebuildChips(list){
+    el.chips.innerHTML = "";
+    list.forEach(function(v){
       var b = document.createElement("button");
       b.type = "button";
       b.className = "chip";
@@ -669,16 +828,23 @@
     if (!r) return;
     var lines = [];
     lines.push("【115 年度薪資所得扣繳試算】");
-    lines.push("扣繳方式：" + modeLabel(r.mode));
-    if (r.mode === "filled") lines.push("扶養親屬：" + r.dep + " 人");
+    lines.push("身分：" + (r.identity === "nonResident" ? "非居住者" : "居住者"));
+    lines.push("扣繳方式：" + modeLabel(r.mode, r.identity));
+    if (r.identity === "resident" && r.mode === "filled") lines.push("扶養親屬：" + r.dep + " 人");
     lines.push("");
     lines.push("每月薪資總額：" + money(r.salary) + " 元");
     if (r.row) lines.push("查表區間：" + money(r.row.low) + " ～ " + money(r.row.high));
+    if (r.identity === "nonResident") lines.push("適用扣繳率：" + r.rate + "（門檻 " + money(NR_THRESHOLD) + " 元）");
     lines.push("應扣繳稅額：" + money(r.tax) + " 元");
     lines.push("員工實領：" + money(r.net) + " 元");
     lines.push("");
-    lines.push("※ 扣繳稅款應於次月 10 日前繳清；免扣者仍須列單申報。");
-    lines.push("※ 資料來源：財政部中區國稅局 115 年度薪資所得扣繳稅額表。");
+    if (r.identity === "nonResident"){
+      lines.push("※ 非居住者扣繳稅款應於代扣日起 10 日內繳清並申報。");
+      lines.push("※ 依各類所得扣繳率標準第 3 條：全月給付總額 ≤ 基本工資 1.5 倍（" + money(NR_THRESHOLD) + " 元）扣 6%，超過扣 18%。");
+    } else {
+      lines.push("※ 扣繳稅款應於次月 10 日前繳清；免扣者仍須列單申報。");
+      lines.push("※ 資料來源：財政部中區國稅局 115 年度薪資所得扣繳稅額表。");
+    }
 
     var text = lines.join("\n");
     var done = function(){
@@ -709,6 +875,8 @@
     }
   }
 
+  el.idResident.addEventListener("click", function(){ setIdentity("resident"); });
+  el.idNonResident.addEventListener("click", function(){ setIdentity("nonResident"); });
   el.mFilled.addEventListener("click", function(){ setMode("filled"); });
   el.mNotFilled.addEventListener("click", function(){ setMode("notFilled"); });
   el.mPartTime.addEventListener("click", function(){ setMode("partTime"); });
@@ -716,8 +884,8 @@
   el.dep.addEventListener("change", render);
   el.copyBtn.addEventListener("click", copyResult);
 
-  buildChips();
   setMode("filled");
+  setIdentity("resident");
 })();
 </script>
 </body>
