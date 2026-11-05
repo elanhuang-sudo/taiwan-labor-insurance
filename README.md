@@ -3,7 +3,7 @@
 台灣勞動法規相關試算工具的集合站。**一個網域、多個子路徑** —— 新增工具不必再動 DNS。
 
 **線上版：<https://info.kscpb.com/>**
-（備用：<https://elanhuang-sudo.github.io/taiwan-labor-insurance/>）
+（GitHub 原始碼：<https://github.com/elanhuang-sudo/info-kscpb>）
 
 ## 網站結構
 
