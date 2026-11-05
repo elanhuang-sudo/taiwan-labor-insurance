@@ -5,6 +5,25 @@
 **線上版：<https://info.kscpb.com/>**
 （GitHub 原始碼：<https://github.com/elanhuang-sudo/info-kscpb>）
 
+## 給客戶的短網址
+
+使用自有的短網址服務 **`g.kscpb.com`（Rebrandly）**，不使用第三方免費短網址。
+
+| 短網址 | 指向 | 用途 |
+|---|---|---|
+| `https://g.kscpb.com/labor` | `https://info.kscpb.com/labor/` | 勞健保保費試算，直接傳給客戶（**待建立**）|
+
+建立方式（Rebrandly 後台）：
+
+1. 登入 <https://app.rebrandly.com>
+2. **Create link** → Destination 填 `https://info.kscpb.com/labor/`
+3. Domain 選 `g.kscpb.com`，Slashing 填 `labor`
+4. 存檔後即為 `https://g.kscpb.com/labor`
+
+> ⚠️ 建立前請先確認 `https://info.kscpb.com/labor/` 已能正常開啟，
+> 否則會建出一條連到死頁的短網址。
+> 短網址為外部服務，若目標網址日後變更，需回 Rebrandly 修改或重建。
+
 ## 網站結構
 
 ```
