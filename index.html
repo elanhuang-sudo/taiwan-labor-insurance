@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>2026 勞健保三合一保費試算｜單位應繳・員工應繳</title>
+<meta name="description" content="2026（民國115年）勞保、健保、勞退三合一保費試算：輸入或選擇投保金額，立即算出單位（雇主）應繳與員工（勞工）應繳金額。" />
+<style>
+  :root{
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --line:#e2e8f0;
+    --bg:#f1f5f9; --card:#ffffff;
+    --brand:#1d4ed8; --brand-2:#0e7490;
+    --worker:#1d4ed8; --worker-bg:#eff6ff;
+    --employer:#b45309; --employer-bg:#fffbeb;
+    --ok:#047857;
+    --radius:18px;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 12px 32px -12px rgba(15,23,42,.18);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei","Segoe UI",system-ui,-apple-system,sans-serif;
+    line-height:1.6; padding-bottom:88px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 16px 40px}
+  /* ---------- header ---------- */
+  header.hero{
+    background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 55%,#0e7490 100%);
+    color:#fff;border-radius:var(--radius);padding:28px 26px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  header.hero::after{
+    content:"";position:absolute;inset:auto -60px -120px auto;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle,rgba(56,189,248,.35),transparent 65%);
+  }
+  .year-tag{
+    display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.04em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    padding:5px 12px;border-radius:999px;margin-bottom:12px;
+  }
+  header.hero h1{margin:0;font-size:clamp(21px,3.4vw,30px);line-height:1.35;letter-spacing:.01em}
+  header.hero p{margin:10px 0 0;color:#cbd5e1;font-size:14.5px;max-width:56ch}
+  /* ---------- cards ---------- */
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line)}
+  section{margin-top:18px}
+  .pad{padding:20px 22px}
+  h2.sec{font-size:15px;margin:0 0 14px;color:var(--ink-2);letter-spacing:.06em;font-weight:800;display:flex;align-items:center;gap:9px}
+  h2.sec::before{content:"";width:4px;height:16px;border-radius:2px;background:linear-gradient(180deg,var(--brand),var(--brand-2))}
+  h2.sec .hint{font-weight:500;letter-spacing:0;color:var(--muted);font-size:12.5px}
+  .sechead{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .sechead h2.sec{margin:0}
+  .btn-copy{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:10px;
+    padding:7px 13px;font-size:12.5px;font-weight:800;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap;
+  }
+  .btn-copy:hover{border-color:#93c5fd;background:#eff6ff;color:var(--brand)}
+  .btn-copy.done{background:#d1fae5;border-color:#6ee7b7;color:#047857}
+
+  /* ---------- input ---------- */
+  .field{display:grid;gap:8px}
+  .field label{font-size:13px;font-weight:700;color:var(--ink-2)}
+  .money{
+    display:flex;align-items:center;gap:10px;border:2px solid var(--line);border-radius:14px;
+    padding:6px 14px;background:#f8fafc;transition:.15s;
+  }
+  .money:focus-within{border-color:var(--brand);background:#fff;box-shadow:0 0 0 4px rgba(29,78,216,.12)}
+  .money .cur{font-size:16px;color:var(--muted);font-weight:700}
+  .money input{
+    flex:1;min-width:0;border:0;background:transparent;outline:none;
+    font-size:clamp(26px,5vw,34px);font-weight:800;letter-spacing:-.01em;color:var(--ink);
+    font-variant-numeric:tabular-nums;padding:6px 0;
+  }
+  .money input::-webkit-outer-spin-button,.money input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .money input[type=number]{-moz-appearance:textfield}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{
+    border:1px solid var(--line);background:#f8fafc;color:var(--ink-2);border-radius:999px;
+    padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:.15s;font-variant-numeric:tabular-nums;
+  }
+  .chip:hover{border-color:#93c5fd;background:#eff6ff;color:var(--brand)}
+  .chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+  select{
+    width:100%;border:2px solid var(--line);border-radius:12px;padding:11px 12px;background:#f8fafc;
+    font-size:15px;font-weight:700;color:var(--ink);font-family:inherit;cursor:pointer;
+  }
+  select:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 4px rgba(29,78,216,.12)}
+  .note{font-size:13px;color:var(--muted);margin:12px 0 0;padding-left:14px;border-left:3px solid var(--line)}
+  .note b{color:var(--ink-2)}
+
+  /* ---------- result cards ---------- */
+  .results{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .res{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .res::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+  .res.worker{background:linear-gradient(180deg,#eff6ff,#fff 60%)}
+  .res.worker::before{background:var(--worker)}
+  .res.employer{background:linear-gradient(180deg,#fffbeb,#fff 60%)}
+  .res.employer::before{background:var(--employer)}
+  .res .who{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .res .who h3{margin:0;font-size:15px;font-weight:800;letter-spacing:.02em}
+  .res.worker .who h3{color:var(--worker)}
+  .res.employer .who h3{color:var(--employer)}
+  .res .who .sub{font-size:12px;color:var(--muted);font-weight:600}
+  .res .amt{
+    margin:10px 0 2px;font-size:clamp(34px,6.4vw,46px);font-weight:900;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums;line-height:1.1;
+  }
+  .res.worker .amt{color:var(--worker)}
+  .res.employer .amt{color:var(--employer)}
+  .res .amt small{font-size:15px;font-weight:700;color:var(--muted);margin-left:4px;letter-spacing:0}
+  .res .brk{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--ink-2)}
+  .res .brk div{display:flex;justify-content:space-between;gap:10px;padding:2.5px 0;font-variant-numeric:tabular-nums}
+  .res .brk span:last-child{font-weight:700}
+
+  /* ---------- total strip ---------- */
+  .strip{
+    margin-top:16px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;
+    background:#0f172a;color:#e2e8f0;border-radius:16px;padding:16px 20px;
+  }
+  .strip .lbl{font-size:13px;color:#94a3b8;font-weight:700}
+  .strip .big{font-size:24px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+  .strip .plus{color:#64748b;font-size:20px}
+  .strip .item{display:flex;flex-direction:column}
+  .strip .split{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+
+  /* ---------- breakdown table ---------- */
+  .tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  th,td{padding:10px 12px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left;white-space:normal}
+  thead th{background:#f8fafc;font-size:12.5px;color:var(--muted);letter-spacing:.03em;font-weight:800;border-bottom:2px solid var(--line)}
+  tbody tr:last-child td{border-bottom:0}
+  tr.total td{background:#f8fafc;font-weight:900;font-size:15px;border-top:2px solid var(--line)}
+  .rate{display:block;font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:0}
+  .zero{color:#cbd5e1}
+  .ref tbody tr{cursor:pointer;transition:background .12s}
+  .ref tbody tr:hover{background:#eff6ff}
+  .ref tbody tr.sel{background:#dbeafe;box-shadow:inset 3px 0 0 var(--brand)}
+  .ref tbody tr.sel td{font-weight:800}
+  .tag{
+    display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;
+    background:#fee2e2;color:#b91c1c;margin-left:6px;vertical-align:1px;
+  }
+  .tag.blue{background:#dbeafe;color:#1d4ed8}
+  .tag.green{background:#d1fae5;color:#047857}
+  .lv{color:var(--muted);font-weight:700;font-size:12.5px}
+
+  /* ---------- options ---------- */
+  .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+  .opt{display:grid;gap:7px}
+  .opt label{font-size:13px;font-weight:700;color:var(--ink-2);display:flex;align-items:center;gap:7px}
+  .opt .sm{font-size:12px;color:var(--muted);font-weight:500}
+  .switch{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700;color:var(--ink-2);cursor:pointer;user-select:none}
+  .switch input{width:18px;height:18px;accent-color:var(--brand);cursor:pointer}
+  input[type=number].mini{
+    width:100%;border:2px solid var(--line);border-radius:12px;padding:9px 12px;background:#f8fafc;
+    font-size:15px;font-weight:700;font-family:inherit;color:var(--ink);font-variant-numeric:tabular-nums;
+  }
+  input[type=number].mini:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 4px rgba(29,78,216,.12)}
+  input[type=number].mini:disabled{opacity:.5}
+
+  details{margin-top:18px}
+  details > summary{
+    cursor:pointer;list-style:none;font-weight:800;font-size:14.5px;color:var(--ink-2);
+    padding:16px 22px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  details > summary::-webkit-details-marker{display:none}
+  details > summary .arw{transition:.2s;color:var(--muted)}
+  details[open] > summary .arw{transform:rotate(180deg)}
+  details[open] > summary{border-radius:var(--radius) var(--radius) 0 0;border-bottom:0;box-shadow:none}
+  details .body{background:var(--card);border:1px solid var(--line);border-top:0;border-radius:0 0 var(--radius) var(--radius);padding:6px 0 4px;box-shadow:var(--shadow);overflow:hidden}
+
+  footer.dis{margin-top:22px;font-size:12.5px;color:var(--muted);line-height:1.75}
+  footer.dis b{color:var(--ink-2)}
+  footer.dis a{color:var(--brand);text-decoration:none;border-bottom:1px solid rgba(29,78,216,.3)}
+
+  /* ---------- sticky bar ---------- */
+  .sticky{
+    position:fixed;left:0;right:0;bottom:0;z-index:50;background:rgba(15,23,42,.96);
+    backdrop-filter:blur(10px);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    display:flex;align-items:center;justify-content:center;gap:clamp(16px,6vw,64px);
+    box-shadow:0 -8px 24px rgba(15,23,42,.22);border-top:1px solid rgba(255,255,255,.12);
+  }
+  .sticky .it{display:flex;flex-direction:column;align-items:center;line-height:1.25}
+  .sticky .it .k{font-size:11px;color:#94a3b8;font-weight:700;letter-spacing:.04em}
+  .sticky .it .v{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .sticky .it.worker .v{color:#93c5fd}
+  .sticky .it.employer .v{color:#fcd34d}
+  .sticky .lvbox{font-size:11px;color:#94a3b8;text-align:center;border-left:1px solid rgba(255,255,255,.14);padding-left:clamp(12px,4vw,28px);font-variant-numeric:tabular-nums}
+  .sticky .lvbox b{display:block;color:#e2e8f0;font-size:13px}
+
+  @media (max-width:720px){
+    .results{grid-template-columns:1fr}
+    .row2{grid-template-columns:1fr}
+    .pad{padding:18px 16px}
+    .res{padding:18px}
+  }
+  @media (max-width:640px){
+    table{font-size:12.5px}
+    th,td{padding:8px 7px}
+    th:first-child,td:first-child{max-width:46vw;white-space:normal}
+    .rate{font-size:10.5px}
+    tr.total td{font-size:13.5px}
+    details > summary{font-size:13px;padding:14px 16px}
+    .tag{font-size:10px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .sticky,.chips,select,.btn-print{display:none!important}
+    .card,.res,header.hero,.strip,details>summary,details .body{box-shadow:none;border:1px solid #cbd5e1}
+    header.hero{background:#f1f5f9!important;color:#0f172a}
+    header.hero p{color:#334155}
+    .strip{background:#f1f5f9;color:#0f172a}
+    .strip .big{color:#0f172a}
+    details{display:block}
+    details .body{display:block}
+  }
+  .btn-print{
+    position:absolute;right:20px;top:20px;z-index:2;
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+    border-radius:10px;padding:7px 13px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .btn-print:hover{background:rgba(255,255,255,.24)}
+  @media (max-width:560px){.btn-print{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <button class="btn-print" onclick="window.print()">列印／存 PDF</button>
+    <div class="year-tag">2026 年 ・ 民國 115 年 ・ 三合一對照表</div>
+    <h1>勞健保保費試算：單位應繳 與 員工應繳</h1>
+    <p>輸入月薪資（或直接選投保級距），立即看出單位（雇主）與員工（勞工）每月各自要負擔多少勞保、健保與勞退。級距介於兩級之間時，以「較高級數」計算。</p>
+  </header>
+
+  <!-- 輸入 -->
+  <section class="card pad" aria-label="投保金額輸入">
+    <h2 class="sec">輸入投保金額 <span class="hint">鍵入全薪，自動對應投保級距</span></h2>
+
+    <div class="field">
+      <label for="wage">月薪資總額（全薪）</label>
+      <div class="money">
+        <span class="cur">NT$</span>
+        <input id="wage" type="number" inputmode="numeric" min="0" step="1" value="36300" autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="chips" id="chips"></div>
+
+    <div class="row2">
+      <div class="field">
+        <label for="gradeSel">或直接選擇投保級距</label>
+        <select id="gradeSel"></select>
+      </div>
+      <div class="field">
+        <label for="dep">健保眷屬人數（員工自付）</label>
+        <select id="dep">
+          <option value="0">0 人</option>
+          <option value="1">1 人</option>
+          <option value="2">2 人</option>
+          <option value="3">3 人</option>
+          <option value="4">4 人（以 3 人計）</option>
+          <option value="5">5 人（以 3 人計）</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="note" id="pickNote"></p>
+  </section>
+
+  <!-- 結果 -->
+  <section class="results" aria-live="polite">
+    <div class="res worker">
+      <div class="who">
+        <h3>員工應繳</h3>
+        <span class="sub">勞工自付額</span>
+      </div>
+      <div class="amt" id="workerAmt">—<small>元／月</small></div>
+      <div class="brk" id="workerBrk"></div>
+    </div>
+
+    <div class="res employer">
+      <div class="who">
+        <h3>單位應繳</h3>
+        <span class="sub">雇主負擔額</span>
+      </div>
+      <div class="amt" id="employerAmt">—<small>元／月</small></div>
+      <div class="brk" id="employerBrk"></div>
+    </div>
+  </section>
+
+  <div class="strip">
+    <div class="item">
+      <span class="lbl">勞雇雙方合計（每月保費成本）</span>
+      <span class="big" id="totalAmt">—</span>
+    </div>
+    <div class="split">
+      <div class="item">
+        <span class="lbl">員工</span>
+        <span class="big" id="stripWorker" style="font-size:18px;color:#93c5fd">—</span>
+      </div>
+      <span class="plus">＋</span>
+      <div class="item">
+        <span class="lbl">單位</span>
+        <span class="big" id="stripEmployer" style="font-size:18px;color:#fcd34d">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 明細 -->
+  <section class="card pad">
+    <div class="sechead">
+      <h2 class="sec">費用明細 <span class="hint" id="detailHead"></span></h2>
+      <button class="btn-copy" id="copyBtn" type="button">複製試算結果</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>項目</th>
+            <th>員工應繳</th>
+            <th>單位應繳</th>
+          </tr>
+        </thead>
+        <tbody id="detailBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 進階 -->
+  <section class="card pad">
+    <h2 class="sec">進階選項 <span class="hint">選填，不影響上方基本試算</span></h2>
+    <div class="opts">
+      <div class="opt">
+        <label class="switch" for="oaOn">
+          <input type="checkbox" id="oaOn" /> 加入職業災害保險費（單位全額負擔）
+        </label>
+        <span class="sm">職災費率依行業別不同，法定上限 72,800 元。</span>
+      </div>
+      <div class="opt">
+        <label for="oaRate">職災保險費率（%）</label>
+        <input id="oaRate" class="mini" type="number" step="0.01" min="0" max="5" value="0.16" disabled />
+        <span class="sm">常見行業約 0.11%～0.97%，請依勞保局行業別費率表填入。</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 完整級距表 -->
+  <details id="refBox">
+    <summary>
+      <span>2026 年完整級距對照表（共 <span id="rowCount">0</span> 級，點任一列即可套用）</span>
+      <span class="arw">▾</span>
+    </summary>
+    <div class="body tbl-wrap">
+      <table class="ref">
+        <thead>
+          <tr>
+            <th>級數／投保級距</th>
+            <th>勞保<br><span class="rate">含就保</span></th>
+            <th>墊償<br><span class="rate">雇主</span></th>
+            <th>健保</th>
+            <th>勞退<br><span class="rate">雇主 6%</span></th>
+            <th>合計</th>
+          </tr>
+        </thead>
+        <tbody id="refBody"></tbody>
+      </table>
+      <p class="note" style="margin:14px 22px">
+        本表金額以「月」為單位（投保日數 30 日）。勞保費含就業保險，不含職業災害保險。健保費為一般本國人、無眷屬之金額。
+      </p>
+    </div>
+  </details>
+
+  <footer class="dis">
+    <b>資料來源：</b>Workforce 勞動力量《2026 年（民國 115 年）勞健保保費及勞退提繳三合一費用對照參考用表》
+    （<a href="https://twworkforce.com/2025/12/12/2026-3in1/" target="_blank" rel="noopener noreferrer">twworkforce.com</a>），
+    級距與金額於 2025-12-12 公告。<br>
+    <b>試算基礎：</b>勞保（含就保）費率 12.5%，勞工 20%／雇主 70%；健保費率 5.17%，勞工 30%／雇主 60%（雇主負擔含平均眷口數 0.56）；
+    勞退新制 6%（雇主全額）；工資墊償基金 0.025%（雇主）。<br>
+    <b>提醒：</b>本頁僅供參考與內部估算，實際應繳金額以勞保局、健保署核定為準。到職或離職當月未足月者，勞保按日計收、健保按月計收。
+  </footer>
+</div>
+
+<!-- 行動版固定摘要 -->
+<div class="sticky" aria-hidden="true">
+  <div class="it worker"><span class="k">員工應繳</span><span class="v" id="barWorker">—</span></div>
+  <div class="lvbox">投保級距<b id="barLv">—</b></div>
+  <div class="it employer"><span class="k">單位應繳</span><span class="v" id="barEmployer">—</span></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* =========================================================
+     資料：[級數, 投保級距, 勞保-勞工, 勞保-雇主, 墊償-雇主,
+            健保-勞工, 健保-雇主, 勞退-雇主, 合計-勞工, 合計-雇主, 備註]
+     級數 0 表示表頭的低薪／部分工時級（無級數編號）
+     ========================================================= */
+  var ROWS = [
+    [0,   1500, 277,  972,  3,  458, 1428,   90,  735, 2493, "部分工時／勞退最低級距"],
+    [0,   3000, 277,  972,  3,  458, 1428,  180,  735, 2583, ""],
+    [0,   4500, 277,  972,  3,  458, 1428,  270,  735, 2673, ""],
+    [0,   6000, 277,  972,  3,  458, 1428,  360,  735, 2763, ""],
+    [0,   7500, 277,  972,  3,  458, 1428,  450,  735, 2853, ""],
+    [0,   8700, 277,  972,  3,  458, 1428,  522,  735, 2925, ""],
+    [0,   9900, 277,  972,  3,  458, 1428,  594,  735, 2997, ""],
+    [0,  11100, 277,  972,  3,  458, 1428,  666,  735, 3069, "勞保最低級距"],
+    [0,  12540, 313, 1097,  3,  458, 1428,  752,  771, 3280, ""],
+    [0,  13500, 338, 1182,  3,  458, 1428,  810,  796, 3423, ""],
+    [0,  15840, 396, 1386,  4,  458, 1428,  950,  854, 3768, ""],
+    [0,  16500, 413, 1444,  4,  458, 1428,  990,  871, 3866, ""],
+    [0,  17280, 432, 1512,  4,  458, 1428, 1037,  890, 3981, ""],
+    [0,  17880, 447, 1564,  4,  458, 1428, 1073,  905, 4069, ""],
+    [0,  19047, 476, 1666,  5,  458, 1428, 1143,  934, 4242, ""],
+    [0,  20008, 500, 1751,  5,  458, 1428, 1200,  958, 4384, ""],
+    [0,  21009, 525, 1838,  5,  458, 1428, 1261,  983, 4532, ""],
+    [0,  22000, 550, 1925,  6,  458, 1428, 1320, 1008, 4679, ""],
+    [0,  23100, 577, 2022,  6,  458, 1428, 1386, 1035, 4842, ""],
+    [0,  24000, 600, 2100,  6,  458, 1428, 1440, 1058, 4974, ""],
+    [0,  25250, 632, 2210,  6,  458, 1428, 1515, 1090, 5159, ""],
+    [0,  26400, 660, 2310,  7,  458, 1428, 1584, 1118, 5329, ""],
+    [0,  27600, 690, 2415,  7,  458, 1428, 1656, 1148, 5506, ""],
+    [0,  28590, 715, 2501,  7,  458, 1428, 1715, 1173, 5651, ""],
+    [1,  29500, 738, 2582,  7,  458, 1428, 1770, 1196, 5787, "健保最低級距"],
+    [2,  30300, 758, 2651,  8,  470, 1466, 1818, 1228, 5943, ""],
+    [3,  31800, 795, 2783,  8,  493, 1539, 1908, 1288, 6238, ""],
+    [4,  33300, 833, 2914,  8,  516, 1611, 1998, 1349, 6531, ""],
+    [5,  34800, 870, 3045,  9,  540, 1684, 2088, 1410, 6826, ""],
+    [6,  36300, 908, 3176,  9,  563, 1757, 2178, 1471, 7120, ""],
+    [7,  38200, 955, 3342, 10,  592, 1849, 2292, 1547, 7493, ""],
+    [8,  40100,1002, 3509, 10,  622, 1940, 2406, 1624, 7865, ""],
+    [9,  42000,1050, 3675, 11,  651, 2032, 2520, 1701, 8238, ""],
+    [10, 43900,1098, 3841, 11,  681, 2124, 2634, 1779, 8610, ""],
+    [11, 45800,1145, 4008, 11,  710, 2216, 2748, 1855, 8983, "勞保最高級距"],
+    [12, 48200,1145, 4008, 11,  748, 2332, 2892, 1893, 9243, ""],
+    [13, 50600,1145, 4008, 11,  785, 2449, 3036, 1930, 9504, ""],
+    [14, 53000,1145, 4008, 11,  822, 2565, 3180, 1967, 9764, ""],
+    [15, 55400,1145, 4008, 11,  859, 2681, 3324, 2004,10024, ""],
+    [16, 57800,1145, 4008, 11,  896, 2797, 3468, 2041,10284, ""],
+    [17, 60800,1145, 4008, 11,  943, 2942, 3648, 2088,10609, ""],
+    [18, 63800,1145, 4008, 11,  990, 3087, 3828, 2135,10934, ""],
+    [19, 66800,1145, 4008, 11, 1036, 3233, 4008, 2181,11260, ""],
+    [20, 69800,1145, 4008, 11, 1083, 3378, 4188, 2228,11585, ""],
+    [21, 72800,1145, 4008, 11, 1129, 3523, 4368, 2274,11910, "災保最高級距"],
+    [22, 76500,1145, 4008, 11, 1187, 3702, 4590, 2332,12311, ""],
+    [23, 80200,1145, 4008, 11, 1244, 3881, 4812, 2389,12712, ""],
+    [24, 83900,1145, 4008, 11, 1301, 4060, 5034, 2446,13113, ""],
+    [25, 87600,1145, 4008, 11, 1359, 4239, 5256, 2504,13514, ""],
+    [26, 92100,1145, 4008, 11, 1428, 4457, 5526, 2573,14002, ""],
+    [27, 96600,1145, 4008, 11, 1498, 4675, 5796, 2643,14490, ""],
+    [28,101100,1145, 4008, 11, 1568, 4892, 6066, 2713,14977, ""],
+    [29,105600,1145, 4008, 11, 1638, 5110, 6336, 2783,15465, ""],
+    [30,110100,1145, 4008, 11, 1708, 5328, 6606, 2853,15953, ""],
+    [31,115500,1145, 4008, 11, 1791, 5589, 6930, 2936,16538, ""],
+    [32,120900,1145, 4008, 11, 1875, 5850, 7254, 3020,17123, ""],
+    [33,126300,1145, 4008, 11, 1959, 6112, 7578, 3104,17709, ""],
+    [34,131700,1145, 4008, 11, 2043, 6373, 7902, 3188,18294, ""],
+    [35,137100,1145, 4008, 11, 2126, 6634, 8226, 3271,18879, ""],
+    [36,142500,1145, 4008, 11, 2210, 6896, 8550, 3355,19465, ""],
+    [37,147900,1145, 4008, 11, 2294, 7157, 8874, 3439,20050, ""],
+    [38,150000,1145, 4008, 11, 2327, 7259, 9000, 3472,20278, "勞退最高級距"],
+    [39,156400,1145, 4008, 11, 2426, 7568, 9000, 3571,20587, ""],
+    [40,162800,1145, 4008, 11, 2525, 7878, 9000, 3670,20897, ""],
+    [41,169200,1145, 4008, 11, 2624, 8188, 9000, 3769,21207, ""],
+    [42,175600,1145, 4008, 11, 2724, 8497, 9000, 3869,21516, ""],
+    [43,182000,1145, 4008, 11, 2823, 8807, 9000, 3968,21826, ""],
+    [44,189500,1145, 4008, 11, 2939, 9170, 9000, 4084,22189, ""],
+    [45,197000,1145, 4008, 11, 3055, 9533, 9000, 4200,22552, ""],
+    [46,204500,1145, 4008, 11, 3172, 9896, 9000, 4317,22915, ""],
+    [47,212000,1145, 4008, 11, 3288,10259, 9000, 4433,23278, ""],
+    [48,219500,1145, 4008, 11, 3404,10622, 9000, 4549,23641, ""],
+    [49,228200,1145, 4008, 11, 3539,11043, 9000, 4684,24062, ""],
+    [50,236900,1145, 4008, 11, 3674,11464, 9000, 4819,24483, ""],
+    [51,245600,1145, 4008, 11, 3809,11885, 9000, 4954,24904, ""],
+    [52,254300,1145, 4008, 11, 3944,12306, 9000, 5089,25325, ""],
+    [53,263000,1145, 4008, 11, 4079,12727, 9000, 5224,25746, ""],
+    [54,273000,1145, 4008, 11, 4234,13211, 9000, 5379,26230, ""],
+    [55,283000,1145, 4008, 11, 4389,13695, 9000, 5534,26714, ""],
+    [56,293000,1145, 4008, 11, 4544,14179, 9000, 5689,27198, ""],
+    [57,303000,1145, 4008, 11, 4700,14663, 9000, 5845,27682, ""],
+    [58,313000,1145, 4008, 11, 4855,15146, 9000, 6000,28165, "健保最高級距"]
+  ];
+
+  /* 欄位索引 */
+  var F = { no:0, lv:1, li:2, le:3, wf:4, hi:5, he:6, lp:7, ti:8, te:9, memo:10 };
+
+  var nf = new Intl.NumberFormat("zh-TW");
+  var money = function(n){ return nf.format(Math.round(n)); };
+
+  var el = {
+    wage: document.getElementById("wage"),
+    gradeSel: document.getElementById("gradeSel"),
+    dep: document.getElementById("dep"),
+    pickNote: document.getElementById("pickNote"),
+    workerAmt: document.getElementById("workerAmt"),
+    employerAmt: document.getElementById("employerAmt"),
+    workerBrk: document.getElementById("workerBrk"),
+    employerBrk: document.getElementById("employerBrk"),
+    totalAmt: document.getElementById("totalAmt"),
+    stripWorker: document.getElementById("stripWorker"),
+    stripEmployer: document.getElementById("stripEmployer"),
+    detailBody: document.getElementById("detailBody"),
+    detailHead: document.getElementById("detailHead"),
+    refBody: document.getElementById("refBody"),
+    rowCount: document.getElementById("rowCount"),
+    chips: document.getElementById("chips"),
+    oaOn: document.getElementById("oaOn"),
+    oaRate: document.getElementById("oaRate"),
+    barWorker: document.getElementById("barWorker"),
+    barEmployer: document.getElementById("barEmployer"),
+    barLv: document.getElementById("barLv"),
+    copyBtn: document.getElementById("copyBtn")
+  };
+
+  var CHIPS = [29500, 30300, 36300, 45800, 72800, 313000];
+  var CHIP_LABEL = {
+    29500: "29,500 最低工資",
+    30300: "30,300",
+    36300: "36,300",
+    45800: "45,800 勞保上限",
+    72800: "72,800 災保上限",
+    313000: "313,000 健保上限"
+  };
+
+  /* 狀態 */
+  var selIdx = 0;
+  var last = null;
+
+  function findLevel(wage){
+    // 介於級距之間 → 取較高級；低於最低 → 第一級；高於最高 → 最高級
+    for (var i = 0; i < ROWS.length; i++){
+      if (wage <= ROWS[i][F.lv]) return i;
+    }
+    return ROWS.length - 1;
+  }
+
+  function depMult(n){ return 1 + Math.min(Math.max(n, 0), 3); }
+
+  function oaBase(lv){ return Math.min(Math.max(lv, 29500), 72800); }
+
+  /* ---- 初始化下拉選單 ---- */
+  function buildSelect(){
+    var frag = document.createDocumentFragment();
+    ROWS.forEach(function(r, i){
+      var o = document.createElement("option");
+      var lv = r[F.lv], no = r[F.no];
+      o.value = i;
+      o.textContent = money(lv) + " 元" + (no > 0 ? "（第 " + no + " 級）" : "（低薪／部分工時級）");
+      frag.appendChild(o);
+    });
+    el.gradeSel.appendChild(frag);
+  }
+
+  /* ---- 初始化 chips ---- */
+  function buildChips(){
+    CHIPS.forEach(function(v){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "chip";
+      b.dataset.v = v;
+      b.textContent = CHIP_LABEL[v] || money(v);
+      b.addEventListener("click", function(){
+        el.wage.value = v;
+        var i = findLevel(v);
+        selIdx = i;
+        el.gradeSel.value = i;
+        render();
+      });
+      el.chips.appendChild(b);
+    });
+  }
+
+  /* ---- 完整級距表 ---- */
+  function buildRef(){
+    var html = "";
+    el.rowCount.textContent = ROWS.length;
+    ROWS.forEach(function(r, i){
+      var lbl = (r[F.no] > 0 ? '<span class="lv">第 ' + r[F.no] + " 級</span> " : "") + money(r[F.lv]);
+      var tag = r[F.memo] ? '<span class="tag ' + (r[F.memo].indexOf("最高") > -1 ? "blue" : "green") + '">' + r[F.memo] + "</span>" : "";
+      html += '<tr data-i="' + i + '">'
+        + "<td>" + lbl + tag + "</td>"
+        + "<td>" + money(r[F.li]) + ' <span class="rate">雇 ' + money(r[F.le]) + "</span></td>"
+        + "<td>" + money(r[F.wf]) + "</td>"
+        + "<td>" + money(r[F.hi]) + ' <span class="rate">雇 ' + money(r[F.he]) + "</span></td>"
+        + "<td>" + money(r[F.lp]) + "</td>"
+        + "<td><b>" + money(r[F.ti]) + "</b> <span class=\"rate\">雇 " + money(r[F.te]) + "</span></td>"
+        + "</tr>";
+    });
+    el.refBody.innerHTML = html;
+
+    el.refBody.addEventListener("click", function(e){
+      var tr = e.target.closest("tr[data-i]");
+      if (!tr) return;
+      selIdx = parseInt(tr.dataset.i, 10);
+      el.wage.value = ROWS[selIdx][F.lv];
+      el.gradeSel.value = selIdx;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  /* ---- 主渲染 ---- */
+  function render(){
+    var r = ROWS[selIdx];
+    var lv = r[F.lv];
+    var wageVal = parseFloat(el.wage.value);
+    var dep = parseInt(el.dep.value, 10) || 0;
+    var mult = depMult(dep);
+
+    // 員工：勞保 + 健保（× 眷屬倍數）
+    var wIns = r[F.li];
+    var wHi = r[F.hi] * mult;
+    var wTotal = wIns + wHi;
+
+    // 單位：勞保 + 墊償 + 健保 + 勞退 (+ 職災)
+    var eIns = r[F.le];
+    var eWf = r[F.wf];
+    var eHi = r[F.he];
+    var eLp = r[F.lp];
+    var eOa = 0;
+    if (el.oaOn.checked){
+      var rate = parseFloat(el.oaRate.value);
+      if (!isFinite(rate) || rate < 0) rate = 0;
+      eOa = oaBase(lv) * rate / 100;
+    }
+    var eTotal = eIns + eWf + eHi + eLp + eOa;
+
+    // 數字卡
+    el.workerAmt.innerHTML = money(wTotal) + "<small>元／月</small>";
+    el.employerAmt.innerHTML = money(eTotal) + "<small>元／月</small>";
+
+    el.workerBrk.innerHTML =
+        "<div><span>勞保（含就保）</span><span>" + money(wIns) + "</span></div>"
+      + "<div><span>健保" + (mult > 1 ? "（含眷屬 ×" + mult + "）" : "") + "</span><span>" + money(wHi) + "</span></div>";
+
+    el.employerBrk.innerHTML =
+        "<div><span>勞保</span><span>" + money(eIns) + "</span></div>"
+      + "<div><span>健保</span><span>" + money(eHi) + "</span></div>"
+      + "<div><span>勞退提繳</span><span>" + money(eLp) + "</span></div>"
+      + "<div><span>工資墊償</span><span>" + money(eWf) + "</span></div>"
+      + (eOa > 0 ? "<div><span>職災保險（概估）</span><span>" + money(eOa) + "</span></div>" : "");
+
+    // 合計
+    el.totalAmt.textContent = "NT$ " + money(wTotal + eTotal);
+    el.stripWorker.textContent = money(wTotal);
+    el.stripEmployer.textContent = money(eTotal);
+
+    // 固定列
+    el.barWorker.textContent = money(wTotal);
+    el.barEmployer.textContent = money(eTotal);
+    el.barLv.textContent = r[F.no] > 0 ? money(lv) + "（第" + r[F.no] + "級）" : money(lv);
+
+    // 明細表
+    var rows = [
+      ["勞工保險（含就業保險）", '<span class="rate">費率 12.5%｜勞工 20%、雇主 70%</span>', wIns, eIns],
+      ['全民健康保險', '<span class="rate">費率 5.17%｜勞工 30%、雇主 60%（含平均眷口 0.56）</span>', wHi, eHi],
+      ['勞工退休金（新制）', '<span class="rate">6%｜雇主全額負擔</span>', 0, eLp],
+      ['工資墊償基金', '<span class="rate">0.025%｜雇主全額負擔</span>', 0, eWf]
+    ];
+    if (eOa > 0){
+      rows.push(['職業災害保險（選填）', '<span class="rate">費率 ' + el.oaRate.value + '%｜雇主全額負擔</span>', 0, eOa]);
+    }
+
+    var html = "";
+    rows.forEach(function(row){
+      html += "<tr>"
+        + "<td>" + row[0] + row[1] + "</td>"
+        + "<td" + (row[2] ? "" : ' class="zero"') + ">" + (row[2] ? money(row[2]) : "—") + "</td>"
+        + "<td>" + money(row[3]) + "</td>"
+        + "</tr>";
+    });
+    html += '<tr class="total"><td>合計</td><td>' + money(wTotal) + "</td><td>" + money(eTotal) + "</td></tr>";
+    el.detailBody.innerHTML = html;
+
+    el.detailHead.textContent = (r[F.no] > 0 ? "第 " + r[F.no] + " 級 ・ " : "低薪／部分工時級 ・ ")
+      + "投保級距 " + money(lv) + " 元" + (mult > 1 ? " ・ 眷屬 " + Math.min(dep, 3) + " 人" : "");
+
+    // 判定說明
+    if (isFinite(wageVal) && wageVal > 0 && wageVal !== lv){
+      var msg;
+      if (wageVal > ROWS[ROWS.length - 1][F.lv]){
+        msg = "<b>輸入 " + money(wageVal) + " 元</b> 超過健保最高級距，以最高級 <b>" + money(ROWS[ROWS.length - 1][F.lv]) + " 元</b> 計算。";
+      } else if (wageVal < ROWS[0][F.lv]){
+        msg = "<b>輸入 " + money(wageVal) + " 元</b> 低於最低級距，以 <b>" + money(ROWS[0][F.lv]) + " 元</b>（部分工時級）計算。";
+      } else {
+        msg = "<b>輸入 " + money(wageVal) + " 元</b> 未達整級，依規定以較高級數 <b>" + money(lv) + " 元</b> 投保。";
+      }
+      el.pickNote.innerHTML = msg;
+      el.pickNote.style.display = "";
+    } else {
+      el.pickNote.innerHTML = "目前為投保級距 <b>" + money(lv) + " 元</b>"
+        + (r[F.memo] ? "（" + r[F.memo] + "）" : "") + "。";
+      el.pickNote.style.display = "";
+    }
+
+    // 級距表高亮
+    var prev = el.refBody.querySelector("tr.sel");
+    if (prev) prev.classList.remove("sel");
+    var cur = el.refBody.querySelector('tr[data-i="' + selIdx + '"]');
+    if (cur) cur.classList.add("sel");
+
+    // chip 高亮
+    Array.prototype.forEach.call(el.chips.children, function(b){
+      b.classList.toggle("on", parseInt(b.dataset.v, 10) === lv);
+    });
+
+    // 供「複製試算結果」使用
+    last = {
+      no: r[F.no], lv: lv, memo: r[F.memo], dep: Math.min(dep, 3),
+      wIns: wIns, wHi: wHi, wTotal: wTotal,
+      eIns: eIns, eWf: eWf, eHi: eHi, eLp: eLp, eOa: eOa, eTotal: eTotal
+    };
+  }
+
+  /* ---- 複製試算結果 ---- */
+  function copyResult(){
+    if (!last) return;
+    var L = last;
+    var lines = [];
+    lines.push("【2026（民國115年）勞健保保費試算】");
+    lines.push("投保級距：" + money(L.lv) + " 元" + (L.no > 0 ? "（第 " + L.no + " 級）" : "（低薪／部分工時級）"));
+    if (L.dep > 0) lines.push("健保眷屬：" + L.dep + " 人（以 1+" + L.dep + " 倍計）");
+    lines.push("");
+    lines.push("員工應繳：" + money(L.wTotal) + " 元／月");
+    lines.push("　勞保（含就保）" + money(L.wIns) + "、健保" + money(L.wHi));
+    lines.push("單位應繳：" + money(L.eTotal) + " 元／月");
+    lines.push("　勞保" + money(L.eIns) + "、健保" + money(L.eHi) + "、勞退" + money(L.eLp) + "、墊償" + money(L.eWf)
+      + (L.eOa > 0 ? "、職災" + money(L.eOa) : ""));
+    lines.push("");
+    lines.push("勞雇合計：" + money(L.wTotal + L.eTotal) + " 元／月");
+    lines.push("※ " + (L.eOa > 0 ? "職災保險費為概估；" : "未含職業災害保險費；") + "僅供參考，實際金額以勞保局／健保署核定為準。");
+
+    var text = lines.join("\n");
+    var done = function(){
+      var b = el.copyBtn;
+      b.textContent = "已複製 ✓";
+      b.classList.add("done");
+      clearTimeout(b._t);
+      b._t = setTimeout(function(){
+        b.textContent = "複製試算結果";
+        b.classList.remove("done");
+      }, 1800);
+    };
+    var fallback = function(){
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.cssText = "position:fixed;top:0;left:0;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { window.prompt("請手動複製：", text); }
+      document.body.removeChild(ta);
+    };
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ---- 事件 ---- */
+  el.wage.addEventListener("input", function(){
+    var v = parseFloat(el.wage.value);
+    if (!isFinite(v)) return;
+    selIdx = findLevel(v);
+    el.gradeSel.value = selIdx;
+    render();
+  });
+
+  el.wage.addEventListener("blur", function(){
+    var v = parseFloat(el.wage.value);
+    if (isFinite(v) && v > 0) el.wage.value = Math.round(v);
+    render();
+  });
+
+  el.gradeSel.addEventListener("change", function(){
+    selIdx = parseInt(el.gradeSel.value, 10) || 0;
+    el.wage.value = ROWS[selIdx][F.lv];
+    render();
+  });
+
+  el.dep.addEventListener("change", render);
+
+  el.oaOn.addEventListener("change", function(){
+    el.oaRate.disabled = !el.oaOn.checked;
+    if (el.oaOn.checked) el.oaRate.focus();
+    render();
+  });
+  el.oaRate.addEventListener("input", render);
+
+  el.copyBtn.addEventListener("click", copyResult);
+
+  /* ---- 啟動 ---- */
+  buildSelect();
+  buildChips();
+  buildRef();
+  selIdx = findLevel(36300);
+  el.gradeSel.value = selIdx;
+  render();
+})();
+</script>
+</body>
+</html>
