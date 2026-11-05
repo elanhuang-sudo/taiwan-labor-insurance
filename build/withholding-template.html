@@ -398,28 +398,26 @@
 
   <!-- 表單下載 -->
   <section class="card pad">
-    <h2 class="sec">表單與官方資料下載 <span class="hint">財政部中區國稅局</span></h2>
+    <h2 class="sec">表單與官方資料下載 <span class="hint">財政部北區國稅局</span></h2>
     <div class="dl">
       <div class="dlcard">
         <h3><span class="ico">📝</span> 薪資受領人免稅額申報表</h3>
         <p>員工要「填表」才能按扶養親屬人數查表扣繳。新到職或扶養親屬有異動時，請員工填寫後交回公司留存。</p>
         <div class="dlrow">
-          <a class="dlbtn primary" href="https://www.ntbca.gov.tw/download/15f95ce317284840896358cd2bb226bf" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
-          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/7757a083dbbe434fb706f67f5fd3bac9" target="_blank" rel="noopener noreferrer">下載 ODT <span class="ext">↗</span></a>
+          <a class="dlbtn primary" href="https://www.ntbna.gov.tw/download/cc2703d67b554694974f711c35cf776d" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
         </div>
       </div>
       <div class="dlcard">
         <h3><span class="ico">📊</span> 115 年度薪資所得扣繳稅額表</h3>
         <p>本頁查表結果即取自這份官方檔案（共 840 列，涵蓋月薪 80,001～500,000 元）。可下載原始檔自行核對。</p>
         <div class="dlrow">
-          <a class="dlbtn primary" href="https://www.ntbca.gov.tw/download/1c078888d4344f838b88614ebe8e632b" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
-          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7" target="_blank" rel="noopener noreferrer">下載 ODS <span class="ext">↗</span></a>
-          <a class="dlbtn" href="https://www.ntbca.gov.tw/download/ec08154ea280452daefa59a110336f6e" target="_blank" rel="noopener noreferrer">說明 PDF <span class="ext">↗</span></a>
+          <a class="dlbtn primary" href="https://www.ntbna.gov.tw/download/07959ccf9a7b4628a458e2a7a204c8f2" target="_blank" rel="noopener noreferrer">下載 PDF <span class="ext">↗</span></a>
+          <a class="dlbtn" href="https://www.ntbna.gov.tw/download/6f827d6fedac4e1dad682819b626e121" target="_blank" rel="noopener noreferrer">說明 PDF <span class="ext">↗</span></a>
         </div>
       </div>
     </div>
     <p class="note">
-      資料來源：<a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer" style="color:var(--brand)">財政部中區國稅局 扣繳申報專區</a>（更新日期 114-12-24）。
+      資料來源：<a href="https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0" target="_blank" rel="noopener noreferrer" style="color:var(--brand)">財政部北區國稅局 扣繳申報專區</a>（更新日期 114-12-24）。
       檔案連結直接指向國稅局官方下載位置，本頁不另行轉存。
     </p>
   </section>
@@ -483,7 +481,7 @@
       <ul>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340028" target="_blank" rel="noopener noreferrer">各類所得扣繳率標準</a>第 2 條（居住者）、第 3 條（非居住者）</li>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=G0340009" target="_blank" rel="noopener noreferrer">薪資所得扣繳辦法</a>第 5～7 條</li>
-        <li><a href="https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812" target="_blank" rel="noopener noreferrer">財政部中區國稅局 扣繳申報專區</a>（稅額表與免稅額申報表下載）</li>
+        <li><a href="https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0" target="_blank" rel="noopener noreferrer">財政部北區國稅局 扣繳申報專區</a>（稅額表與免稅額申報表下載）</li>
         <li><a href="https://www.mof.gov.tw/singlehtml/384fb3077bb349ea973e7fc6f13b6974?cntId=dd1c8e641b594e6da94a69d613e4947f" target="_blank" rel="noopener noreferrer">財政部：115 年起基本工資調升，非居住者薪資扣繳基準同步調整</a></li>
       </ul>
     </div>
@@ -509,7 +507,7 @@
      115 年度薪資所得扣繳稅額表
      格式：[薪資下限, 0位, 1位, 2位 ... 11位扶養親屬的扣繳稅額]
      尾端為 0 的欄位已省略；查表時缺值視為 0
-     資料來源：財政部中區國稅局（840 列，80,001～500,000）
+     資料來源：財政部北區國稅局（840 列，80,001～500,000）
      ========================================================= */
   var TABLE = __TABLE_DATA__;
 
@@ -843,7 +841,7 @@
       lines.push("※ 依各類所得扣繳率標準第 3 條：全月給付總額 ≤ 基本工資 1.5 倍（" + money(NR_THRESHOLD) + " 元）扣 6%，超過扣 18%。");
     } else {
       lines.push("※ 扣繳稅款應於次月 10 日前繳清；免扣者仍須列單申報。");
-      lines.push("※ 資料來源：財政部中區國稅局 115 年度薪資所得扣繳稅額表。");
+      lines.push("※ 資料來源：財政部北區國稅局 115 年度薪資所得扣繳稅額表。");
     }
 
     var text = lines.join("\n");

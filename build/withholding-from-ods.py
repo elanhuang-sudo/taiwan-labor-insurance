@@ -1,10 +1,20 @@
 # 產生 withholding/index.html（把官方稅額表注入樣板）
 #
 # 用法：
-#   python build/withholding-from-ods.py <官方 ODS 路徑>
+#   python build/withholding-from-ods.py <ODS 路徑>
 #
-# 官方 ODS 來源（115 年度薪資所得扣繳稅額表）：
-#   https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7
+# 資料來源說明：
+#   網站上顯示的下載連結一律指向「財政部北區國稅局」的 PDF。
+#   但 115 年度稅額表北區僅提供 PDF，沒有 ODS 檔，因此**建置時**的解析
+#   需另外取得 ODS。各區國稅局提供的稅額表是同一份財政部檔案
+#   （已用 SHA256 比對北區與中區的 115 年度 PDF，兩者完全相同），
+#   所以用任一區的 ODS 解析出來的數字都一致。
+#
+#   取得 ODS 的其中一個位置（中區國稅局，115 年度）：
+#     https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7
+#
+#   北區國稅局扣繳申報專區（網站連結來源）：
+#     https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0
 #
 # 本腳本會：
 #   1. 解析 ODS（結構：c0=上界、c1="a ~ b" 標籤、c2~c13=0~11 位扶養親屬稅額）

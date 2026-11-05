@@ -194,7 +194,7 @@ node rent\_verify.js
 
 # 工具三：薪資所得扣繳稅額試算（`/withholding/`）
 
-依**財政部中區國稅局**官方「115 年度薪資所得扣繳稅額表」查每月應扣繳稅額，
+依**財政部北區國稅局**官方「115 年度薪資所得扣繳稅額表」查每月應扣繳稅額，
 並支援**非居住者**的 6%／18% 扣繳率判斷。
 
 - 檔案：`withholding/index.html`（單檔、可離線使用）
@@ -229,35 +229,51 @@ node rent\_verify.js
 > 基本工資若調整，門檻跟著變。程式中的 `NR_BASE_WAGE`（29,500）改一個數字即可，
 > 門檻 `NR_THRESHOLD` 會自動算成 1.5 倍。
 
-## 官方資料
+## 官方資料（財政部北區國稅局）
+
+本事務所位於桃園，屬**財政部北區國稅局**轄區，頁面連結一律指向北區國稅局。
 
 | 項目 | 連結 |
 |---|---|
-| 薪資受領人免稅額申報表 | [PDF](https://www.ntbca.gov.tw/download/15f95ce317284840896358cd2bb226bf) ／ [ODT](https://www.ntbca.gov.tw/download/7757a083dbbe434fb706f67f5fd3bac9) |
-| 115 年度扣繳稅額表 | [PDF](https://www.ntbca.gov.tw/download/1c078888d4344f838b88614ebe8e632b) ／ [ODS](https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7) ／ [說明](https://www.ntbca.gov.tw/download/ec08154ea280452daefa59a110336f6e) |
-| 扣繳申報專區 | <https://www.ntbca.gov.tw/multiplehtml/a15c33c827e4470c9263930ab2087812> |
+| 薪資受領人免稅額申報表 | [PDF](https://www.ntbna.gov.tw/download/cc2703d67b554694974f711c35cf776d) |
+| 115 年度扣繳稅額表 | [PDF](https://www.ntbna.gov.tw/download/07959ccf9a7b4628a458e2a7a204c8f2) |
+| 115 年度扣繳稅額表說明 | [PDF](https://www.ntbna.gov.tw/download/6f827d6fedac4e1dad682819b626e121) |
+| 扣繳申報專區 | <https://www.ntbna.gov.tw/multiplehtml/b77824d42c5f462c8cce3fb775057cb0> |
 
-頁面上的下載按鈕直接指向國稅局官方檔案，本專案不另行轉存。
+頁面上**只放 PDF 連結**（不提供 ODT／ODS 按鈕，避免使用者下載到格式跑掉的檔案）。
+按鈕直接指向國稅局官方位置，本專案不另行轉存。
 
 ## 資料重建（換年度時）
 
-稅額表有 840 列 × 12 欄，**不要手動編輯**。改走建置腳本：
+稅額表有 840 列 × 12 欄，**不要手動編輯**。改走建置腳本。
+
+> **為什麼建置用 ODS、網站只給 PDF？**
+> 各區國稅局提供的稅額表是同一份財政部檔案（已用 SHA256 比對北區與中區的
+> 115 年度 PDF，兩者完全相同）。北區只提供 PDF，但 PDF 解析容易受版面影響；
+> ODS 是結構化資料，解析穩定得多。
+> 因此**建置時**用任一區提供的 ODS 解析，**網站上**只顯示北區的 PDF 連結。
 
 ```powershell
-# 1. 下載官方 ODS（每年的下載 ID 會變，請到扣繳申報專區取得）
-curl -L -o wh115.ods "https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7"
+# 1. 取得當年度的 ODS（北區若無 ODS，可用其他區提供的同一份檔案）
+#    115 年度 ODS（中區國稅局）：https://www.ntbca.gov.tw/download/8a42e9511ba449fe84b5264292a636f7
+curl -L -o wh.ods "<當年度 ODS 網址>"
 
 # 2. 解析 ODS → 注入樣板 → 產生網頁
-python build\withholding-from-ods.py wh115.ods
+python build\withholding-from-ods.py wh.ods
 
-# 3. 驗證
+# 3. 驗證（會擋下資料錯誤，未通過就不會寫檔）
 node withholding\_verify.js
 ```
 
 腳本會同時更新 `verify/official-withholding-115.json`（官方資料快照）。
 
-- 樣板：`build/withholding-template.html`（含 `__TABLE_DATA__` 標記）
-- 建置：`build/withholding-from-ods.py`
+| 檔案 | 用途 |
+|---|---|
+| `build/withholding-template.html` | 網頁樣板（含 `__TABLE_DATA__` 標記） |
+| `build/withholding-from-ods.py` | **主要建置路徑**：解析 ODS |
+| `build/withholding-from-pdf.py` | 備援路徑：直接解析 PDF（含完整性驗證） |
+
+兩條路徑我都實際跑過，產出的 HTML 與 JSON **SHA256 完全相同**，可互相驗證。
 
 ## 數字驗證
 
