@@ -137,6 +137,12 @@
 
   /* ---------- 結果 ---------- */
   .results{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  /* 单位模式只有一张卡，占满整列 */
+  .results.single{grid-template-columns:1fr}
+  .results.single .res.keep{display:none}
+  .sticky.single .it.b{display:none}
+  .sticky.single .lvbox{font-size:13px}
+  .sticky.single .lvbox b{font-size:15px}
   .res{border-radius:var(--radius);padding:20px 22px;border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden}
   .res::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
   .res.pay{background:linear-gradient(180deg,#fef2f2,#fff 62%)}
@@ -414,7 +420,7 @@
         </thead>
         <tbody>
           <tr><td>全年累計超過投保金額 4 倍部分的獎金</td><td>無</td><td>單次 1,000 萬元</td></tr>
-          <tr><td>兼職薪資所得<span class="tag">注意</span></td><td><b>達基本工資 29,500 元</b></td><td>單次 1,000 萬元</td></tr>
+          <tr><td>兼職薪資所得<span class="tag">注意</span></td><td><b>達基本工資 29,500 元</b><br><span style="font-size:11.5px;color:#64748b">29,500 整即扣</span></td><td>單次 1,000 萬元</td></tr>
           <tr><td>執行業務收入</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
           <tr><td>股利所得</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
           <tr><td>利息所得</td><td>單次達 20,000 元</td><td>單次 1,000 萬元</td></tr>
@@ -469,25 +475,42 @@
       <h4>四、下限的兩個陷阱</h4>
       <ul>
         <li><b>兼職薪資用基本工資（29,500），不是 20,000。</b>這是六項中唯一不同的。</li>
+        <li><b>「達」就是含當數字：29,500 元整就要扣，不必到 29,501。</b>
+          健保署 Q&amp;A 原文：「按單次計收，單次給付<b>達</b>基本工資（115 年 1 月 1 日起為 29,500 元）需扣繳」。
+          所以 29,499 免扣、29,500 起扣。</li>
         <li><b>達下限時以「全額」計算</b>，不是只算超過的部分。
           例如執行業務收入 25,000 元 → 25,000 × 2.11% = 527 元，不是 (25,000 − 20,000) × 2.11%。</li>
       </ul>
 
-      <h4>五、獎金的四倍門檻怎麼算</h4>
-      <p>獎金是否要扣，看的是「全年累計」是否超過「當月投保金額的 4 倍」：</p>
+      <h4>五、上限：只有「單次」上限，沒有全年總額上限</h4>
       <ul>
-        <li>四倍門檻 = 月投保金額 × 4</li>
-        <li>只有<b>超過四倍的那一段</b>要扣，不是整筆獎金都扣</li>
-        <li>所以同樣金額的獎金，年初發和年底發，扣的金額可能不同（因為累計基礎不同）</li>
+        <li>六項所得的計費金額，<b>單次給付以 1,000 萬元為限</b>；超過 1,000 萬的部分不再計收。</li>
+        <li><b>沒有全年累計的總額上限。</b>同一人一年內多次領取，每次各自判斷單次是否達 1,000 萬，
+          不會因為全年累計超過某個金額就停扣。</li>
+        <li>唯一有「全年累計」概念的是<b>獎金</b>：
+          全年累計獎金超過「當月投保金額 4 倍」的部分才計費。
+          這是<b>判斷基礎</b>的累計，不是「扣到某金額就停」的上限。</li>
+        <li>獎金的費基另有單次 1,000 萬上限：即使超過 4 倍的部分超過 1,000 萬，仍以 1,000 萬計。</li>
       </ul>
 
-      <h4>六、繳納期限</h4>
+      <h4>六、獎金的四倍門檻怎麼算（健保署官方公式）</h4>
+      <p>依健保署<a href="https://cloudicweb.nhi.gov.tw/esrv/trialbill/countinsurance.aspx" target="_blank" rel="noopener noreferrer">補充保險費試算</a>頁的公式，四步驟：</p>
+      <ol class="lim" style="list-style:decimal;padding-left:2.2em">
+        <li>累計超過 4 倍投保金額之獎金 ＝ 全年累計獎金 −（投保金額 × 4）</li>
+        <li>本次獎金 與 上列金額比較，<b>取較小者</b>為獎金之費基</li>
+        <li>費基超過 1,000 萬元，以 1,000 萬元計算</li>
+        <li>費基 × 2.11% ＝ 補充保險費</li>
+      </ol>
+      <p>「取較小者」是關鍵：本次獎金只領 5 萬，即使累計已超過門檻 20 萬，
+      費基也只有 5 萬（不是 20 萬，也不是 25 萬）。</p>
+
+      <h4>七、繳納期限</h4>
       <ul>
         <li>單位：與一般保險費於<b>次月底前</b>一併繳納。</li>
         <li>個人：扣費單位於給付日<b>次月底前</b>填具繳款書向健保署繳納。</li>
       </ul>
 
-      <h4>七、法源</h4>
+      <h4>八、法源</h4>
       <ul>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0060001" target="_blank" rel="noopener noreferrer">全民健康保險法</a>第 31 條（補充保險費計費範圍）</li>
         <li><a href="https://law.moj.gov.tw/LawClass/LawAll.aspx?pcode=L0060027" target="_blank" rel="noopener noreferrer">全民健康保險扣取及繳納補充保險費辦法</a></li>
@@ -525,7 +548,7 @@
      union: 職業工會投保時是否免扣 */
   var TYPES = [
     { id: "bonus",    name: "獎金",       desc: "超過投保金額 4 倍部分", min: 0,        union: false, custom: true },
-    { id: "parttime", name: "兼職薪資",   desc: "下限 = 基本工資 29,500", min: BASE_WAGE, union: true },
+    { id: "parttime", name: "兼職薪資",   desc: "達 29,500 即扣", min: BASE_WAGE, union: true },
     { id: "practice", name: "執行業務",   desc: "下限 20,000",           min: 20000,    union: true },
     { id: "dividend", name: "股利",       desc: "下限 20,000",           min: 20000,    union: false },
     { id: "interest", name: "利息",       desc: "下限 20,000",           min: 20000,    union: false }
@@ -564,7 +587,9 @@
     barPay: document.getElementById("barPay"),
     barLv: document.getElementById("barLv"),
     barKeep: document.getElementById("barKeep"),
-    barKeepK: document.getElementById("barKeepK")
+    barKeepK: document.getElementById("barKeepK"),
+    results: document.querySelector(".results"),
+    sticky: document.querySelector(".sticky")
   };
 
   var state = {
@@ -624,17 +649,18 @@
   }
 
   /* ---------- 個人：獎金（四倍門檻） ---------- */
+  /* 獎金：依健保署官方試算頁公式
+     1. 累計超過 4 倍投保金額之獎金 = 全年累計獎金 − 投保金額 × 4
+     2. 本次獎金 與 上列金額 比較，取「較小者」為費基
+     3. 費基超過 1,000 萬，以 1,000 萬計
+     4. 費基 × 2.11% = 補充保險費 */
   function calcBonus(monthlyInsured, paidBefore, thisBonus){
-    var quota = monthlyInsured * 4;              // 四倍門檻
-    var totalBefore = paidBefore;
-    var totalAfter = paidBefore + thisBonus;
-
-    // 超過四倍的部分才計費
-    var overBefore = Math.max(0, totalBefore - quota);
-    var overAfter = Math.max(0, totalAfter - quota);
-    var base = overAfter - overBefore;           // 本次新增的超過金額
-
-    if (base > CAP) base = CAP;                  // 單次上限
+    var quota = monthlyInsured * 4;                       // 4 倍門檻
+    var totalAfter = paidBefore + thisBonus;              // 全年累計
+    var overQuota = Math.max(0, totalAfter - quota);      // 超過 4 倍的金額
+    var baseRaw = Math.min(thisBonus, overQuota);         // 取較小者為費基
+    var capped = (baseRaw > CAP);
+    var base = capped ? CAP : baseRaw;                    // 1,000 萬上限
     var raw = base * RATE;
     var fee = Math.round(raw);
 
@@ -642,9 +668,9 @@
       side: "person", typeId: "bonus", typeName: "獎金",
       monthlyInsured: monthlyInsured, quota: quota,
       paidBefore: paidBefore, thisBonus: thisBonus, totalAfter: totalAfter,
-      overBefore: overBefore, overAfter: overAfter,
+      overQuota: overQuota, baseRaw: baseRaw,
       amount: thisBonus, base: base, fee: fee, keep: thisBonus - fee,
-      raw: raw, unionFree: false, belowMin: base === 0, capped: base >= CAP,
+      raw: raw, unionFree: false, belowMin: base === 0, capped: capped,
       isBonus: true
     };
   }
@@ -689,7 +715,7 @@
       + row("補充保費", "費率 2.11%", money(r.fee), "次月底前繳納", true);
 
     el.barPay.textContent = money(r.fee);
-    el.barLv.textContent = "差額 " + money(r.diff);
+    el.barLv.innerHTML = "計費差額<b>" + money(r.diff) + "</b>";
     el.barKeep.textContent = money(r.diff);
 
     var tips = [];
@@ -756,7 +782,8 @@
       brk1 = "<div><span>計費金額</span><span>0（工會投保免扣）</span></div>";
     } else if (r.isBonus){
       brk1 = "<div><span>四倍門檻</span><span>" + money(r.quota) + "</span></div>"
-           + "<div><span>超過門檻金額</span><span>" + money(r.base) + "</span></div>";
+           + "<div><span>超過門檻金額</span><span>" + money(r.overQuota) + "</span></div>"
+           + "<div><span>費基（取較小）</span><span>" + money(r.base) + "</span></div>";
     } else {
       brk1 = "<div><span>單次給付</span><span>" + money(r.amount) + "</span></div>"
            + "<div><span>計費金額</span><span>" + money(r.base) + "</span></div>";
@@ -771,12 +798,13 @@
     // 明細
     var rows = "";
     if (r.isBonus){
-      rows += row("月投保金額", "計四倍門檻的基礎", money(r.monthlyInsured), "—");
-      rows += row("四倍門檻", "月投保金額 × 4", money(r.quota), "超過此金額才計費");
-      rows += row("今年已領獎金累計", "本次給付前", money(r.paidBefore), "—");
+      rows += row("投保金額", "計算四倍門檻的基礎", money(r.monthlyInsured), "—");
+      rows += row("四倍門檻", "投保金額 × 4", money(r.quota), "超過此金額才計費");
       rows += row("本次獎金", "本次給付", money(r.thisBonus), "—");
-      rows += row("累計後超過門檻金額", "只算超過的那一段", money(r.base), "計費基礎");
-      rows += row("補充保費", "費率 2.11%", money(r.fee), r.fee ? "次月底前繳納" : "未超過門檻，免扣", true);
+      rows += row("全年累計獎金", "已領 ＋ 本次", money(r.totalAfter), "—");
+      rows += row("超過四倍之金額", "累計 − 四倍門檻", money(r.overQuota), "取較小值的比較基準");
+      rows += row("費基", "本次獎金 與 超過額 取較小", money(r.base), r.capped ? "已達上限 1,000 萬" : "計費基礎");
+      rows += row("補充保費", "費率 2.11%", money(r.fee), r.fee ? "次月底前繳納" : "費基為 0，免扣", true);
     } else {
       rows += row("所得類型", t.desc, t.name, r.unionFree ? '<span class="tag free">工會投保免扣</span>' : (r.belowMin ? '<span class="tag">未達下限</span>' : '<span class="tag na">應扣</span>'));
       rows += row("單次給付金額", "本次給付", money(r.amount), "—");
@@ -800,9 +828,9 @@
       tips.push("<b>職業工會投保</b>，依規定" + t.name + "<b>免扣</b>補充保費。給付 " + money(r.amount) + " 元全額給所得人。");
     } else if (r.isBonus){
       if (r.fee === 0){
-        tips.push("本次獎金 <b>" + money(r.thisBonus) + " 元</b> 加上已領 " + money(r.paidBefore) + " 元，仍未超過四倍門檻 <b>" + money(r.quota) + " 元</b>，<b>免扣</b>。");
+        tips.push("全年累計 <b>" + money(r.totalAfter) + " 元</b> 未超過四倍門檻 <b>" + money(r.quota) + " 元</b>，費基為 0，<b>免扣</b>。");
       } else {
-        tips.push("累計 <b>" + money(r.totalAfter) + " 元</b> 超過四倍門檻 <b>" + money(r.quota) + " 元</b>，超過部分 <b>" + money(r.base) + " 元</b> × 2.11% ＝ <b>" + money(r.fee) + " 元</b>。");
+        tips.push("全年累計 <b>" + money(r.totalAfter) + " 元</b> 超過四倍門檻 <b>" + money(r.quota) + " 元</b>（超出 " + money(r.overQuota) + " 元），取本次獎金與超出額<b>較小者</b> <b>" + money(r.base) + " 元</b> × 2.11% ＝ <b>" + money(r.fee) + " 元</b>。");
       }
     } else if (r.belowMin){
       tips.push("<b>" + t.name + "</b> " + money(r.amount) + " 元未達下限 <b>" + money(t.min) + " 元</b>，<b>免扣</b>補充保費。");
@@ -925,6 +953,9 @@
     el.tabPerson.classList.toggle("on", s === "person");
     el.unitSection.style.display = (s === "unit") ? "" : "none";
     el.personSection.style.display = (s === "person") ? "" : "none";
+    // 单位模式只显示「应缴补充保费」一张卡（差额不是到手金额，语义也不适用）
+    el.results.classList.toggle("single", s === "unit");
+    el.sticky.classList.toggle("single", s === "unit");
     render();
   }
 
